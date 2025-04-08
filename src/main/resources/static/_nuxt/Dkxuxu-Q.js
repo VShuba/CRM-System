@@ -1,0 +1,1 @@
+function u(e){if(e<=0)return"0 хвилин";const t=Math.floor(e/60),r=e%60;let n="";return t>0&&(n+=`${t} ${i(t,["година","години","годин"])}`),r>0&&(n&&(n+=", "),n+=`${r} ${i(r,["хвилина","хвилини","хвилин"])}`),n}function i(e,t){const r=Math.abs(e)%100,n=r%10;return r>10&&r<20?t[2]:n>1&&n<5?t[1]:n===1?t[0]:t[2]}export{u};
