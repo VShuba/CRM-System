@@ -9,9 +9,9 @@ import lombok.Data;
 @Schema(description = "Sign in request")
 public class SignInRequest {
 
-    @Size(min = 5, max = 50, message = "email length must be min = 5 and max = 50 characters")
-    @NotBlank(message = "email cannot be blank")
-    private String email;
+    @Size(min = 5, max = 50, message = "login length must be min = 5 and max = 50 characters")
+    @NotBlank(message = "login cannot be blank")
+    private String login;
 
     @Size(min = 8, max = 255, message = "password length must be from 8 to 255 characters")
     @NotBlank(message = "password cannot be blank")
