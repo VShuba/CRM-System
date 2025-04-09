@@ -13,7 +13,7 @@ import ua.shpp.dto.JwtAuthenticationResponse;
 import ua.shpp.entity.User;
 import ua.shpp.service.JwtService;
 import ua.shpp.service.UserService;
-import ua.shpp.utils.Role;
+import ua.shpp.entity.Role;
 
 import java.io.IOException;
 
@@ -37,9 +37,9 @@ public class OAuthSuccessHandle implements AuthenticationSuccessHandler {
         DefaultOAuth2User oAuthUser = (DefaultOAuth2User) authentication.getPrincipal();
 
         User user = User.builder()
-                .username(oAuthUser.getAttribute("name"))
+                .login(oAuthUser.getAttribute("name"))
                 .email(oAuthUser.getAttribute("email"))
-                .role(Role.ROLE_OWNER)
+                .role(Role.OWNER)
                 .build();
         userService.createOAuthUser(user);
         var jwt = jwtService.generateToken(user);
