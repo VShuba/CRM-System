@@ -2,12 +2,10 @@ package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ua.shpp.repository.UserRepository;
 import ua.shpp.entity.User;
-import ua.shpp.utils.Role;
+import ua.shpp.repository.UserRepository;
 
 //Ticket Scrum-33
 @Service
