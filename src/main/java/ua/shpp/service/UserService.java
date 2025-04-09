@@ -2,16 +2,34 @@ package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ua.shpp.entity.User;
 import ua.shpp.repository.UserRepository;
+import ua.shpp.entity.User;
+import ua.shpp.utils.Role;
 
+//Ticket Scrum-33
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository repository;
 
+    /**
+     * Збереження користувача
+     *
+     * @return збереження користувача
+     */
+    public User save(User user) {
+        return repository.save(user);
+    }
+
+
+    /**
+     * Створення користувача
+     *
+     * @return створення користувача
+     */
     public User create(User user) {
         if (repository.existsByLogin(user.getEmail())) {
             throw new RuntimeException("A user with this email already exists.");
@@ -31,6 +49,11 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+    /**
+     * Отримання поточного користувача
+     *
+     * @return поточний користувач
+     */
     public User getCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return getByUsername(username);

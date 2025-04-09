@@ -5,20 +5,19 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ua.shpp.util.Role;
+import ua.shpp.model.Role;
 
 import java.util.Collection;
 import java.util.List;
 
-@Table(name = "users")
+//Ticket Scrum-33
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(of = "id")
-@ToString
+@Table(name = "users")
 public class User implements UserDetails {
     @Id
     @Column(name = "id")
@@ -32,7 +31,6 @@ public class User implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Enumerated(value = EnumType.STRING)
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
