@@ -8,10 +8,9 @@ import org.springframework.stereotype.Service;
 import ua.shpp.dto.JwtAuthenticationResponse;
 import ua.shpp.dto.SignInRequest;
 import ua.shpp.dto.SignUpRequest;
+import ua.shpp.entity.Role;
 import ua.shpp.entity.User;
-import ua.shpp.utils.Role;
 
-//Ticket Scrum-33
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -20,15 +19,9 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    /**
-     * Реєстрація користувача
-     *
-     * @param request дані користувача
-     * @return токен
-     */
     public JwtAuthenticationResponse signUp(SignUpRequest request) {
 
-        var user = User.builder()
+        User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -37,27 +30,19 @@ public class AuthenticationService {
 
         userService.create(user);
 
-        var jwt = jwtService.generateToken(user);
+        String jwt = jwtService.generateToken(user);
         return new JwtAuthenticationResponse(jwt);
     }
 
-    /**
-     * Аутентифікація користувача
-     *
-     * @param request дані користувача
-     * @return токен
-     */
     public JwtAuthenticationResponse signIn(SignInRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                request.getUsername(),
+                request.getEmail(),
                 request.getPassword()
         ));
 
-        var user = userService
-                .userDetailsService()
-                .loadUserByUsername(request.getUsername());
+        User user = userService.getByEmail(request.getEmail());
 
-        var jwt = jwtService.generateToken(user);
+        String jwt = jwtService.generateToken(user);
         return new JwtAuthenticationResponse(jwt);
     }
 }
