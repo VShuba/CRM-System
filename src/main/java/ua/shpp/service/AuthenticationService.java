@@ -22,7 +22,7 @@ public class AuthenticationService {
     public JwtAuthenticationResponse signUp(SignUpRequest request) {
 
         User user = User.builder()
-                .username(request.getUsername())
+                .login(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.ROLE_OWNER)
@@ -36,11 +36,11 @@ public class AuthenticationService {
 
     public JwtAuthenticationResponse signIn(SignInRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                request.getEmail(),
+                request.getLogin(),
                 request.getPassword()
         ));
 
-        User user = userService.getByEmail(request.getEmail());
+        User user = userService.getByLogin(request.getLogin());
 
         String jwt = jwtService.generateToken(user);
         return new JwtAuthenticationResponse(jwt);
