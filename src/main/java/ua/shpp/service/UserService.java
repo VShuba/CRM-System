@@ -5,8 +5,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ua.shpp.repository.UserRepository;
 import ua.shpp.entity.User;
+import ua.shpp.repository.UserRepository;
 import ua.shpp.utils.Role;
 
 //Ticket Scrum-33
@@ -85,4 +85,12 @@ public class UserService {
         user.setRole(Role.ROLE_ADMIN);
         save(user);
     }
+
+    public User createOAuthUser(User user) {
+        if (!repository.existsByUsername(user.getUsername())) {
+            save(user);
+        }
+        return user;
+    }
+
 }

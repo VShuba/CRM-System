@@ -1,15 +1,16 @@
 package ua.shpp.controller;
 
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ua.shpp.service.AuthenticationService;
 import ua.shpp.dto.JwtAuthenticationResponse;
 import ua.shpp.dto.SignInRequest;
 import ua.shpp.dto.SignUpRequest;
+import ua.shpp.service.AuthenticationService;
 
 //Ticket Scrum-33
 @RestController

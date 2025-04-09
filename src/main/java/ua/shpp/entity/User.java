@@ -28,7 +28,9 @@ public class User implements UserDetails {
     @Column(name = "username", unique = true, nullable = false)
     private String username;
 
-    @Column(name = "password", nullable = false)
+
+    //User may be without password in case of OAuth authentication
+    @Column(name = "password"/*, nullable = false*/)
     private String password;
 
     @Column(name = "email", unique = true, nullable = false)

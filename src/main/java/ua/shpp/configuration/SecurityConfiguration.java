@@ -1,5 +1,6 @@
 package ua.shpp.configuration;
 
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,8 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import ua.shpp.service.UserService;
 import ua.shpp.configuration.filters.JwtAuthenticationFilter;
+import ua.shpp.service.UserService;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -29,6 +30,8 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserService userService;
+    private final OAuthSuccessHandle oAuthSuccessHandle;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,9 +41,11 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.disable())
                 // Доступ до ендпоентів
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/auth/**", "/h2-console/*").permitAll()
+                        .requestMatchers("/auth/**", "/h2-console/*", "/oauth2/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
+                .oauth2Login(oauth -> oauth.successHandler(oAuthSuccessHandle))
+
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
