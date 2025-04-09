@@ -6,10 +6,11 @@ import ua.shpp.entity.User;
 
 import java.util.Optional;
 
-//Ticket Scrum-33
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByUsername(String username);
-    boolean existsByUsername(String username);
+    Optional<User> findByEmail(String email);
+    Optional<User> findByLogin(String login);
+
     boolean existsByEmail(String email);
+    boolean existsByLogin(String login);
 }
