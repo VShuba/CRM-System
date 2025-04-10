@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ua.shpp.entity.UserEntity;
 import ua.shpp.model.Role;
+import ua.shpp.security.service.JwtService;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -1,4 +1,4 @@
-package ua.shpp.configuration.filters;
+package ua.shpp.security.filters;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-import ua.shpp.service.JwtService;
+import ua.shpp.security.service.JwtService;
 
 import java.io.IOException;
 

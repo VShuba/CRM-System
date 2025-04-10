@@ -12,6 +12,7 @@ import ua.shpp.dto.SignInRequest;
 import ua.shpp.dto.SignUpRequest;
 import ua.shpp.entity.UserEntity;
 import ua.shpp.model.Role;
+import ua.shpp.security.service.JwtService;
 
 @Slf4j
 @Service

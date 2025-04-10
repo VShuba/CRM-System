@@ -1,4 +1,4 @@
-package ua.shpp.configuration;
+package ua.shpp.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,9 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-import ua.shpp.configuration.filters.JwtAuthenticationFilter;
+import ua.shpp.security.filters.JwtAuthenticationFilter;
 import ua.shpp.repository.UserRepository;
-import ua.shpp.service.JwtService;
+import ua.shpp.security.service.JwtService;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 

@@ -1,4 +1,4 @@
-package ua.shpp.configuration;
+package ua.shpp.security;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +11,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 import ua.shpp.dto.JwtAuthenticationResponse;
 import ua.shpp.entity.UserEntity;
-import ua.shpp.service.JwtService;
+import ua.shpp.security.service.JwtService;
 import ua.shpp.service.UserService;
 import ua.shpp.model.Role;
 
