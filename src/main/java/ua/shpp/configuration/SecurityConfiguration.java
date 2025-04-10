@@ -41,9 +41,10 @@ public class SecurityConfiguration {
                 .headers(header -> header.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers("/api/**").authenticated()
                         .requestMatchers("/auth/**", "/h2-console/*", "/oauth2/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .oauth2Login(oauth -> oauth.successHandler(oAuthSuccessHandle))
                 .authenticationProvider(authenticationProvider())
