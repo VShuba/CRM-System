@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ua.shpp.entity.User;
+import ua.shpp.entity.UserEntity;
 import ua.shpp.repository.UserRepository;
 
 //Ticket Scrum-33
@@ -18,8 +18,8 @@ public class UserService {
      *
      * @return збереження користувача
      */
-    public User save(User user) {
-        return repository.save(user);
+    public UserEntity save(UserEntity userEntity) {
+        return repository.save(userEntity);
     }
 
 
@@ -28,21 +28,21 @@ public class UserService {
      *
      * @return створення користувача
      */
-    public User create(User user) {
-        if (repository.existsByLogin(user.getEmail())) {
+    public UserEntity create(UserEntity userEntity) {
+        if (repository.existsByLogin(userEntity.getEmail())) {
             throw new RuntimeException("A user with this email already exists.");
         }
 
-        return repository.save(user);
+        return repository.save(userEntity);
     }
 
-    public User getByUsername(String login) {
+    public UserEntity getByUsername(String login) {
         return repository.findByLogin(login)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
     }
 
-    public User getByLogin(String login) {
+    public UserEntity getByLogin(String login) {
         return repository.findByLogin(login)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
@@ -52,12 +52,12 @@ public class UserService {
      *
      * @return поточний користувач
      */
-    public User getCurrentUser() {
+    public UserEntity getCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return getByUsername(username);
     }
 
-    public User createOAuthUser(User login) {
+    public UserEntity createOAuthUser(UserEntity login) {
         if (!repository.existsByLogin(login.getUsername())) {
             repository.save(login);
         }

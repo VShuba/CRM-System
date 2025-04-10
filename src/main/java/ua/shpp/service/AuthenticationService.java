@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import ua.shpp.dto.JwtAuthenticationResponse;
 import ua.shpp.dto.SignInRequest;
 import ua.shpp.dto.SignUpRequest;
+import ua.shpp.entity.UserEntity;
 import ua.shpp.model.Role;
-import ua.shpp.entity.User;
 
 @Slf4j
 @Service
@@ -24,17 +24,17 @@ public class AuthenticationService {
 
     public JwtAuthenticationResponse signUp(SignUpRequest request) {
         log.info("Register new user: {}", request.getUsername());
-        User user = User.builder()
+        UserEntity userEntity = UserEntity.builder()
                 .login(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.OWNER)
                 .build();
 
-        userService.create(user);
+        userService.create(userEntity);
 
         log.info("Registration successful for user: {}", request.getUsername());
-        String jwt = jwtService.generateToken(user);
+        String jwt = jwtService.generateToken(userEntity);
         return new JwtAuthenticationResponse(jwt);
     }
 
@@ -51,10 +51,10 @@ public class AuthenticationService {
             throw ex;
         }
 
-        User user = userService.getByLogin(request.getLogin());
+        UserEntity userEntity = userService.getByLogin(request.getLogin());
         log.info("Successful login attempt for user: {}", request.getLogin());
 
-        String jwt = jwtService.generateToken(user);
+        String jwt = jwtService.generateToken(userEntity);
         return new JwtAuthenticationResponse(jwt);
     }
 }

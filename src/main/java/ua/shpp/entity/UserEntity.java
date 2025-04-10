@@ -18,7 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "users")
-public class User implements UserDetails {
+public class UserEntity implements UserDetails {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")

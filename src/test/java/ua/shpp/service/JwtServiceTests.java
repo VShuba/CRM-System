@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import ua.shpp.entity.UserEntity;
 import ua.shpp.model.Role;
-import ua.shpp.entity.User;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,11 +15,11 @@ class JwtServiceTests {
     @Autowired
     private JwtService jwtService;
 
-    private User user;
+    private UserEntity userEntity;
 
     @BeforeEach
     void setUp() {
-        user = User.builder()
+        userEntity = UserEntity.builder()
                 .id(1L)
                 .login("testuser@example.com")
                 .email("test@mail.com")
@@ -30,32 +30,32 @@ class JwtServiceTests {
 
     @Test
     void shouldGenerateValidToken() {
-        String token = jwtService.generateToken(user);
+        String token = jwtService.generateToken(userEntity);
 
         assertNotNull(token);
-        assertTrue(jwtService.isTokenValid(token, user));
+        assertTrue(jwtService.isTokenValid(token, userEntity));
     }
 
     @Test
     void shouldExtractEmailFromToken() {
-        String token = jwtService.generateToken(user);
+        String token = jwtService.generateToken(userEntity);
         String email = jwtService.extractEmail(token);
 
-        assertEquals(user.getEmail(), email);
+        assertEquals(userEntity.getEmail(), email);
     }
 
     @Test
     void shouldExtractUsernameFromToken() {
-        String token = jwtService.generateToken(user);
+        String token = jwtService.generateToken(userEntity);
         String username = jwtService.extractUserName(token);
 
-        assertEquals(user.getUsername(), username);
+        assertEquals(userEntity.getUsername(), username);
     }
 
     @Test
     void shouldReturnFalseForInvalidToken() {
         String fakeToken = "invalid-token";
 
-        assertThrows(Exception.class, () -> jwtService.isTokenValid(fakeToken, user));
+        assertThrows(Exception.class, () -> jwtService.isTokenValid(fakeToken, userEntity));
     }
 }

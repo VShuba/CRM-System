@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import ua.shpp.entity.User;
+import ua.shpp.entity.UserEntity;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -35,7 +35,7 @@ public class JwtService {
     public String generateToken(UserDetails userDetails) {
         log.debug("Generating a JWT token for the user: {} ", userDetails.getUsername());
         Map<String, Object> claims = new HashMap<>();
-        if (userDetails instanceof User customUserDetails) {
+        if (userDetails instanceof UserEntity customUserDetails) {
             claims.put("id", customUserDetails.getId());
             claims.put("email", customUserDetails.getEmail());
             claims.put("role", customUserDetails.getRole());

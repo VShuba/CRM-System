@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import ua.shpp.dto.JwtAuthenticationResponse;
-import ua.shpp.entity.User;
+import ua.shpp.entity.UserEntity;
 import ua.shpp.service.JwtService;
 import ua.shpp.service.UserService;
 import ua.shpp.model.Role;
@@ -36,13 +36,13 @@ public class OAuthSuccessHandle implements AuthenticationSuccessHandler {
                                         Authentication authentication) throws IOException {
         DefaultOAuth2User oAuthUser = (DefaultOAuth2User) authentication.getPrincipal();
 
-        User user = User.builder()
+        UserEntity userEntity = UserEntity.builder()
                 .login(oAuthUser.getAttribute("name"))
                 .email(oAuthUser.getAttribute("email"))
                 .role(Role.OWNER)
                 .build();
-        userService.createOAuthUser(user);
-        var jwt = jwtService.generateToken(user);
+        userService.createOAuthUser(userEntity);
+        var jwt = jwtService.generateToken(userEntity);
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_OK);
 
