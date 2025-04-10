@@ -1,8 +1,10 @@
 package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.JwtAuthenticationResponse;
@@ -11,6 +13,7 @@ import ua.shpp.dto.SignUpRequest;
 import ua.shpp.entity.Role;
 import ua.shpp.entity.User;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -20,7 +23,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public JwtAuthenticationResponse signUp(SignUpRequest request) {
-
+        log.info("Register new user: {}", request.getUsername());
         User user = User.builder()
                 .login(request.getUsername())
                 .email(request.getEmail())
@@ -30,17 +33,26 @@ public class AuthenticationService {
 
         userService.create(user);
 
+        log.info("Registration successful for user: {}", request.getUsername());
         String jwt = jwtService.generateToken(user);
         return new JwtAuthenticationResponse(jwt);
     }
 
     public JwtAuthenticationResponse signIn(SignInRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                request.getLogin(),
-                request.getPassword()
-        ));
+        log.info("Sign in for user: {}", request.getLogin());
+
+        try {
+
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    request.getLogin(),
+                    request.getPassword()
+            ));
+        } catch (AuthenticationException ex) {
+            log.warn("Unsuccessful login attempt ");
+        }
 
         User user = userService.getByLogin(request.getLogin());
+        log.info("Successful login attempt for user: {}", request.getLogin());
 
         String jwt = jwtService.generateToken(user);
         return new JwtAuthenticationResponse(jwt);

@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+@Slf4j
 @Service
 public class JwtService {
     @Value("${token.signing.key}")
@@ -31,6 +33,7 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
+        log.debug("Generating a JWT token for the user: {} ", userDetails.getUsername());
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof User customUserDetails) {
             claims.put("id", customUserDetails.getId());
@@ -41,8 +44,9 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String userName = extractUserName(token);
-        return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        boolean valid = extractUserName(token).equals(userDetails.getUsername()) && !isTokenExpired(token);
+        log.debug("Token validation: {}, valid: {}", userDetails.getUsername(), valid);
+        return valid;
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
