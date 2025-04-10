@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import ua.shpp.entity.UserEntity;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -34,13 +33,12 @@ public class JwtService {
 
     public String generateToken(UserDetails userDetails) {
         log.debug("Generating a JWT token for the user: {} ", userDetails.getUsername());
-        Map<String, Object> claims = new HashMap<>();
-        if (userDetails instanceof UserEntity customUserDetails) {
-            claims.put("id", customUserDetails.getId());
-            claims.put("email", customUserDetails.getEmail());
-            claims.put("role", customUserDetails.getRole());
-        }
-        return generateToken(claims, userDetails);
+        return generateToken(new HashMap<>(), userDetails);
+    }
+
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolvers.apply(claims);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
@@ -49,12 +47,7 @@ public class JwtService {
         return valid;
     }
 
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolvers.apply(claims);
-    }
-
-    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
@@ -72,7 +65,10 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token)
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
                 .getPayload();
     }
 

@@ -14,6 +14,9 @@ import ua.shpp.entity.UserEntity;
 import ua.shpp.model.Role;
 import ua.shpp.security.service.JwtService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -55,7 +58,12 @@ public class AuthenticationService {
         UserEntity userEntity = userService.getByLogin(request.getLogin());
         log.info("Successful login attempt for user: {}", request.getLogin());
 
-        String jwt = jwtService.generateToken(userEntity);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", userEntity.getId());
+        claims.put("email", userEntity.getEmail());
+        claims.put("role", userEntity.getRole());
+
+        String jwt = jwtService.generateToken(claims, userEntity);
         return new JwtAuthenticationResponse(jwt);
     }
 }

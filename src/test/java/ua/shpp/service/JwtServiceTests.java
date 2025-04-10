@@ -8,6 +8,9 @@ import ua.shpp.entity.UserEntity;
 import ua.shpp.model.Role;
 import ua.shpp.security.service.JwtService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -39,7 +42,12 @@ class JwtServiceTests {
 
     @Test
     void shouldExtractEmailFromToken() {
-        String token = jwtService.generateToken(userEntity);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", userEntity.getId());
+        claims.put("email", userEntity.getEmail());
+        claims.put("role", userEntity.getRole());
+
+        String token = jwtService.generateToken(claims, userEntity);
         String email = jwtService.extractEmail(token);
 
         assertEquals(userEntity.getEmail(), email);
