@@ -1,4 +1,4 @@
-package ua.shpp.configuration.filters;
+package ua.shpp.security.filters;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
