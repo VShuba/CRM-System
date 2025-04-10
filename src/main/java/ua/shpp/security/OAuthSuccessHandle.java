@@ -1,4 +1,4 @@
-package ua.shpp.configuration;
+package ua.shpp.security;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
