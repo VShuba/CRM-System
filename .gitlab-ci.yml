@@ -1,0 +1,45 @@
+# Визначаємо етапи (стадії) пайплайну: спочатку збірка, потім деплой
+stages:
+  - build        # Етап збірки проєкту
+  - deploy       # Етап деплою (вивантаження) на сервер
+
+# Змінні, які використовуються у пайплайні
+variables:
+  APP_NAME: crm-system.jar                                # Назва .jar файлу, який створюється і запускається
+  DEPLOY_DIR: /opt/practics                        # Каталог на сервері, куди копіюється .jar
+  SERVER: ec2-34-254-199-54.eu-west-1.compute.amazonaws.com  # IP-адреса або DNS-ім’я сервера
+  SSH_USER: deployer                               # Ім’я користувача для підключення до сервера
+
+# Завдання для етапу build
+build-job:
+  stage: build                                     # Вказуємо, що це етап збірки
+  image: maven:3.9.6-eclipse-temurin-21            # Docker-образ з Maven і Java 21
+  script:
+    - mvn clean package                # Команда збірки Maven-проєкту
+  artifacts:
+    paths:
+      - target/*.jar                               # Зберігаємо зібраний .jar файл як артефакт для наступного етапу
+
+# Завдання для етапу deploy
+deploy-job:
+  stage: deploy                                    # Вказуємо, що це етап деплою
+  image: ubuntu:22.04                              # Docker-образ з Ubuntu для запуску команд деплою
+  before_script:
+    - apt-get update -y                              #  Оновлення списку пакетів
+    - apt-get install -y openssh-client              #  Встановлення SSH-клієнта
+    - mkdir -p ~/.ssh                                #  Створюємо директорію для SSH-ключів
+    - cat "$DEPLOYER_RSA_PRIVATE_KEY" > ~/.ssh/id_rsa  #  Читаємо вміст файлу зі змінної (File тип) і записуємо у ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa                        #  Встановлюємо права доступу до ключа
+    - echo -e "Host $SERVER\n  User $SSH_USER\n  IdentityFile ~/.ssh/id_rsa\n  StrictHostKeyChecking no" > ~/.ssh/config  # Додаємо налаштування для SSH
+
+  only:
+    - main                                         # Цей job запускається лише при пуші або merge в гілку main
+
+  script:
+    - echo "Deploying to $SERVER"                 #  Виводимо повідомлення про деплой
+    - scp -o StrictHostKeyChecking=no target/*.jar $SSH_USER@$SERVER:$DEPLOY_DIR/$APP_NAME  # Копіюємо .jar файл на сервер
+    - |
+      ssh $SSH_USER@$SERVER << EOF
+        pkill -f "$APP_NAME" || true              # Зупиняємо попередній процес, якщо є
+        nohup java -jar $DEPLOY_DIR/$APP_NAME > $DEPLOY_DIR/log.txt 2>&1 &  # Запускаємо нову версію додатку у фоновому режимі
+      EOF
