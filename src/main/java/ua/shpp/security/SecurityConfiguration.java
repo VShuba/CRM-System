@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import ua.shpp.security.filters.JwtAuthenticationFilter;
 import ua.shpp.repository.UserRepository;
-import ua.shpp.service.JwtService;
+import ua.shpp.security.service.JwtService;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 

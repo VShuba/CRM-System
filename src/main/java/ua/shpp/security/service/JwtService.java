@@ -1,4 +1,4 @@
-package ua.shpp.service;
+package ua.shpp.security.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
