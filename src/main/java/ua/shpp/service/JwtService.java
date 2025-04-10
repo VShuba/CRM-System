@@ -19,6 +19,8 @@ import java.util.function.Function;
 public class JwtService {
     @Value("${token.signing.key}")
     private String jwtSigningKey;
+    @Value("${token.expirationInMillis}")
+    private int tokenExpirationInMillis;
 
     public String extractUserName(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -53,7 +55,7 @@ public class JwtService {
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 100000 * 60 * 24))
+                .expiration(new Date(System.currentTimeMillis() + tokenExpirationInMillis))
                 .signWith(getSigningKey()).compact();
     }
 
