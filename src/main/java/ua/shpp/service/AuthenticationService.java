@@ -42,13 +42,13 @@ public class AuthenticationService {
         log.info("Sign in for user: {}", request.getLogin());
 
         try {
-
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     request.getLogin(),
                     request.getPassword()
             ));
         } catch (AuthenticationException ex) {
             log.warn("Unsuccessful login attempt ");
+            throw ex;
         }
 
         User user = userService.getByLogin(request.getLogin());
