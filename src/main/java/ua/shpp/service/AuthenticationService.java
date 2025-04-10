@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import ua.shpp.dto.JwtAuthenticationResponse;
 import ua.shpp.dto.SignInRequest;
 import ua.shpp.dto.SignUpRequest;
-import ua.shpp.entity.Role;
+import ua.shpp.model.Role;
 import ua.shpp.entity.User;
 
 @Slf4j

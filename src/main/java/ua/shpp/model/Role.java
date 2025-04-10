@@ -1,4 +1,4 @@
-package ua.shpp.entity;
+package ua.shpp.model;
 public enum Role {
     ADMIN,
     OWNER,

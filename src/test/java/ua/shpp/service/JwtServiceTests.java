@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ua.shpp.entity.Role;
+import ua.shpp.model.Role;
 import ua.shpp.entity.User;
 
 import static org.junit.jupiter.api.Assertions.*;

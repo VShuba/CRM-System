@@ -13,7 +13,7 @@ import ua.shpp.dto.JwtAuthenticationResponse;
 import ua.shpp.entity.User;
 import ua.shpp.service.JwtService;
 import ua.shpp.service.UserService;
-import ua.shpp.entity.Role;
+import ua.shpp.model.Role;
 
 import java.io.IOException;
 
