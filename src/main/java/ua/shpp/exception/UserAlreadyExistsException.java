@@ -1,4 +1,4 @@
-package ua.shpp.exeption;
+package ua.shpp.exception;
 
 public class UserAlreadyExistsException extends RuntimeException {
 

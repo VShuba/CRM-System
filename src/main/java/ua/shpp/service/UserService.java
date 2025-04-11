@@ -5,7 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ua.shpp.entity.UserEntity;
-import ua.shpp.exeption.UserAlreadyExistsException;
+import ua.shpp.exception.UserAlreadyExistsException;
 import ua.shpp.repository.UserRepository;
 
 //Ticket Scrum-33
