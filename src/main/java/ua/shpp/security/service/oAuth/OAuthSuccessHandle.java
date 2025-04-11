@@ -1,4 +1,4 @@
-package ua.shpp.security;
+package ua.shpp.security.service.oAuth;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,11 +11,13 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 import ua.shpp.dto.JwtAuthenticationResponse;
 import ua.shpp.entity.UserEntity;
+import ua.shpp.model.Role;
 import ua.shpp.security.service.JwtService;
 import ua.shpp.service.UserService;
-import ua.shpp.model.Role;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 // Success handler for Google oAuth account registration/retrieval
 @Slf4j
@@ -23,10 +25,16 @@ import java.io.IOException;
 public class OAuthSuccessHandle implements AuthenticationSuccessHandler {
     private final UserService userService;
     private final JwtService jwtService;
+    private final PasswordGeneratorService passwordGeneratorService;
 
-    public OAuthSuccessHandle(UserService userService, JwtService jwtService) {
+    private final Integer RANDOM_PASSWORD_LENGTH = 15;
+    private final ObjectMapper objectMapper;
+
+    public OAuthSuccessHandle(UserService userService, JwtService jwtService, PasswordGeneratorService passwordGeneratorService, ObjectMapper objectMapper) {
         this.userService = userService;
         this.jwtService = jwtService;
+        this.passwordGeneratorService = passwordGeneratorService;
+        this.objectMapper = objectMapper;
     }
 
 
@@ -37,18 +45,22 @@ public class OAuthSuccessHandle implements AuthenticationSuccessHandler {
         DefaultOAuth2User oAuthUser = (DefaultOAuth2User) authentication.getPrincipal();
 
         UserEntity userEntity = UserEntity.builder()
-                .login(oAuthUser.getAttribute("name"))
+                .login(oAuthUser.getAttribute("email"))
                 .email(oAuthUser.getAttribute("email"))
+                .password(passwordGeneratorService.generateRandomPassword(RANDOM_PASSWORD_LENGTH))
                 .role(Role.OWNER)
                 .build();
         userService.createOAuthUser(userEntity);
-        var jwt = jwtService.generateToken(userEntity);
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", userEntity.getId());
+        claims.put("email", userEntity.getEmail());
+        claims.put("role", userEntity.getRole());
+
+        var jwt = jwtService.generateToken(claims, userEntity);
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_OK);
-
-        //todo create Bean
-        ObjectMapper mapper = new ObjectMapper();
-        response.getWriter().write(mapper.writeValueAsString(new JwtAuthenticationResponse(jwt)));
+        response.getWriter().write(objectMapper.writeValueAsString(new JwtAuthenticationResponse(jwt)));
     }
 }
 
