@@ -5,6 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ua.shpp.entity.UserEntity;
+import ua.shpp.exeption.UserAlreadyExistsException;
 import ua.shpp.repository.UserRepository;
 
 //Ticket Scrum-33
@@ -30,7 +31,7 @@ public class UserService {
      */
     public UserEntity create(UserEntity userEntity) {
         if (repository.existsByLogin(userEntity.getEmail())) {
-            throw new RuntimeException("A user with this email already exists.");
+            throw new UserAlreadyExistsException("A user with this email already exists.");
         }
 
         return repository.save(userEntity);
