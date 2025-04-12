@@ -37,8 +37,8 @@ public class AuthenticationService {
         userService.create(userEntity);
 
         log.info("Registration successful for user: {}", request.getUsername());
-        String jwt = jwtService.generateToken(userEntity);
-        return new JwtAuthenticationResponse(jwt);
+
+        return generateTokenByUser(userEntity);
     }
 
     public JwtAuthenticationResponse signIn(SignInRequest request) {
@@ -52,6 +52,10 @@ public class AuthenticationService {
         UserEntity userEntity = userService.getByLogin(request.getLogin());
         log.info("Successful login attempt for user: {}", request.getLogin());
 
+        return generateTokenByUser(userEntity);
+    }
+
+    private JwtAuthenticationResponse generateTokenByUser(UserEntity userEntity) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", userEntity.getId());
         claims.put("email", userEntity.getEmail());
