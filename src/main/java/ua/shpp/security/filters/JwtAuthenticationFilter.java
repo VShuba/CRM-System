@@ -41,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            final String jwt = authHeader.substring(BEARER_PREFIX.length());
+            final String jwt = authHeader.substring(BEARER_PREFIX.length() + 1);
             final String userEmail = jwtService.extractEmail(jwt);
 
             log.debug("Process JWT for user: {}", userEmail);
