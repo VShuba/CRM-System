@@ -69,4 +69,18 @@ public class GlobalExceptionHandler {
                                                                           HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.CONFLICT, "User Already Exists", request);
     }
+
+    // for Organization
+
+    @ExceptionHandler(OrganizationNotFound.class)
+    public ResponseEntity<ErrorResponse> handleOrganizationNotFound(OrganizationNotFound ex,
+                                                                    HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Organization Not Found", request);
+    }
+
+    @ExceptionHandler(OrganizationAlreadyExists.class)
+    public ResponseEntity<ErrorResponse> handleOrganizationAlreadyExists(OrganizationAlreadyExists ex,
+                                                                         HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Organization Already Exists", request);
+    }
 }
