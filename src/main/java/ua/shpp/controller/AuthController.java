@@ -30,7 +30,9 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Successful registration",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = JwtAuthenticationResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Incorrect data", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Incorrect data", content = @Content),
+            @ApiResponse(responseCode = "409", description = "A user with this email already exists",
+                    content = @Content)
     })
     @PostMapping("/sign-up")
     public JwtAuthenticationResponse signUp(@RequestBody @Valid SignUpRequest request) {
@@ -43,6 +45,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Successful authorization",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = JwtAuthenticationResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Incorrect data", content = @Content),
             @ApiResponse(responseCode = "401", description = "Incorrect credentials", content = @Content)
     })
     @PostMapping("/sign-in")
