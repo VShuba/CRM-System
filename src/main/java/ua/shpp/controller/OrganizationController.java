@@ -9,7 +9,7 @@ import ua.shpp.dto.OrganizationResponseDTO;
 import ua.shpp.service.OrganizationService;
 
 @RestController
-@RequestMapping("/api/organization")
+@RequestMapping("/api/organizations")
 @RequiredArgsConstructor
 public class OrganizationController {
 

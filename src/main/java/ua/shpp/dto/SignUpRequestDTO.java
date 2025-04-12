@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "Registration request")
-public class SignUpRequest {
+public class SignUpRequestDTO {
 
     @Schema(description = "User name", example = "user@gmail.com")
     @Size(min = 5, max = 255, message = "Username must be between 5 and 255 characters long")

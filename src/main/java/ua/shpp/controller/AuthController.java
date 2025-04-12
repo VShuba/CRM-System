@@ -12,12 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ua.shpp.dto.JwtAuthenticationResponse;
-import ua.shpp.dto.SignInRequest;
-import ua.shpp.dto.SignUpRequest;
+import ua.shpp.dto.JwtAuthenticationResponseDTO;
+import ua.shpp.dto.SignInRequestDTO;
+import ua.shpp.dto.SignUpRequestDTO;
 import ua.shpp.service.AuthenticationService;
 
-//Ticket Scrum-33
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -29,13 +28,13 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful registration",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = JwtAuthenticationResponse.class))),
+                            schema = @Schema(implementation = JwtAuthenticationResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Incorrect data", content = @Content),
             @ApiResponse(responseCode = "409", description = "A user with this email already exists",
                     content = @Content)
     })
     @PostMapping("/sign-up")
-    public JwtAuthenticationResponse signUp(@RequestBody @Valid SignUpRequest request) {
+    public JwtAuthenticationResponseDTO signUp(@RequestBody @Valid SignUpRequestDTO request) {
         return authenticationService.signUp(request);
     }
 
@@ -44,12 +43,12 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful authorization",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = JwtAuthenticationResponse.class))),
+                            schema = @Schema(implementation = JwtAuthenticationResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Incorrect data", content = @Content),
             @ApiResponse(responseCode = "401", description = "Incorrect credentials", content = @Content)
     })
     @PostMapping("/sign-in")
-    public JwtAuthenticationResponse signIn(@RequestBody @Valid SignInRequest request) {
+    public JwtAuthenticationResponseDTO signIn(@RequestBody @Valid SignInRequestDTO request) {
         return authenticationService.signIn(request);
     }
 }

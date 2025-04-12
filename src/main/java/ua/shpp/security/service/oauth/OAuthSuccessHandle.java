@@ -1,5 +1,4 @@
-package ua.shpp.security.service.oAuth;
-
+package ua.shpp.security.service.oauth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import ua.shpp.dto.JwtAuthenticationResponse;
+import ua.shpp.dto.JwtAuthenticationResponseDTO;
 import ua.shpp.entity.UserEntity;
 import ua.shpp.model.Role;
 import ua.shpp.security.service.JwtService;
@@ -27,16 +26,21 @@ public class OAuthSuccessHandle implements AuthenticationSuccessHandler {
     private final JwtService jwtService;
     private final PasswordGeneratorService passwordGeneratorService;
 
-    private final Integer RANDOM_PASSWORD_LENGTH = 15;
+    private static final Integer RANDOM_PASSWORD_LENGTH = 15;
+    public static final String EMAIL = "email";
+
     private final ObjectMapper objectMapper;
 
-    public OAuthSuccessHandle(UserService userService, JwtService jwtService, PasswordGeneratorService passwordGeneratorService, ObjectMapper objectMapper) {
+    public OAuthSuccessHandle(UserService userService,
+                              JwtService jwtService,
+                              PasswordGeneratorService passwordGeneratorService,
+                              ObjectMapper objectMapper
+    ) {
         this.userService = userService;
         this.jwtService = jwtService;
         this.passwordGeneratorService = passwordGeneratorService;
         this.objectMapper = objectMapper;
     }
-
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -45,8 +49,8 @@ public class OAuthSuccessHandle implements AuthenticationSuccessHandler {
         DefaultOAuth2User oAuthUser = (DefaultOAuth2User) authentication.getPrincipal();
 
         UserEntity userEntity = UserEntity.builder()
-                .login(oAuthUser.getAttribute("email"))
-                .email(oAuthUser.getAttribute("email"))
+                .login(oAuthUser.getAttribute(EMAIL))
+                .email(oAuthUser.getAttribute(EMAIL))
                 .password(passwordGeneratorService.generateRandomPassword(RANDOM_PASSWORD_LENGTH))
                 .role(Role.OWNER)
                 .build();
@@ -54,13 +58,13 @@ public class OAuthSuccessHandle implements AuthenticationSuccessHandler {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", userEntity.getId());
-        claims.put("email", userEntity.getEmail());
+        claims.put(EMAIL, userEntity.getEmail());
         claims.put("role", userEntity.getRole());
 
         var jwt = jwtService.generateToken(claims, userEntity);
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write(objectMapper.writeValueAsString(new JwtAuthenticationResponse(jwt)));
+        response.getWriter().write(objectMapper.writeValueAsString(new JwtAuthenticationResponseDTO(jwt)));
     }
 }
 

@@ -12,12 +12,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @RestController
-@RequestMapping("/logfile")
+@RequestMapping("/api")
 @Tag(name = "Log files", description = "Obtaining application log files")
 public class LogController {
 
@@ -28,8 +27,8 @@ public class LogController {
             @ApiResponse(responseCode = "404", description = "Log file not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @GetMapping
-    public ResponseEntity<Resource> getLogfile() throws IOException {
+    @GetMapping("/logfile")
+    public ResponseEntity<Resource> getLogfile() {
         Path path = Paths.get("logs/app.log");
         Resource resource = new FileSystemResource(path.toFile());
         return ResponseEntity.ok()

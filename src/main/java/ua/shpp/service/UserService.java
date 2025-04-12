@@ -8,7 +8,6 @@ import ua.shpp.entity.UserEntity;
 import ua.shpp.exception.UserAlreadyExistsException;
 import ua.shpp.repository.UserRepository;
 
-//Ticket Scrum-33
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -30,6 +29,7 @@ public class UserService {
      * @return створення користувача
      */
     public UserEntity create(UserEntity userEntity) {
+
         if (repository.existsByLogin(userEntity.getEmail())) {
             throw new UserAlreadyExistsException("A user with this email already exists.");
         }

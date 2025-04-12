@@ -1,4 +1,4 @@
-package ua.shpp.security.service.oAuth;
+package ua.shpp.security.service.oauth;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

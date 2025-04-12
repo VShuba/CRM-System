@@ -21,7 +21,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import ua.shpp.repository.UserRepository;
 import ua.shpp.security.filters.JwtAuthenticationFilter;
 import ua.shpp.security.service.JwtService;
-import ua.shpp.security.service.oAuth.OAuthSuccessHandle;
+import ua.shpp.security.service.oauth.OAuthSuccessHandle;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -30,6 +30,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
+
     private final UserRepository userRepository;
     private final OAuthSuccessHandle oAuthSuccessHandle;
     private final HandlerExceptionResolver handlerExceptionResolver;
