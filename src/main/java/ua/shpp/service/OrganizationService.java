@@ -1,6 +1,5 @@
 package ua.shpp.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ua.shpp.dto.OrganizationRequestDTO;
 import ua.shpp.dto.OrganizationResponseDTO;
 import ua.shpp.entity.Organization;
+import ua.shpp.exception.OrganizationAlreadyExists;
 import ua.shpp.exception.OrganizationNotFound;
 import ua.shpp.repository.OrganizationRepository;
 
@@ -19,11 +19,18 @@ public class OrganizationService {
 
     public ResponseEntity<OrganizationResponseDTO> create(OrganizationRequestDTO organizationRequestDTO) {
 
-        // check before save !!! how to check before?
+        if (repository.existsByName(organizationRequestDTO.name())) {
+            // checking before save in DB
+            throw new OrganizationAlreadyExists("Organization with name '"
+                    + organizationRequestDTO.name() +
+                    "' already exists.");
+        }
 
         Organization organization = Organization.builder()
                 .name(organizationRequestDTO.name())
                 .build();
+
+        repository.save(organization);
 
         return new ResponseEntity<>(toOrgDTO(organization), HttpStatus.CREATED);
     }
@@ -36,14 +43,20 @@ public class OrganizationService {
         return new ResponseEntity<>(toOrgDTO(organization), HttpStatus.OK);
     }
 
-    public ResponseEntity<OrganizationResponseDTO> update(Long orgID, String newName) {
+    public ResponseEntity<OrganizationResponseDTO> update(Long orgID, OrganizationRequestDTO organizationRequestDTO) {
 
         Organization organization = repository.findById(orgID).orElseThrow(
                 () -> new OrganizationNotFound("Failed to find organization in DB."));
 
-        // check if allowed name of organization?
+        if (repository.existsByName(organizationRequestDTO.name()) // Check for duplicate in DB
+                && !organization.getName().equalsIgnoreCase(organizationRequestDTO.name())) {
+            throw new OrganizationAlreadyExists(
+                    "Organization with name '" + organizationRequestDTO.name() + "' already exists.");
+        }
 
-        organization.setName(newName);
+        organization.setName(organizationRequestDTO.name());
+
+        repository.save(organization);
 
         return new ResponseEntity<>(toOrgDTO(organization), HttpStatus.OK);
     }

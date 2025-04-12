@@ -2,7 +2,6 @@ package ua.shpp.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.OrganizationRequestDTO;
@@ -17,7 +16,8 @@ public class OrganizationController {
     private final OrganizationService organizationService;
 
     @PostMapping("/")
-    public ResponseEntity<OrganizationResponseDTO> createOrganization(@RequestBody @Valid OrganizationRequestDTO requestDTO) {
+    public ResponseEntity<OrganizationResponseDTO> createOrganization(
+            @RequestBody @Valid OrganizationRequestDTO requestDTO) {
         return organizationService.create(requestDTO);
     }
 
@@ -27,8 +27,10 @@ public class OrganizationController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<OrganizationResponseDTO> updateOrganization(@PathVariable Long id, @Valid @RequestParam String name) {
-        return organizationService.update(id, name);
+    public ResponseEntity<OrganizationResponseDTO> updateOrganization(
+            @PathVariable Long id,
+            @RequestBody @Valid OrganizationRequestDTO requestDTO) {
+        return organizationService.update(id, requestDTO);
     }
 
     @DeleteMapping("/{id}")
