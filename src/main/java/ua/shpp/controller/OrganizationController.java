@@ -1,5 +1,11 @@
 package ua.shpp.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,21 +17,48 @@ import ua.shpp.service.OrganizationService;
 @RestController
 @RequestMapping("/api/organizations")
 @RequiredArgsConstructor
+@Tag(name = "Organizations", description = "Organization management API")
 public class OrganizationController {
 
     private final OrganizationService organizationService;
 
+    @Operation(summary = "Create new organization", description = "Returns the created organization as a DTO")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "The organization was created successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = OrganizationResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
+            @ApiResponse(responseCode = "409", description = "An organization with this name already exists",
+                    content = @Content)
+    })
     @PostMapping("/")
     public ResponseEntity<OrganizationResponseDTO> createOrganization(
             @RequestBody @Valid OrganizationRequestDTO requestDTO) {
         return organizationService.create(requestDTO);
     }
 
+    @Operation(summary = "Get organization by ID", description = "Returns the organization as a DTO")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Organization found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = OrganizationResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Organization not found", content = @Content)
+    })
     @GetMapping("/{id}")
     public ResponseEntity<OrganizationResponseDTO> getOrganization(@PathVariable Long id) {
         return organizationService.get(id);
     }
 
+    @Operation(summary = "Update organization", description = "Updates organization name by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Organization updated successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = OrganizationResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Organization not found", content = @Content),
+            @ApiResponse(responseCode = "409", description = "An organization with this name already exists",
+                    content = @Content)
+    })
     @PatchMapping("/{id}")
     public ResponseEntity<OrganizationResponseDTO> updateOrganization(
             @PathVariable Long id,
@@ -33,6 +66,11 @@ public class OrganizationController {
         return organizationService.update(id, requestDTO);
     }
 
+    @Operation(summary = "Delete organization", description = "Deletes an organization by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Organization successfully deleted", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Organization not found", content = @Content)
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrganization(@PathVariable Long id) {
         organizationService.delete(id);
