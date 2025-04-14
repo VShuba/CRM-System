@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.JwtAuthenticationResponseDTO;
@@ -45,12 +46,12 @@ public class AuthenticationService {
     public JwtAuthenticationResponseDTO signIn(SignInRequestDTO request) {
         log.info("Sign in for user: {}", request.getLogin());
 
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 request.getLogin(),
                 request.getPassword()
         ));
 
-        UserEntity userEntity = userService.getByLogin(request.getLogin());
+        UserEntity userEntity = (UserEntity) authentication.getPrincipal();
         log.info("Successful login attempt for user: {}", request.getLogin());
 
         return generateTokenByUser(userEntity);
