@@ -40,7 +40,7 @@ public class UserEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return login;
+        return String.valueOf(id);
     }
 
     @Override
