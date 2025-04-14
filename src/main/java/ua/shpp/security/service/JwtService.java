@@ -27,6 +27,7 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
+    @Deprecated
     public String extractEmail(String token) {
         return extractClaim(token, claims -> claims.get("email", String.class));
     }
