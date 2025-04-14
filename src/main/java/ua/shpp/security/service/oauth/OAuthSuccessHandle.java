@@ -55,10 +55,9 @@ public class OAuthSuccessHandle implements AuthenticationSuccessHandler {
                 .role(Role.OWNER)
                 .build();
         userService.createOAuthUser(userEntity);
-
+        log.info("userEntity id: {}", userEntity.getId());
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", userEntity.getId());
-        claims.put(EMAIL, userEntity.getEmail());
         claims.put("role", userEntity.getRole());
 
         var jwt = jwtService.generateToken(claims, userEntity);
@@ -67,4 +66,3 @@ public class OAuthSuccessHandle implements AuthenticationSuccessHandler {
         response.getWriter().write(objectMapper.writeValueAsString(new JwtAuthenticationResponseDTO(jwt)));
     }
 }
-
