@@ -32,6 +32,10 @@ public class JwtService {
         return extractClaim(token, claims -> claims.get("email", String.class));
     }
 
+    public String extractAuthority(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
+    }
+
     public String generateToken(UserDetails userDetails) {
         log.debug("Generating a JWT token for the user: {} ", userDetails.getUsername());
         return generateToken(new HashMap<>(), userDetails);
@@ -46,6 +50,12 @@ public class JwtService {
     public boolean isTokenValid(String token, UserDetails userDetails) {
         boolean valid = extractUserName(token).equals(userDetails.getUsername()) && !isTokenExpired(token);
         log.debug("Token validation: {}, valid: {}", userDetails.getUsername(), valid);
+        return valid;
+    }
+
+    public boolean isTokenValid(String token) {
+        boolean valid = !isTokenExpired(token);
+        log.debug("Token validation for user with id: {}, valid: {}", extractUserName(token), valid);
         return valid;
     }
 
