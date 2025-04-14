@@ -42,6 +42,7 @@ public class JwtService {
         return claimsResolvers.apply(claims);
     }
 
+    @Deprecated
     public boolean isTokenValid(String token, UserDetails userDetails) {
         boolean valid = extractUserName(token).equals(userDetails.getUsername()) && !isTokenExpired(token);
         log.debug("Token validation: {}, valid: {}", userDetails.getUsername(), valid);
