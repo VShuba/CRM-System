@@ -9,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -18,6 +18,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import ua.shpp.security.service.JwtService;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,27 +43,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             final String jwt = authHeader.substring(BEARER_PREFIX.length() + 1);
-            final String username = jwtService.extractUserName(jwt);
+            final String userId = jwtService.extractUserName(jwt);
 
-            log.debug("Process JWT for user with id: {}", username);
+            log.debug("Process JWT for user with id: {}", userId);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            if (username != null && authentication == null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            if (userId != null && authentication == null) {
 
-                if (jwtService.isTokenValid(jwt, userDetails)) {
-                    log.debug("Token valid for user with id: {}", username);
+                if (jwtService.isTokenValid(jwt)) {
+                    log.debug("Token valid for user with id: {}", userId);
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
+                            userId,
                             null,
-                            userDetails.getAuthorities()
+                            Collections.singletonList(new SimpleGrantedAuthority(jwtService.extractAuthority(jwt)))
                     );
 
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 } else {
-                    log.warn("Invalid token for user with id: {}", username);
+                    log.warn("Invalid token for user with id: {}", userId);
                 }
             }
 
