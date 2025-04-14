@@ -59,7 +59,7 @@ public class UserService {
     }
 
     public UserEntity createOAuthUser(UserEntity login) {
-        if (!repository.existsByLogin(login.getUsername())) {
+        if (!repository.existsByLogin(login.getEmail())) {
             repository.save(login);
         }
         return login;
