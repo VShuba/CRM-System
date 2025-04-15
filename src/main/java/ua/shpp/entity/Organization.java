@@ -11,8 +11,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = "branchEntities")
-@EqualsAndHashCode(exclude = "branchEntities") // needs for exclude ймовірну recursion
+@ToString(exclude = {"branchEntities", "userOrganizations"})
+@EqualsAndHashCode(exclude = {"branchEntities", "userOrganizations"}) // needs for exclude ймовірну recursion
 @Entity
 @Table(name = "organizations")
 public class Organization {
@@ -28,4 +28,7 @@ public class Organization {
     @JsonIgnore // also needs for exclude recursion
     private List<BranchEntity> branchEntities;
 
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<UserOrganization> userOrganizations;
 }
