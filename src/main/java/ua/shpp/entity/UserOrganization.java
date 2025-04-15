@@ -2,6 +2,7 @@ package ua.shpp.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ua.shpp.model.Role;
 
 import java.time.LocalDate;
 
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 public class UserOrganization {
 
     @EmbeddedId
-    private UserOrganizationId id = new UserOrganizationId();
+    private UserOrganizationId id;
 
     @ManyToOne
     @MapsId("userId") // @MapsId каже: "використовуй ID з @EmbeddedId"
@@ -29,4 +30,6 @@ public class UserOrganization {
 
     private LocalDate joinedAt; // Додаткове поле
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
 }
