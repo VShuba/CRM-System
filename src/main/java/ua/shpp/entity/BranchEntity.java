@@ -11,7 +11,7 @@ import lombok.ToString;
 @Setter
 @EqualsAndHashCode(of = "id")
 @ToString
-@Table(name = "Branches")
+@Table(name = "branches")
 public class BranchEntity {
 
     @Id
