@@ -1,13 +1,18 @@
 package ua.shpp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = "branchEntities")
+@EqualsAndHashCode(exclude = "branchEntities") // needs for exclude ймовірну recursion
 @Entity
 @Table(name = "organizations")
 public class Organization {
@@ -18,4 +23,9 @@ public class Organization {
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
+
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // also needs for exclude recursion
+    private List<BranchEntity> branchEntities;
+
 }

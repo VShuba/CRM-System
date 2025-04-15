@@ -33,7 +33,14 @@ public class BranchController {
     }
 
     @PatchMapping("/{id}")
-    ResponseEntity<BranchResponseDTO> updateBranch(@PathVariable Long id, @RequestBody @Valid BranchPatchRequestDTO requestDTO) {
+    ResponseEntity<BranchResponseDTO> updateBranch(@PathVariable Long id,
+                                                   @RequestBody @Valid BranchPatchRequestDTO requestDTO) {
         return ResponseEntity.ok(branchService.updateName(id, requestDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBranch(@PathVariable Long id) {
+        branchService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

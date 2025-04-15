@@ -71,10 +71,10 @@ public class OrganizationController {
             @ApiResponse(responseCode = "204", description = "Organization successfully deleted", content = @Content),
             @ApiResponse(responseCode = "404", description = "Organization not found", content = @Content)
     })
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrganization(@PathVariable Long id) {
         organizationService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }
