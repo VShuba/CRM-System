@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import ua.shpp.entity.BranchEntity;
 
 @Repository
-public interface BranchRepository extends JpaRepository<BranchEntity, Integer> {
+public interface BranchRepository extends JpaRepository<BranchEntity, Long> {
 }
