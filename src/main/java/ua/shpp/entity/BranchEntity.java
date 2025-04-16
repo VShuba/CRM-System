@@ -3,6 +3,8 @@ package ua.shpp.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -23,5 +25,8 @@ public class BranchEntity {
     @ManyToOne
     @JoinColumn(name = "organization_id")
     private Organization organization;
+
+    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoomEntity> rooms;
 
 }
