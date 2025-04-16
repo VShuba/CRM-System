@@ -1,0 +1,38 @@
+package ua.shpp.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.Period;
+
+@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Table(name = "subscription_services")
+public class SubscriptionServiceEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true, nullable = false)
+    private String name;
+
+    //    @ManyToMany
+//    @JoinTable(
+//            name = "subscription_activity",
+//            joinColumns = @JoinColumn(name = "subscription_id",nullable = false),
+//            inverseJoinColumns = @JoinColumn(name = "activity_id", nullable = false)
+//    )
+//    private List<Activity> activities;
+
+    @Column(nullable = false)
+    private Integer visits;
+
+    @Column(name = "term_of_validity_in_day", nullable = false)
+    private Period termOfValidityInDays = Period.ofDays(35);
+
+    private Long price;
+}
