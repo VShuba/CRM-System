@@ -30,4 +30,6 @@ public class BranchEntity {
     @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoomEntity> rooms = new ArrayList<>();
 
+    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ServiceEntity> serviceEntities;
 }
