@@ -27,4 +27,12 @@ public class OneTimeServiceEntity {
 
     @Column(nullable = false)
     private Long price;
+
+    public Duration getDurationInMinutes() {
+        return durationInMinutes;
+    }
+
+    public void setDurationInMinutes(long durationInMinutes) {
+        this.durationInMinutes = Duration.ofMinutes(durationInMinutes);
+    }
 }

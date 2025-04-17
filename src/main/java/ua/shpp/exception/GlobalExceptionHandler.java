@@ -84,14 +84,6 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Organization Already Exists", request);
     }
 
-    // for Service
-
-    @ExceptionHandler(ServiceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleServiceNotFoundException(ServiceNotFoundException ex,
-                                                                        HttpServletRequest request) {
-        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Service/Room/Branch Not Found in DB", request);
-    }
-
     // For Branch
 
     @ExceptionHandler(BranchNotFoundException.class)
@@ -100,4 +92,10 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Branch Not Found in DB", request);
     }
 
+
+    @ExceptionHandler(OfferNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleOfferNotFound(OfferNotFoundException ex,
+                                                               HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Offer not found", request);
+    }
 }
