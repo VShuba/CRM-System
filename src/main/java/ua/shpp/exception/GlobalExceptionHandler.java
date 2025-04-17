@@ -83,4 +83,12 @@ public class GlobalExceptionHandler {
                                                                          HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Organization Already Exists", request);
     }
+
+    // for Service
+
+    @ExceptionHandler(ServiceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleServiceNotFoundException(ServiceNotFoundException ex,
+                                                                         HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Service/Room/Branch Not Found in DB", request);
+    }
 }

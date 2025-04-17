@@ -3,18 +3,16 @@ package ua.shpp.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "id")
 @ToString
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "rooms")
-public class RoomEntity {
+@AllArgsConstructor
+@Builder
+@Table(name = "services")
+public class ServiceEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,12 +20,13 @@ public class RoomEntity {
 
     private String name;
 
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "room")
-    private List<ServiceEntity> serviceEntities;
+    private String color; // HEX-code - like #FF0000
 
     @ManyToOne
     @JoinColumn(name = "branch_id")
     private BranchEntity branch;
 
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private RoomEntity room;
 }
