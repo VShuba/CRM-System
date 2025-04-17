@@ -18,9 +18,9 @@ public class OneTimeServiceEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "activity_id", nullable = false)
-//    private Activity activity;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "activity_id", nullable = false)
+    private ServiceEntity activity;
 
     @Column(name = "duration_in_minutes", nullable = false)
     private Duration durationInMinutes;

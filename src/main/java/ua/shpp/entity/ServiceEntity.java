@@ -1,7 +1,11 @@
 package ua.shpp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,4 +33,24 @@ public class ServiceEntity {
     @ManyToOne
     @JoinColumn(name = "room_id")
     private RoomEntity room;
+
+    @ManyToMany(mappedBy = "activities", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<SubscriptionServiceEntity> subscriptions = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "activity",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    private List<OneTimeServiceEntity> oneTimeServices = new ArrayList<>();
+
+    @PreRemove
+    private void preRemove() {
+        for (SubscriptionServiceEntity sub : new ArrayList<>(subscriptions)) {
+            sub.getActivities().remove(this);
+        }
+    }
 }

@@ -8,7 +8,8 @@ import jakarta.validation.constraints.Size;
 public record OneTimeOfferDTO(
         @Schema(description = "Service id", example = "1")
         Long id,
-//        Activity activity,
+        @Schema(description = "Service id", example = "1")
+        Long activity,
         @Schema(description = "Duration in minutes", example = "60")
         @Size(min = 1, max = 500, message = "Duration must be between 1 and 500 minutes")
         @NotBlank(message = "Duration cannot be blank")

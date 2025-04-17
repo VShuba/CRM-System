@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Builder
@@ -20,13 +22,13 @@ public class SubscriptionServiceEntity {
     @Column(unique = true, nullable = false)
     private String name;
 
-    //    @ManyToMany
-//    @JoinTable(
-//            name = "subscription_activity",
-//            joinColumns = @JoinColumn(name = "subscription_id",nullable = false),
-//            inverseJoinColumns = @JoinColumn(name = "activity_id", nullable = false)
-//    )
-//    private List<Activity> activities;
+    @ManyToMany
+    @JoinTable(
+            name = "subscription_activity",
+            joinColumns = @JoinColumn(name = "subscription_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "activity_id", nullable = false)
+    )
+    private List<ServiceEntity> activities = new ArrayList<>();
 
     @Column(nullable = false)
     private Integer visits;

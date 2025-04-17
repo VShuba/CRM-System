@@ -5,10 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.OneTimeOfferDTO;
-import ua.shpp.entity.OneTimeServiceEntity;
+import ua.shpp.entity.ServiceEntity;
 import ua.shpp.exception.OfferNotFoundException;
+import ua.shpp.exception.ServiceNotFoundException;
 import ua.shpp.mapper.OneTimeOfferMapper;
 import ua.shpp.repository.OneTimeOfferRepository;
+import ua.shpp.repository.ServiceRepository;
 
 @Slf4j
 @Service
@@ -16,11 +18,15 @@ import ua.shpp.repository.OneTimeOfferRepository;
 public class OneTimeOfferService {
     private final OneTimeOfferMapper oneTimeOfferMapper;
     private final OneTimeOfferRepository oneTimeOfferRepository;
+    private final ServiceRepository serviceRepository;
 
     public OneTimeOfferDTO create(OneTimeOfferDTO oneTimeOfferDTO) {
         log.debug("create() called with DTO: {}", oneTimeOfferDTO);
-        var entity = oneTimeOfferMapper.dtoToEntity(oneTimeOfferDTO);
+        var entity = oneTimeOfferMapper.dtoToEntity(oneTimeOfferDTO,serviceRepository);
         entity.setId(null);
+        ServiceEntity serviceEntity = serviceRepository.findById(oneTimeOfferDTO.activity())
+                .orElseThrow(() -> new ServiceNotFoundException("Service not found"));
+        entity.setActivity(serviceEntity);
         entity = oneTimeOfferRepository.save(entity);
         log.info("Created one-time offer (id={})", entity.getId());
         return oneTimeOfferMapper.entityToDto(entity);
@@ -36,11 +42,12 @@ public class OneTimeOfferService {
 
     public OneTimeOfferDTO update(OneTimeOfferDTO updateDto) {
         log.debug("update() called with DTO: {}", updateDto);
-        var oldDto = get(updateDto.id());
-        var updateEntity = updateEntity(oldDto, updateDto);
-        oneTimeOfferRepository.save(updateEntity);
-        log.info("Updated one-time offer (id={})", updateEntity.getId());
-        return oneTimeOfferMapper.entityToDto(updateEntity);
+        var entity = oneTimeOfferRepository.findById(updateDto.id())
+                .orElseThrow(() -> new OfferNotFoundException(String.format("Offer id: %d, not found", updateDto.id())));
+        oneTimeOfferMapper.updateFromDto(updateDto, entity,serviceRepository);
+        oneTimeOfferRepository.save(entity);
+        log.info("Updated one-time offer (id={})", entity.getId());
+        return oneTimeOfferMapper.entityToDto(entity);
     }
 
     public void delete(Long id) {
@@ -51,22 +58,5 @@ public class OneTimeOfferService {
             oneTimeOfferRepository.deleteById(id);
             log.info("Deleted one-time offer (id={})", id);
         }
-    }
-
-    private OneTimeServiceEntity updateEntity(OneTimeOfferDTO oldDto, OneTimeOfferDTO updateDto) {
-        OneTimeServiceEntity updateEntity = new OneTimeServiceEntity();
-        updateEntity.setId(updateDto.id());
-        if (updateDto.durationInMinutes() != null) {
-            updateEntity.setDurationInMinutes(updateDto.durationInMinutes());
-        } else {
-            updateEntity.setDurationInMinutes(oldDto.durationInMinutes());
-        }
-        if (updateDto.price() != null) {
-            updateEntity.setPrice(updateDto.price());
-        } else {
-            updateEntity.setPrice(oldDto.price());
-        }
-        //todo add  Activity blocker
-        return updateEntity;
     }
 }
