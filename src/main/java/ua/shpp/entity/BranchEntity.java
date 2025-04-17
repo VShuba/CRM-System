@@ -3,6 +3,7 @@ package ua.shpp.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,6 +28,6 @@ public class BranchEntity {
     private Organization organization;
 
     @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RoomEntity> rooms;
+    private List<RoomEntity> rooms = new ArrayList<>();
 
 }

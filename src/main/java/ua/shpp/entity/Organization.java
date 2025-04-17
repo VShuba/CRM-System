@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Builder
@@ -24,9 +25,10 @@ public class Organization {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
+    @Builder.Default
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore // also needs for exclude recursion
-    private List<BranchEntity> branchEntities;
+    private List<BranchEntity> branchEntities = new ArrayList<>();
 
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
