@@ -35,4 +35,8 @@ public class OneTimeServiceEntity {
     public void setDurationInMinutes(long durationInMinutes) {
         this.durationInMinutes = Duration.ofMinutes(durationInMinutes);
     }
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "event_type_id", nullable = false)
+    private EventTypeEntity eventType;
 }

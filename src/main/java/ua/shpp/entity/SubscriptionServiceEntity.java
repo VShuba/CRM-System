@@ -43,4 +43,8 @@ public class SubscriptionServiceEntity {
     public void setTermOfValidityInDays(Integer termOfValidityInDays) {
         this.termOfValidityInDays = Period.ofDays(termOfValidityInDays);
     }
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "event_type_id", nullable = false)
+    private EventTypeEntity eventType;
 }
