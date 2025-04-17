@@ -2,6 +2,8 @@ package ua.shpp.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.List;
+
 @Schema(description = "Response branch")
 public record BranchResponseDTO(
 
@@ -10,7 +12,11 @@ public record BranchResponseDTO(
 
         @Schema(description = "Id of organization", example = "1")
         Long organizationId,
+
         @Schema(description = "Name of branch")
-        String name
+        String name,
+
+        @Schema(description = "List of rooms")
+        List<RoomResponseDTO> rooms
 ) {
 }
