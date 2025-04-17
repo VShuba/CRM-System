@@ -9,6 +9,7 @@ import ua.shpp.dto.OrganizationResponseDTO;
 import ua.shpp.entity.Organization;
 import ua.shpp.exception.OrganizationAlreadyExists;
 import ua.shpp.exception.OrganizationNotFound;
+import ua.shpp.mapper.OrganizationEntityToOrganizationDTOMapper;
 import ua.shpp.repository.OrganizationRepository;
 
 @Service
@@ -16,6 +17,8 @@ import ua.shpp.repository.OrganizationRepository;
 public class OrganizationService {
 
     private final OrganizationRepository repository;
+
+    private final OrganizationEntityToOrganizationDTOMapper mapper;
 
     public ResponseEntity<OrganizationResponseDTO> create(OrganizationRequestDTO organizationRequestDTO) {
 
@@ -32,7 +35,7 @@ public class OrganizationService {
 
         repository.save(organization);
 
-        return new ResponseEntity<>(toOrgDTO(organization), HttpStatus.CREATED);
+        return new ResponseEntity<>(mapper.organizationEntityToOrganizationResponseDTO(organization), HttpStatus.CREATED);
     }
 
     public ResponseEntity<OrganizationResponseDTO> get(Long orgID) {
@@ -40,7 +43,7 @@ public class OrganizationService {
         Organization organization = repository.findById(orgID).orElseThrow(
                 () -> new OrganizationNotFound("Failed to find organization in DB."));
 
-        return new ResponseEntity<>(toOrgDTO(organization), HttpStatus.OK);
+        return new ResponseEntity<>(mapper.organizationEntityToOrganizationResponseDTO(organization), HttpStatus.OK);
     }
 
     public ResponseEntity<OrganizationResponseDTO> update(Long orgID, OrganizationRequestDTO organizationRequestDTO) {
@@ -58,7 +61,7 @@ public class OrganizationService {
 
         repository.save(organization);
 
-        return new ResponseEntity<>(toOrgDTO(organization), HttpStatus.OK);
+        return new ResponseEntity<>(mapper.organizationEntityToOrganizationResponseDTO(organization), HttpStatus.OK);
     }
 
     public void delete(Long orgID) {
@@ -69,8 +72,5 @@ public class OrganizationService {
         repository.delete(organization);
     }
 
-    private OrganizationResponseDTO toOrgDTO(Organization organization) {
-        return new OrganizationResponseDTO(organization.getId(), organization.getName());
-    }
 
 }
