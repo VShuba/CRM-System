@@ -88,7 +88,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ServiceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleServiceNotFoundException(ServiceNotFoundException ex,
-                                                                         HttpServletRequest request) {
+                                                                        HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Service/Room/Branch Not Found in DB", request);
     }
+
+    // For Branch
+
+    @ExceptionHandler(BranchNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleBranchNotFoundException(BranchNotFoundException ex,
+                                                                       HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Branch Not Found in DB", request);
+    }
+
 }

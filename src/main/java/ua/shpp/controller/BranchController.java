@@ -1,5 +1,11 @@
 package ua.shpp.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,30 +20,61 @@ import java.net.URI;
 @RestController
 @RequestMapping("/api/branches") //TODO 13:42 15.04.2025 maybe /api/organizations/{orgId}/branches ???
 @RequiredArgsConstructor
+@Tag(name = "Branches", description = "Operations related to organization branches")
 public class BranchController {
 
     private final BranchService branchService;
 
+    @Operation(summary = "Create a new branch", description =
+            "Creates a new branch under a specific organization and returns its DTO")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Branch created successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BranchResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
+    })
     @PostMapping
-    ResponseEntity<BranchResponseDTO> createBranch(@RequestBody @Valid BranchRequestDTO requestDTO) {
-        BranchResponseDTO createdBranch = branchService.create(requestDTO);
+    public ResponseEntity<BranchResponseDTO> createBranch(
+            @RequestBody @Valid BranchRequestDTO requestDTO) {
+        BranchResponseDTO createdBranch = branchService.create(requestDTO).getBody();
 
         URI location = URI.create("/api/branches/" + createdBranch.id());
 
         return ResponseEntity.created(location).body(createdBranch);
     }
 
+    @Operation(summary = "Get a branch by ID", description = "Returns a single branch by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Branch found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BranchResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content)
+    })
     @GetMapping("/{id}")
-    ResponseEntity<BranchResponseDTO> getBranch(@PathVariable Long id) {
-        return ResponseEntity.ok(branchService.get(id));
+    public ResponseEntity<BranchResponseDTO> getBranch(@PathVariable Long id) {
+        return branchService.get(id);
     }
 
+    @Operation(summary = "Update branch name", description = "Updates the name of an existing branch")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Branch updated successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BranchResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
+    })
     @PatchMapping("/{id}")
-    ResponseEntity<BranchResponseDTO> updateBranch(@PathVariable Long id,
-                                                   @RequestBody @Valid BranchPatchRequestDTO requestDTO) {
-        return ResponseEntity.ok(branchService.updateName(id, requestDTO));
+    public ResponseEntity<BranchResponseDTO> updateBranch(
+            @PathVariable Long id,
+            @RequestBody @Valid BranchPatchRequestDTO requestDTO) {
+        return branchService.updateName(id, requestDTO);
     }
 
+    @Operation(summary = "Delete a branch", description = "Deletes a branch by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Branch deleted successfully", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content)
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBranch(@PathVariable Long id) {
         branchService.delete(id);
