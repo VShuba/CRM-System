@@ -98,4 +98,18 @@ public class GlobalExceptionHandler {
                                                                HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Offer not found", request);
     }
+
+    // for event type
+
+    @ExceptionHandler(EventTypeNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEventTypeNotFound(EventTypeNotFoundException ex,
+                                                             HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Event type not found", request);
+    }
+
+    @ExceptionHandler(EventTypeAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleEventTypeAlreadyExists(EventTypeAlreadyExistsException ex,
+                                                                 HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.CONFLICT, "Event type Already Exists", request);
+    }
 }
