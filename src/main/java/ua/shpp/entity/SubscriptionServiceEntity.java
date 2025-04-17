@@ -35,4 +35,12 @@ public class SubscriptionServiceEntity {
     private Period termOfValidityInDays = Period.ofDays(35);
 
     private Long price;
+
+    public Period getTermOfValidityInDays() {
+        return termOfValidityInDays;
+    }
+
+    public void setTermOfValidityInDays(Integer termOfValidityInDays) {
+        this.termOfValidityInDays = Period.ofDays(termOfValidityInDays);
+    }
 }

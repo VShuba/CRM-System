@@ -7,8 +7,5 @@ import java.util.Optional;
 
 
 public interface OneTimeOfferRepository extends JpaRepository<OneTimeServiceEntity, Long> {
-    @Override
-    Optional<OneTimeServiceEntity> findById(Long aLong);
 
-    boolean existsById(Long id);
 }

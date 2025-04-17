@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-@Schema(description = "Request to one time offer")
+@Schema(description = "Request to one-time offer")
 public record OneTimeOfferDTO(
         @Schema(description = "Service id", example = "1")
         Long id,

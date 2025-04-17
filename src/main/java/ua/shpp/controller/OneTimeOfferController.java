@@ -15,7 +15,7 @@ import java.net.URI;
 @RestController
 @RequestMapping("/api/offer/one-time")
 @RequiredArgsConstructor
-@Tag(name = "OneTimeOffer", description = "One time service management API")
+@Tag(name = "OneTimeOffer", description = "One-time service management API")
 public class OneTimeOfferController {
 
     private final OneTimeOfferService oneTimeOfferService;
@@ -24,7 +24,7 @@ public class OneTimeOfferController {
     public ResponseEntity<OneTimeOfferDTO> create(
             @RequestBody OneTimeOfferDTO oneTimeOfferDTO) {
         var service = oneTimeOfferService.create(oneTimeOfferDTO);
-        URI location = URI.create("/api/service/one/" + service.id());
+        URI location = URI.create("/api/offer/one-time/" + service.id());
 
         return ResponseEntity.created(location).body(service);
     }
@@ -39,7 +39,7 @@ public class OneTimeOfferController {
     public ResponseEntity<OneTimeOfferDTO> update(
             @RequestBody OneTimeOfferDTO oneTimeOfferDTO) {
         var service = oneTimeOfferService.update(oneTimeOfferDTO);
-        URI location = URI.create("/api/service/one/" + service.id());
+        URI location = URI.create("/api/offer/one-time/" + service.id());
 
         return ResponseEntity
                 .ok()
@@ -48,8 +48,8 @@ public class OneTimeOfferController {
     }
 
 
-    @Operation(summary = "Delete a one‑time service by its id",
-            description = "Delete a one‑time service by its id")
+    @Operation(summary = "Delete a one‑time offer by its id",
+            description = "Delete a one‑time offer by its id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Deleted successfully"),
     })
