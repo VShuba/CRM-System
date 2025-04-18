@@ -32,7 +32,7 @@ public class ServiceEntity {
 
     @ManyToOne
     @JoinColumn(name = "room_id")
-    private RoomEntity room;
+    private RoomEntity room; // может быть много комнат, переделать связь
 
     @ManyToMany(mappedBy = "activity", fetch = FetchType.LAZY)
     @JsonIgnore

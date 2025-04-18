@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.OrganizationRequestDTO;
@@ -34,7 +35,7 @@ public class OrganizationController {
     @PostMapping("/")
     public ResponseEntity<OrganizationResponseDTO> createOrganization(
             @RequestBody @Valid OrganizationRequestDTO requestDTO) {
-        return organizationService.create(requestDTO);
+        return new ResponseEntity<>(organizationService.create(requestDTO), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Get organization by ID", description = "Returns the organization as a DTO")
@@ -46,7 +47,7 @@ public class OrganizationController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<OrganizationResponseDTO> getOrganization(@PathVariable Long id) {
-        return organizationService.get(id);
+        return new ResponseEntity<>(organizationService.get(id), HttpStatus.OK);
     }
 
     @Operation(summary = "Update organization", description = "Updates organization name by ID")
@@ -63,7 +64,7 @@ public class OrganizationController {
     public ResponseEntity<OrganizationResponseDTO> updateOrganization(
             @PathVariable Long id,
             @RequestBody @Valid OrganizationRequestDTO requestDTO) {
-        return organizationService.update(id, requestDTO);
+        return new ResponseEntity<>(organizationService.update(id, requestDTO), HttpStatus.OK);
     }
 
     @Operation(summary = "Delete organization", description = "Deletes an organization by ID")

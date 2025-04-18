@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.ServiceRequestDTO;
@@ -32,7 +33,7 @@ public class ServiceController {
     @PostMapping("/")
     public ResponseEntity<ServiceResponseDTO> createService(
             @RequestBody @Valid ServiceRequestDTO requestDTO) {
-        return serviceService.create(requestDTO);
+        return new ResponseEntity<>(serviceService.create(requestDTO), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Get service by ID", description = "Returns service DTO by its ID")
@@ -44,7 +45,7 @@ public class ServiceController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResponseDTO> getService(@PathVariable Long id) {
-        return serviceService.get(id);
+        return new ResponseEntity<>(serviceService.get(id), HttpStatus.OK);
     }
 
     @Operation(summary = "Update service", description = "Updates a service by its ID")
@@ -59,7 +60,7 @@ public class ServiceController {
     public ResponseEntity<ServiceResponseDTO> updateService(
             @PathVariable Long id,
             @RequestBody @Valid ServiceRequestDTO requestDTO) {
-        return serviceService.update(id, requestDTO);
+        return new ResponseEntity<>(serviceService.update(id, requestDTO), HttpStatus.OK);
     }
 
     @Operation(summary = "Delete service", description = "Deletes a service by ID")
