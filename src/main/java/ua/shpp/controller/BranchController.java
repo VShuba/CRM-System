@@ -13,12 +13,14 @@ import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.BranchPatchRequestDTO;
 import ua.shpp.dto.BranchRequestDTO;
 import ua.shpp.dto.BranchResponseDTO;
+import ua.shpp.dto.WorkingHourDTO;
 import ua.shpp.service.BranchService;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/branches") //TODO 13:42 15.04.2025 maybe /api/organizations/{orgId}/branches ???
+@RequestMapping("/api/organizations/{orgId}/branches")
 @RequiredArgsConstructor
 @Tag(name = "Branches", description = "Operations related to organization branches")
 public class BranchController {
@@ -35,10 +37,11 @@ public class BranchController {
     })
     @PostMapping
     public ResponseEntity<BranchResponseDTO> createBranch(
+            @PathVariable Long orgId,
             @RequestBody @Valid BranchRequestDTO requestDTO) {
         BranchResponseDTO createdBranch = branchService.create(requestDTO).getBody();
 
-        URI location = URI.create("/api/branches/" + createdBranch.id());
+        URI location = URI.create("/api/organizations/" + orgId + "/branches/" + createdBranch.id());
 
         return ResponseEntity.created(location).body(createdBranch);
     }
@@ -50,9 +53,11 @@ public class BranchController {
                             schema = @Schema(implementation = BranchResponseDTO.class))),
             @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content)
     })
-    @GetMapping("/{id}")
-    public ResponseEntity<BranchResponseDTO> getBranch(@PathVariable Long id) {
-        return branchService.get(id);
+    @GetMapping("/{branchId}")
+    public ResponseEntity<BranchResponseDTO> getBranch(
+            @PathVariable Long orgId,
+            @PathVariable Long branchId) {
+        return branchService.get(branchId);
     }
 
     @Operation(summary = "Update branch name", description = "Updates the name of an existing branch")
@@ -63,11 +68,20 @@ public class BranchController {
             @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content),
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
     })
-    @PatchMapping("/{id}")
+    @PatchMapping("/{branchId}")
     public ResponseEntity<BranchResponseDTO> updateBranch(
-            @PathVariable Long id,
+            @PathVariable Long orgId,
+            @PathVariable Long branchId,
             @RequestBody @Valid BranchPatchRequestDTO requestDTO) {
-        return branchService.updateName(id, requestDTO);
+        return branchService.updateName(branchId, requestDTO);
+    }
+
+    @PatchMapping("/{branchId}/working-hours")
+    public ResponseEntity<BranchResponseDTO> updateWorkingHours(
+            @PathVariable Long orgId,
+            @PathVariable Long branchId,
+            @RequestBody @Valid List<WorkingHourDTO> requestDTO) {
+        return ResponseEntity.ok(branchService.updateWorkingHours(orgId, branchId, requestDTO));
     }
 
     @Operation(summary = "Delete a branch", description = "Deletes a branch by its ID")
@@ -75,9 +89,11 @@ public class BranchController {
             @ApiResponse(responseCode = "204", description = "Branch deleted successfully", content = @Content),
             @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content)
     })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBranch(@PathVariable Long id) {
-        branchService.delete(id);
+    @DeleteMapping("/{branchId}")
+    public ResponseEntity<Void> deleteBranch(
+            @PathVariable Long orgId,
+            @PathVariable Long branchId) {
+        branchService.delete(branchId);
         return ResponseEntity.noContent().build();
     }
 }
