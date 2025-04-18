@@ -2,6 +2,7 @@ package ua.shpp.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ua.shpp.model.WorkingHour;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,4 +33,8 @@ public class BranchEntity {
 
     @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ServiceEntity> serviceEntities;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "branch_working_hours", joinColumns = @JoinColumn(name = "branch_id"))
+    private List<WorkingHour> workingHours = new ArrayList<>();
 }

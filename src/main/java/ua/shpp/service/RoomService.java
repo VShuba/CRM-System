@@ -6,11 +6,9 @@ import ua.shpp.dto.RoomRequestDTO;
 import ua.shpp.dto.RoomResponseDTO;
 import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.RoomEntity;
-import ua.shpp.exception.BranchNotFoundException;
 import ua.shpp.exception.RoomAlreadyExistsException;
 import ua.shpp.exception.RoomNotFoundException;
 import ua.shpp.mapper.RoomEntityToRoomDTOMapper;
-import ua.shpp.repository.BranchRepository;
 import ua.shpp.repository.RoomRepository;
 
 @Service
@@ -18,11 +16,11 @@ import ua.shpp.repository.RoomRepository;
 public class RoomService {
 
     private final RoomRepository roomRepository;
-    private final BranchRepository branchRepository;
+    private final BranchService branchService;
     private final RoomEntityToRoomDTOMapper mapper;
 
     public RoomResponseDTO create(Long orgId, Long branchId, RoomRequestDTO requestDTO) {
-        BranchEntity branchEntity = validateBranch(orgId, branchId);
+        BranchEntity branchEntity = branchService.validateBranch(orgId, branchId);
 
         if (roomRepository.existsByNameAndBranchId(requestDTO.name(), branchId)) {
             throw new RoomAlreadyExistsException("Room with name " + requestDTO.name() + " already exists in this branch");
@@ -39,7 +37,7 @@ public class RoomService {
     }
 
     public RoomResponseDTO get(Long orgId, Long branchId, Long roomId) {
-        validateBranch(orgId, branchId);
+        branchService.validateBranch(orgId, branchId);
 
         RoomEntity room = validateRoom(branchId, roomId);
 
@@ -47,7 +45,7 @@ public class RoomService {
     }
 
     public RoomResponseDTO patch(Long orgId, Long branchId, Long roomId, RoomRequestDTO requestDTO) {
-        validateBranch(orgId, branchId);
+        branchService.validateBranch(orgId, branchId);
 
         RoomEntity room = validateRoom(branchId, roomId);
 
@@ -59,7 +57,7 @@ public class RoomService {
     }
 
     public RoomResponseDTO delete(Long orgId, Long branchId, Long roomId) {
-        validateBranch(orgId, branchId);
+        validateRoom(orgId, branchId);
 
         RoomEntity room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RoomNotFoundException("Room with id " + roomId + " not found"));
@@ -67,17 +65,6 @@ public class RoomService {
         roomRepository.delete(room);
 
         return mapper.roomEntityToRoomDTO(room);
-    }
-
-    private BranchEntity validateBranch(Long orgId, Long branchId) {
-        BranchEntity branch = branchRepository.findById(branchId)
-                .orElseThrow(() -> new BranchNotFoundException("Branch with id: " + branchId + " not found"));
-
-        if (!branch.getOrganization().getId().equals(orgId)) {
-            throw new IllegalArgumentException("Branch does not belong to the given organization");
-        }
-
-        return branch;
     }
 
     private RoomEntity validateRoom(Long branchId, Long roomId) {
@@ -90,6 +77,5 @@ public class RoomService {
 
         return room;
     }
-
 
 }

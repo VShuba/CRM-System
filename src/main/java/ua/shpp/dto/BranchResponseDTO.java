@@ -17,6 +17,8 @@ public record BranchResponseDTO(
         String name,
 
         @Schema(description = "List of rooms")
-        List<RoomResponseDTO> rooms
+        List<RoomResponseDTO> rooms,
+
+        List<WorkingHourDTO> workingHours
 ) {
 }
