@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import ua.shpp.dto.JwtAuthenticationResponseDTO;
+import ua.shpp.dto.auth.JwtAuthenticationResponseDTO;
 import ua.shpp.entity.UserEntity;
 import ua.shpp.model.Role;
 import ua.shpp.security.service.JwtService;

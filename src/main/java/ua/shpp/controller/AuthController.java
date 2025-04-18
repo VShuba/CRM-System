@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ua.shpp.dto.JwtAuthenticationResponseDTO;
-import ua.shpp.dto.SignInRequestDTO;
-import ua.shpp.dto.SignUpRequestDTO;
+import ua.shpp.dto.auth.JwtAuthenticationResponseDTO;
+import ua.shpp.dto.auth.SignInRequestDTO;
+import ua.shpp.dto.auth.SignUpRequestDTO;
 import ua.shpp.service.AuthenticationService;
 
 @RestController

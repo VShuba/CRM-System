@@ -7,9 +7,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ua.shpp.dto.JwtAuthenticationResponseDTO;
-import ua.shpp.dto.SignInRequestDTO;
-import ua.shpp.dto.SignUpRequestDTO;
+import ua.shpp.dto.auth.JwtAuthenticationResponseDTO;
+import ua.shpp.dto.auth.SignInRequestDTO;
+import ua.shpp.dto.auth.SignUpRequestDTO;
 import ua.shpp.entity.UserEntity;
 import ua.shpp.model.Role;
 import ua.shpp.security.service.JwtService;
