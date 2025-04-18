@@ -2,8 +2,6 @@ package ua.shpp.service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.BranchPatchRequestDTO;
 import ua.shpp.dto.BranchRequestDTO;
@@ -12,6 +10,7 @@ import ua.shpp.dto.WorkingHourDTO;
 import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.Organization;
 import ua.shpp.exception.BranchNotFoundException;
+import ua.shpp.exception.BranchOrganizationMismatchException;
 import ua.shpp.exception.OrganizationNotFound;
 import ua.shpp.mapper.BranchEntityToBranchDTOMapper;
 import ua.shpp.mapper.WorkingHourMapper;
@@ -81,7 +80,7 @@ public class BranchService {
                 .orElseThrow(() -> new BranchNotFoundException("Branch with branchId: " + branchId + " not found"));
 
         if (!branch.getOrganization().getId().equals(orgId)) {
-            throw new IllegalArgumentException("Branch does not belong to the given organization");
+            throw new BranchOrganizationMismatchException(branchId, orgId);
         }
 
         return branch;

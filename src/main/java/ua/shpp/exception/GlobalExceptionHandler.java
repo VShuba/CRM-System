@@ -92,6 +92,12 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Branch Not Found in DB", request);
     }
 
+    @ExceptionHandler(BranchOrganizationMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleBranchOrganizationMismatchException(BranchOrganizationMismatchException ex,
+                                                                                   HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Branch Organization Mismatch", request);
+    }
+
 
     @ExceptionHandler(OfferNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleOfferNotFound(OfferNotFoundException ex,
