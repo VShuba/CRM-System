@@ -1,8 +1,6 @@
 package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.OrganizationRequestDTO;
 import ua.shpp.dto.OrganizationResponseDTO;
@@ -20,7 +18,7 @@ public class OrganizationService {
 
     private final OrganizationEntityToOrganizationDTOMapper mapper;
 
-    public ResponseEntity<OrganizationResponseDTO> create(OrganizationRequestDTO organizationRequestDTO) {
+    public OrganizationResponseDTO create(OrganizationRequestDTO organizationRequestDTO) {
 
         if (repository.existsByName(organizationRequestDTO.name())) {
             // checking before save in DB
@@ -35,18 +33,18 @@ public class OrganizationService {
 
         repository.save(organization);
 
-        return new ResponseEntity<>(mapper.organizationEntityToOrganizationResponseDTO(organization), HttpStatus.CREATED);
+        return mapper.organizationEntityToOrganizationResponseDTO(organization);
     }
 
-    public ResponseEntity<OrganizationResponseDTO> get(Long orgID) {
+    public OrganizationResponseDTO get(Long orgID) {
 
         Organization organization = repository.findById(orgID).orElseThrow(
                 () -> new OrganizationNotFound("Failed to find organization in DB."));
 
-        return new ResponseEntity<>(mapper.organizationEntityToOrganizationResponseDTO(organization), HttpStatus.OK);
+        return mapper.organizationEntityToOrganizationResponseDTO(organization);
     }
 
-    public ResponseEntity<OrganizationResponseDTO> update(Long orgID, OrganizationRequestDTO organizationRequestDTO) {
+    public OrganizationResponseDTO update(Long orgID, OrganizationRequestDTO organizationRequestDTO) {
 
         Organization organization = repository.findById(orgID).orElseThrow(
                 () -> new OrganizationNotFound("Failed to find organization in DB."));
@@ -61,7 +59,7 @@ public class OrganizationService {
 
         repository.save(organization);
 
-        return new ResponseEntity<>(mapper.organizationEntityToOrganizationResponseDTO(organization), HttpStatus.OK);
+        return mapper.organizationEntityToOrganizationResponseDTO(organization);
     }
 
     public void delete(Long orgID) {

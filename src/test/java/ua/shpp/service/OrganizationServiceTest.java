@@ -6,6 +6,7 @@ import ua.shpp.dto.OrganizationRequestDTO;
 import ua.shpp.entity.Organization;
 import ua.shpp.exception.OrganizationAlreadyExists;
 import ua.shpp.exception.OrganizationNotFound;
+import ua.shpp.mapper.OrganizationEntityToOrganizationDTOMapper;
 import ua.shpp.repository.OrganizationRepository;
 
 import java.util.Optional;
@@ -16,12 +17,14 @@ import static org.mockito.Mockito.*;
 class OrganizationServiceTest {
 
     private OrganizationRepository repository;
+    private OrganizationEntityToOrganizationDTOMapper organizationDTOMapper;
     private OrganizationService service;
 
     @BeforeEach
     void setUp() {
         repository = mock(OrganizationRepository.class);
-        service = new OrganizationService(repository);
+        organizationDTOMapper = mock(OrganizationEntityToOrganizationDTOMapper.class);
+        service = new OrganizationService(repository, organizationDTOMapper);
     }
 
     @Test

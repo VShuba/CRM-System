@@ -1,8 +1,6 @@
 package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.ServiceRequestDTO;
 import ua.shpp.dto.ServiceResponseDTO;
@@ -24,7 +22,7 @@ public class ServiceService {
     private final RoomRepository roomRepository;
     private final ServiceEntityToDTOMapper mapper;
 
-    public ResponseEntity<ServiceResponseDTO> create(ServiceRequestDTO dto) {
+    public ServiceResponseDTO create(ServiceRequestDTO dto) {
         BranchEntity branch = branchRepository.findById(dto.branchId())
                 .orElseThrow(() -> new ServiceNotFoundException("Branch not found"));
 
@@ -43,17 +41,17 @@ public class ServiceService {
 
         repository.save(service);
 
-        return new ResponseEntity<>(mapper.toResponse(service), HttpStatus.CREATED);
+        return mapper.toResponse(service);
     }
 
-    public ResponseEntity<ServiceResponseDTO> get(Long id) {
+    public ServiceResponseDTO get(Long id) {
         ServiceEntity service = repository.findById(id)
                 .orElseThrow(() -> new ServiceNotFoundException("Service not found"));
 
-        return new ResponseEntity<>(mapper.toResponse(service), HttpStatus.OK);
+        return mapper.toResponse(service);
     }
 
-    public ResponseEntity<ServiceResponseDTO> update(Long id, ServiceRequestDTO dto) {
+    public ServiceResponseDTO update(Long id, ServiceRequestDTO dto) {
         ServiceEntity service = repository.findById(id)
                 .orElseThrow(() -> new ServiceNotFoundException("Service not found"));
 
@@ -70,7 +68,7 @@ public class ServiceService {
 
         repository.save(service);
 
-        return new ResponseEntity<>(mapper.toResponse(service), HttpStatus.OK);
+        return mapper.toResponse(service);
     }
 
     public void delete(Long id) {
