@@ -23,6 +23,10 @@ public class EmployeeEntity {
 
     private String phone;
 
+    @Lob
+    @Column(nullable = false, columnDefinition = "BLOB")
+    private byte[] avatar;
+
     @ManyToMany
     @JoinTable(
             name = "employee_service",
