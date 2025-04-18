@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ua.shpp.dto.SubscriptionOfferDTO;
 import ua.shpp.exception.OfferNotFoundException;
 import ua.shpp.mapper.SubscriptionOfferMapper;
+import ua.shpp.repository.ServiceRepository;
 import ua.shpp.repository.SubscriptionOfferRepository;
 
 
@@ -15,10 +16,11 @@ import ua.shpp.repository.SubscriptionOfferRepository;
 public class SubscriptionOfferService {
     private final SubscriptionOfferRepository subscriptionOfferRepository;
     private final SubscriptionOfferMapper subscriptionOfferMapper;
+    private final ServiceRepository serviceRepository;
 
     public SubscriptionOfferDTO create(SubscriptionOfferDTO dto) {
         log.debug("create() called with DTO: {}", dto);
-        var entity = subscriptionOfferMapper.toEntity(dto);
+        var entity = subscriptionOfferMapper.toEntity(dto,serviceRepository);
         entity.setId(null);
         entity = subscriptionOfferRepository.save(entity);
         log.info("Created subscription offer (id={})", entity.getId());
@@ -37,7 +39,7 @@ public class SubscriptionOfferService {
         log.debug("update() called with DTO: {}", updateDto);
         var entity = subscriptionOfferRepository.findById(updateDto.id())
                 .orElseThrow(() -> new OfferNotFoundException(String.format("Offer id: %d, not found", updateDto.id())));
-        subscriptionOfferMapper.updateFromDto(updateDto, entity);
+        subscriptionOfferMapper.updateFromDto(updateDto, entity, serviceRepository);
         subscriptionOfferRepository.save(entity);
         log.info("Updated subscription offer (id={})", entity.getId());
         return subscriptionOfferMapper.toDto(entity);

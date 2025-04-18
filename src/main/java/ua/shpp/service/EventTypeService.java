@@ -15,6 +15,7 @@ import ua.shpp.mapper.EventTypeMapper;
 import ua.shpp.mapper.OneTimeOfferMapper;
 import ua.shpp.mapper.SubscriptionOfferMapper;
 import ua.shpp.repository.EventTypeRepository;
+import ua.shpp.repository.ServiceRepository;
 
 import java.util.ArrayList;
 
@@ -26,6 +27,7 @@ public class EventTypeService {
     private final EventTypeMapper eventTypeMapper;
     private final OneTimeOfferMapper oneTimeOfferMapper;
     private final SubscriptionOfferMapper subscriptionOfferMapper;
+    private final ServiceRepository serviceRepository;
 
     public ResponseEntity<EventTypeResponseDTO> create(EventTypeRequestDTO eventTypeRequestDTO) {
         if (eventTypeRepository.existsByName(eventTypeRequestDTO.name())) {
@@ -33,7 +35,7 @@ public class EventTypeService {
                     + eventTypeRequestDTO.name() + " already exists.");
         }
 
-        EventTypeEntity entity = eventTypeMapper.toEntity(eventTypeRequestDTO);
+        EventTypeEntity entity = eventTypeMapper.toEntity(eventTypeRequestDTO,serviceRepository);
 
         // Ініціалізуємо списки, щоб уникнути NullPointerException
         if (entity.getOneTimeVisits() == null) {
@@ -47,7 +49,7 @@ public class EventTypeService {
         if (eventTypeRequestDTO.oneTimeVisits() != null) {
             entity.getOneTimeVisits().addAll(
                     eventTypeRequestDTO.oneTimeVisits().stream()
-                            .map(oneTimeOfferMapper::dtoToEntity)
+                            .map(x -> oneTimeOfferMapper.dtoToEntity(x,serviceRepository))
                             .peek(e -> e.setEventType(entity))
                             .toList()
             );
@@ -56,7 +58,7 @@ public class EventTypeService {
         if (eventTypeRequestDTO.subscriptions() != null) {
             entity.getSubscriptions().addAll(
                     eventTypeRequestDTO.subscriptions().stream()
-                            .map(subscriptionOfferMapper::toEntity)
+                            .map(x -> subscriptionOfferMapper.toEntity(x, serviceRepository))
                             .peek(e -> e.setEventType(entity))
                             .toList()
             );
@@ -91,7 +93,7 @@ public class EventTypeService {
         // Додавання нових послуг та абонементів
         if (eventTypeRequestDTO.oneTimeVisits() != null) {
             eventTypeRequestDTO.oneTimeVisits().forEach(service -> {
-                OneTimeServiceEntity serviceEntity = oneTimeOfferMapper.dtoToEntity(service);
+                OneTimeServiceEntity serviceEntity = oneTimeOfferMapper.dtoToEntity(service, serviceRepository);
                 serviceEntity.setEventType(existing);
                 existing.getOneTimeVisits().add(serviceEntity);
             });
@@ -99,7 +101,7 @@ public class EventTypeService {
 
         if (eventTypeRequestDTO.subscriptions() != null) {
             eventTypeRequestDTO.subscriptions().forEach(service -> {
-                SubscriptionServiceEntity subscriptionEntity = subscriptionOfferMapper.toEntity(service);
+                SubscriptionServiceEntity subscriptionEntity = subscriptionOfferMapper.toEntity(service, serviceRepository);
                 subscriptionEntity.setEventType(existing);
                 existing.getSubscriptions().add(subscriptionEntity);
             });

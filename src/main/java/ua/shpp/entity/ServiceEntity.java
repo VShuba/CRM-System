@@ -34,7 +34,7 @@ public class ServiceEntity {
     @JoinColumn(name = "room_id")
     private RoomEntity room;
 
-    @ManyToMany(mappedBy = "activities", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "activity", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<SubscriptionServiceEntity> subscriptions = new ArrayList<>();
 
@@ -50,7 +50,7 @@ public class ServiceEntity {
     @PreRemove
     private void preRemove() {
         for (SubscriptionServiceEntity sub : new ArrayList<>(subscriptions)) {
-            sub.getActivities().remove(this);
+            sub.getActivity().remove(this);
         }
     }
 }
