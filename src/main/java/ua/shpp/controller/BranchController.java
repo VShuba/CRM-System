@@ -40,7 +40,7 @@ public class BranchController {
     public ResponseEntity<BranchResponseDTO> createBranch(
             @PathVariable Long orgId,
             @RequestBody @Valid BranchRequestDTO requestDTO) {
-        BranchResponseDTO createdBranch = branchService.create(requestDTO);
+        BranchResponseDTO createdBranch = branchService.create(orgId, requestDTO);
 
         URI location = URI.create("/api/organizations/" + orgId + "/branches/" + createdBranch.id());
 
@@ -58,7 +58,7 @@ public class BranchController {
     public ResponseEntity<BranchResponseDTO> getBranch(
             @PathVariable Long orgId,
             @PathVariable Long branchId) {
-        return new ResponseEntity<>(branchService.get(branchId), HttpStatus.OK) ;
+        return new ResponseEntity<>(branchService.get(orgId, branchId), HttpStatus.OK);
     }
 
     @Operation(summary = "Update branch name", description = "Updates the name of an existing branch")
@@ -74,7 +74,7 @@ public class BranchController {
             @PathVariable Long orgId,
             @PathVariable Long branchId,
             @RequestBody @Valid BranchPatchRequestDTO requestDTO) {
-        return new ResponseEntity<>(branchService.updateName(branchId, requestDTO), HttpStatus.OK) ;
+        return new ResponseEntity<>(branchService.updateName(orgId, branchId, requestDTO), HttpStatus.OK);
     }
 
     @PatchMapping("/{branchId}/working-hours")
@@ -94,7 +94,7 @@ public class BranchController {
     public ResponseEntity<Void> deleteBranch(
             @PathVariable Long orgId,
             @PathVariable Long branchId) {
-        branchService.delete(branchId);
+        branchService.delete(orgId, branchId);
         return ResponseEntity.noContent().build();
     }
 }

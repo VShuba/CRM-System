@@ -30,9 +30,9 @@ public class BranchService {
     private final BranchEntityToBranchDTOMapper branchMapper;
     private final WorkingHourMapper workingHourMapper;
 
-    public BranchResponseDTO create(BranchRequestDTO requestDTO) {
+    public BranchResponseDTO create(Long orgId, BranchRequestDTO requestDTO) {
 
-        Organization org = organizationRepository.findById(requestDTO.organizationId())
+        Organization org = organizationRepository.findById(orgId)
                 .orElseThrow(() -> new OrganizationNotFound("Organization not found"));
 
         BranchEntity branch = BranchEntity.builder()
@@ -45,23 +45,18 @@ public class BranchService {
         return branchMapper.branchEntityToBranchResponseDTO(branch);
     }
 
-    public BranchResponseDTO get(Long id) {
-
-        BranchEntity branchEntity = branchRepository.findById(id)
-                .orElseThrow(BranchNotFoundException::new);
-
+    public BranchResponseDTO get(Long orgId, Long branchId) {
+        BranchEntity branchEntity = validateBranch(orgId, branchId);
         return branchMapper.branchEntityToBranchResponseDTO(branchEntity);
     }
 
-    public BranchResponseDTO updateName(Long id, BranchPatchRequestDTO request) {
+    public BranchResponseDTO updateName(Long orgId, Long branchId, BranchPatchRequestDTO request) {
 
-        BranchEntity branch = branchRepository.findById(id)
-                .orElseThrow(BranchNotFoundException::new);
+        BranchEntity branchEntity = validateBranch(orgId, branchId);
+        branchEntity.setName(request.name());
+        branchRepository.save(branchEntity);
 
-        branch.setName(request.name());
-        branchRepository.save(branch);
-
-        return branchMapper.branchEntityToBranchResponseDTO(branch);
+        return branchMapper.branchEntityToBranchResponseDTO(branchEntity);
     }
 
     public BranchResponseDTO updateWorkingHours(Long orgId, Long branchId, @Valid List<WorkingHourDTO> workingHourDTOS) {
@@ -74,17 +69,16 @@ public class BranchService {
         return branchMapper.branchEntityToBranchResponseDTO(branchEntity);
     }
 
-    public void delete(Long id) {
+    public void delete(Long orgId, Long branchId) {
 
-        BranchEntity branchEntity = branchRepository.findById(id)
-                .orElseThrow(BranchNotFoundException::new);
+        BranchEntity branchEntity = validateBranch(orgId, branchId);
 
         branchRepository.delete(branchEntity);
     }
 
     protected BranchEntity validateBranch(Long orgId, Long branchId) {
         BranchEntity branch = branchRepository.findById(branchId)
-                .orElseThrow(() -> new BranchNotFoundException("Branch with id: " + branchId + " not found"));
+                .orElseThrow(() -> new BranchNotFoundException("Branch with branchId: " + branchId + " not found"));
 
         if (!branch.getOrganization().getId().equals(orgId)) {
             throw new IllegalArgumentException("Branch does not belong to the given organization");
