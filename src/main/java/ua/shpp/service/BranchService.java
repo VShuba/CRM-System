@@ -30,7 +30,7 @@ public class BranchService {
     private final BranchEntityToBranchDTOMapper branchMapper;
     private final WorkingHourMapper workingHourMapper;
 
-    public ResponseEntity<BranchResponseDTO> create(BranchRequestDTO requestDTO) {
+    public BranchResponseDTO create(BranchRequestDTO requestDTO) {
 
         Organization org = organizationRepository.findById(requestDTO.organizationId())
                 .orElseThrow(() -> new OrganizationNotFound("Organization not found"));
@@ -42,18 +42,18 @@ public class BranchService {
 
         branchRepository.save(branch);
 
-        return new ResponseEntity<>(branchMapper.branchEntityToBranchResponseDTO(branch), HttpStatus.CREATED);
+        return branchMapper.branchEntityToBranchResponseDTO(branch);
     }
 
-    public ResponseEntity<BranchResponseDTO> get(Long id) {
+    public BranchResponseDTO get(Long id) {
 
         BranchEntity branchEntity = branchRepository.findById(id)
                 .orElseThrow(BranchNotFoundException::new);
 
-        return new ResponseEntity<>(branchMapper.branchEntityToBranchResponseDTO(branchEntity), HttpStatus.OK);
+        return branchMapper.branchEntityToBranchResponseDTO(branchEntity);
     }
 
-    public ResponseEntity<BranchResponseDTO> updateName(Long id, BranchPatchRequestDTO request) {
+    public BranchResponseDTO updateName(Long id, BranchPatchRequestDTO request) {
 
         BranchEntity branch = branchRepository.findById(id)
                 .orElseThrow(BranchNotFoundException::new);
@@ -61,7 +61,7 @@ public class BranchService {
         branch.setName(request.name());
         branchRepository.save(branch);
 
-        return new ResponseEntity<>(branchMapper.branchEntityToBranchResponseDTO(branch), HttpStatus.OK);
+        return branchMapper.branchEntityToBranchResponseDTO(branch);
     }
 
     public BranchResponseDTO updateWorkingHours(Long orgId, Long branchId, @Valid List<WorkingHourDTO> workingHourDTOS) {
