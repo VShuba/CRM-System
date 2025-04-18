@@ -21,8 +21,7 @@ public class InvitationEntity {
     @ManyToOne
     UserEntity creator;
 
-    @ManyToOne
-    UserEntity recipient;
+    String recipientEmail;
 
     @Enumerated(EnumType.STRING)
     Role role;

@@ -112,4 +112,32 @@ public class GlobalExceptionHandler {
                                                                  HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.CONFLICT, "Event type Already Exists", request);
     }
+
+
+    // for Invitation
+    @ExceptionHandler(InvitationAlreadyUsedException.class)
+    public ResponseEntity<ErrorResponse> handleInvitationAlreadyUsedException(
+            InvitationAlreadyUsedException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(InvitationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleInvitationNotFoundException(
+            InvitationNotFoundException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(InvitationExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleInvitationExpiredException(
+            InvitationExpiredException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(WrongInvitationRecipient.class)
+    public ResponseEntity<ErrorResponse> handleWrongInvitationRecipient(
+            WrongInvitationRecipient ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+
 }
