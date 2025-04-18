@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.BranchPatchRequestDTO;
@@ -39,7 +40,7 @@ public class BranchController {
     public ResponseEntity<BranchResponseDTO> createBranch(
             @PathVariable Long orgId,
             @RequestBody @Valid BranchRequestDTO requestDTO) {
-        BranchResponseDTO createdBranch = branchService.create(requestDTO).getBody();
+        BranchResponseDTO createdBranch = branchService.create(requestDTO);
 
         URI location = URI.create("/api/organizations/" + orgId + "/branches/" + createdBranch.id());
 
@@ -57,7 +58,7 @@ public class BranchController {
     public ResponseEntity<BranchResponseDTO> getBranch(
             @PathVariable Long orgId,
             @PathVariable Long branchId) {
-        return branchService.get(branchId);
+        return new ResponseEntity<>(branchService.get(branchId), HttpStatus.OK) ;
     }
 
     @Operation(summary = "Update branch name", description = "Updates the name of an existing branch")
@@ -73,7 +74,7 @@ public class BranchController {
             @PathVariable Long orgId,
             @PathVariable Long branchId,
             @RequestBody @Valid BranchPatchRequestDTO requestDTO) {
-        return branchService.updateName(branchId, requestDTO);
+        return new ResponseEntity<>(branchService.updateName(branchId, requestDTO), HttpStatus.OK) ;
     }
 
     @PatchMapping("/{branchId}/working-hours")
