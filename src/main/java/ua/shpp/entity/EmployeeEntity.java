@@ -13,10 +13,10 @@ public class EmployeeEntity {
     private Integer id;
 
     @Column(name = "first_name", nullable = false)
-    private String firstname;
+    private String firstName;
 
     @Column(name = "last_name", nullable = false)
-    private String lastname;
+    private String lastName;
 
     @Column(unique = true, nullable = false)
     private String email;
