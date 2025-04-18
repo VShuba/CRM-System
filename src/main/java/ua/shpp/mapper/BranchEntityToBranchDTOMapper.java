@@ -13,10 +13,11 @@ import ua.shpp.entity.Organization;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         uses = RoomEntityToRoomDTOMapper.class)
 public interface BranchEntityToBranchDTOMapper {
+
     @Mapping(target = "organizationId", source = "organization", qualifiedByName = "organizationIdFromOrganization")
     @Mapping(target = "rooms", source = "rooms")
+    @Mapping(target = "workingHours", source = "workingHours")
     BranchResponseDTO branchEntityToBranchResponseDTO(BranchEntity source);
-
     BranchShortResponseDTO branchEntityToBranchShortResponseDTO(BranchEntity source);
 
     BranchEntity branchRequestDTOToBranchEntity(BranchRequestDTO source);

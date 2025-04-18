@@ -1,6 +1,6 @@
 package ua.shpp.service;
 
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,20 +8,27 @@ import org.springframework.stereotype.Service;
 import ua.shpp.dto.BranchPatchRequestDTO;
 import ua.shpp.dto.BranchRequestDTO;
 import ua.shpp.dto.BranchResponseDTO;
+import ua.shpp.dto.WorkingHourDTO;
 import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.Organization;
 import ua.shpp.exception.BranchNotFoundException;
 import ua.shpp.exception.OrganizationNotFound;
 import ua.shpp.mapper.BranchEntityToBranchDTOMapper;
+import ua.shpp.mapper.WorkingHourMapper;
+import ua.shpp.model.WorkingHour;
 import ua.shpp.repository.BranchRepository;
 import ua.shpp.repository.OrganizationRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BranchService {
     private final OrganizationRepository organizationRepository;
     private final BranchRepository branchRepository;
-    private final BranchEntityToBranchDTOMapper mapper;
+    private final BranchEntityToBranchDTOMapper branchMapper;
+    private final WorkingHourMapper workingHourMapper;
 
     public ResponseEntity<BranchResponseDTO> create(BranchRequestDTO requestDTO) {
 
@@ -35,7 +42,7 @@ public class BranchService {
 
         branchRepository.save(branch);
 
-        return new ResponseEntity<>(mapper.branchEntityToBranchResponseDTO(branch), HttpStatus.CREATED);
+        return new ResponseEntity<>(branchMapper.branchEntityToBranchResponseDTO(branch), HttpStatus.CREATED);
     }
 
     public ResponseEntity<BranchResponseDTO> get(Long id) {
@@ -43,7 +50,7 @@ public class BranchService {
         BranchEntity branchEntity = branchRepository.findById(id)
                 .orElseThrow(BranchNotFoundException::new);
 
-        return new ResponseEntity<>(mapper.branchEntityToBranchResponseDTO(branchEntity), HttpStatus.OK);
+        return new ResponseEntity<>(branchMapper.branchEntityToBranchResponseDTO(branchEntity), HttpStatus.OK);
     }
 
     public ResponseEntity<BranchResponseDTO> updateName(Long id, BranchPatchRequestDTO request) {
@@ -54,7 +61,17 @@ public class BranchService {
         branch.setName(request.name());
         branchRepository.save(branch);
 
-        return new ResponseEntity<>(mapper.branchEntityToBranchResponseDTO(branch), HttpStatus.OK);
+        return new ResponseEntity<>(branchMapper.branchEntityToBranchResponseDTO(branch), HttpStatus.OK);
+    }
+
+    public BranchResponseDTO updateWorkingHours(Long orgId, Long branchId, @Valid List<WorkingHourDTO> workingHourDTOS) {
+        BranchEntity branchEntity = validateBranch(orgId, branchId);
+
+        List<WorkingHour> workingHours = workingHourDTOS.stream().map(workingHourMapper::toEntity).collect(Collectors.toList());
+        branchEntity.setWorkingHours(workingHours);
+        branchRepository.save(branchEntity);
+
+        return branchMapper.branchEntityToBranchResponseDTO(branchEntity);
     }
 
     public void delete(Long id) {
@@ -63,5 +80,16 @@ public class BranchService {
                 .orElseThrow(BranchNotFoundException::new);
 
         branchRepository.delete(branchEntity);
+    }
+
+    protected BranchEntity validateBranch(Long orgId, Long branchId) {
+        BranchEntity branch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new BranchNotFoundException("Branch with id: " + branchId + " not found"));
+
+        if (!branch.getOrganization().getId().equals(orgId)) {
+            throw new IllegalArgumentException("Branch does not belong to the given organization");
+        }
+
+        return branch;
     }
 }
