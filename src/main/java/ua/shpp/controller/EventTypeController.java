@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.EventTypeRequestDTO;
@@ -33,7 +34,8 @@ public class EventTypeController {
     })
     @PostMapping
     public ResponseEntity<EventTypeResponseDTO> create(@RequestBody @Valid EventTypeRequestDTO dto) {
-        return eventTypeService.create(dto);
+        EventTypeResponseDTO response = eventTypeService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(summary = "Get event type by ID (useful when copying)")
@@ -45,7 +47,8 @@ public class EventTypeController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<EventTypeResponseDTO> get(@PathVariable Long id) {
-        return eventTypeService.get(id);
+        EventTypeResponseDTO response = eventTypeService.get(id);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Update event type")
@@ -59,7 +62,8 @@ public class EventTypeController {
     @PatchMapping("/{id}")
     public ResponseEntity<EventTypeResponseDTO> update(@PathVariable Long id,
                                                        @RequestBody @Valid EventTypeRequestDTO dto) {
-        return eventTypeService.update(id, dto);
+        EventTypeResponseDTO response = eventTypeService.update(id, dto);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Delete event type")

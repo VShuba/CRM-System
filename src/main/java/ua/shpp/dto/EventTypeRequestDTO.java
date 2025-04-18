@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Schema(description = "Request to event_type")
@@ -14,10 +13,10 @@ public record EventTypeRequestDTO(
         @NotBlank
         String name,
 
-        @Schema(description = "Список разових послуг")
+        @Schema(description = "Список разових послуг", example = "[]")
         List<OneTimeOfferDTO> oneTimeVisits,
 
-        @Schema(description = "Список абонементів")
+        @Schema(description = "Список абонементів", example = "[]")
         List<SubscriptionOfferDTO> subscriptions
 ) {
 }

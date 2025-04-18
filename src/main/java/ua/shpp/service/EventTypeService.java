@@ -1,8 +1,7 @@
 package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.EventTypeRequestDTO;
 import ua.shpp.dto.EventTypeResponseDTO;
@@ -18,9 +17,11 @@ import ua.shpp.repository.EventTypeRepository;
 import ua.shpp.repository.ServiceRepository;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EventTypeService {
 
     private final EventTypeRepository eventTypeRepository;
@@ -29,35 +30,31 @@ public class EventTypeService {
     private final SubscriptionOfferMapper subscriptionOfferMapper;
     private final ServiceRepository serviceRepository;
 
-    public ResponseEntity<EventTypeResponseDTO> create(EventTypeRequestDTO eventTypeRequestDTO) {
-        if (eventTypeRepository.existsByName(eventTypeRequestDTO.name())) {
-            throw new EventTypeAlreadyExistsException("Event type with name "
-                    + eventTypeRequestDTO.name() + " already exists.");
+    public EventTypeResponseDTO create(EventTypeRequestDTO dto) {
+        log.info("Creating new EventType with name: {}", dto.name());
+
+        if (eventTypeRepository.existsByName(dto.name())) {
+            log.warn("EventType with name '{}' already exists", dto.name());
+            throw new EventTypeAlreadyExistsException("Event type with name " + dto.name() + " already exists");
         }
 
-        EventTypeEntity entity = eventTypeMapper.toEntity(eventTypeRequestDTO,serviceRepository);
+        EventTypeEntity entity = eventTypeMapper.toEntity(dto, serviceRepository);
 
-        // Ініціалізуємо списки, щоб уникнути NullPointerException
-        if (entity.getOneTimeVisits() == null) {
-            entity.setOneTimeVisits(new ArrayList<>());
-        }
-        if (entity.getSubscriptions() == null) {
-            entity.setSubscriptions(new ArrayList<>());
-        }
+        entity.setOneTimeVisits(Optional.ofNullable(entity.getOneTimeVisits()).orElseGet(ArrayList::new));
+        entity.setSubscriptions(Optional.ofNullable(entity.getSubscriptions()).orElseGet(ArrayList::new));
 
-        // Мапінг і додавання в колекції (якщо є)
-        if (eventTypeRequestDTO.oneTimeVisits() != null) {
+        if (dto.oneTimeVisits() != null) {
             entity.getOneTimeVisits().addAll(
-                    eventTypeRequestDTO.oneTimeVisits().stream()
-                            .map(x -> oneTimeOfferMapper.dtoToEntity(x,serviceRepository))
+                    dto.oneTimeVisits().stream()
+                            .map(x -> oneTimeOfferMapper.dtoToEntity(x, serviceRepository))
                             .peek(e -> e.setEventType(entity))
                             .toList()
             );
         }
 
-        if (eventTypeRequestDTO.subscriptions() != null) {
+        if (dto.subscriptions() != null) {
             entity.getSubscriptions().addAll(
-                    eventTypeRequestDTO.subscriptions().stream()
+                    dto.subscriptions().stream()
                             .map(x -> subscriptionOfferMapper.toEntity(x, serviceRepository))
                             .peek(e -> e.setEventType(entity))
                             .toList()
@@ -65,42 +62,49 @@ public class EventTypeService {
         }
 
         EventTypeEntity saved = eventTypeRepository.save(entity);
+        log.info("EventType created with id: {}", saved.getId());
 
-        return new ResponseEntity<>(eventTypeMapper.toResponseDTO(saved), HttpStatus.CREATED);
+        return eventTypeMapper.toResponseDTO(saved);
     }
 
-    public ResponseEntity<EventTypeResponseDTO> get(Long id) {
+    public EventTypeResponseDTO get(Long id) {
+        log.info("Retrieving EventType with id: {}", id);
         EventTypeEntity entity = eventTypeRepository.findById(id)
-                .orElseThrow(() -> new EventTypeNotFoundException("Event type with id " + id + " not found"));
+                .orElseThrow(() -> {
+                    log.warn("EventType with id '{}' not found", id);
+                    return new EventTypeNotFoundException("Event type with id " + id + " not found");
+                });
 
-        return new ResponseEntity<>(eventTypeMapper.toResponseDTO(entity), HttpStatus.OK);
+        return eventTypeMapper.toResponseDTO(entity);
     }
 
-    public ResponseEntity<EventTypeResponseDTO> update(Long id, EventTypeRequestDTO eventTypeRequestDTO) {
+    public EventTypeResponseDTO update(Long id, EventTypeRequestDTO dto) {
+        log.info("Updating EventType with id: {}", id);
         EventTypeEntity existing = eventTypeRepository.findById(id)
-                .orElseThrow(() -> new EventTypeNotFoundException("Event type with id " + id + " not found"));
+                .orElseThrow(() -> {
+                    log.warn("EventType with id '{}' not found", id);
+                    return new EventTypeNotFoundException("Event type with id " + id + " not found");
+                });
 
-        if (eventTypeRepository.existsByName(eventTypeRequestDTO.name())) {
-            throw new EventTypeAlreadyExistsException("Event type with name "
-                    + eventTypeRequestDTO.name() + " already exists.");
+        if (eventTypeRepository.existsByName(dto.name()) && !existing.getName().equals(dto.name())) {
+            log.warn("EventType with name '{}' already exists", dto.name());
+            throw new EventTypeAlreadyExistsException("Event type with name " + dto.name() + " already exists");
         }
 
-        existing.setName(eventTypeRequestDTO.name());
-
+        existing.setName(dto.name());
         existing.getOneTimeVisits().clear();
         existing.getSubscriptions().clear();
 
-        // Додавання нових послуг та абонементів
-        if (eventTypeRequestDTO.oneTimeVisits() != null) {
-            eventTypeRequestDTO.oneTimeVisits().forEach(service -> {
+        if (dto.oneTimeVisits() != null) {
+            dto.oneTimeVisits().forEach(service -> {
                 OneTimeServiceEntity serviceEntity = oneTimeOfferMapper.dtoToEntity(service, serviceRepository);
                 serviceEntity.setEventType(existing);
                 existing.getOneTimeVisits().add(serviceEntity);
             });
         }
 
-        if (eventTypeRequestDTO.subscriptions() != null) {
-            eventTypeRequestDTO.subscriptions().forEach(service -> {
+        if (dto.subscriptions() != null) {
+            dto.subscriptions().forEach(service -> {
                 SubscriptionServiceEntity subscriptionEntity = subscriptionOfferMapper.toEntity(service, serviceRepository);
                 subscriptionEntity.setEventType(existing);
                 existing.getSubscriptions().add(subscriptionEntity);
@@ -108,13 +112,19 @@ public class EventTypeService {
         }
 
         EventTypeEntity updated = eventTypeRepository.save(existing);
-        return new ResponseEntity<>(eventTypeMapper.toResponseDTO(updated), HttpStatus.OK);
+        log.info("EventType updated with id: {}", updated.getId());
+
+        return eventTypeMapper.toResponseDTO(updated);
     }
 
-    public ResponseEntity<Void> delete(Long id) {
+    public void delete(Long id) {
+        log.info("Deleting EventType with id: {}", id);
+        if (!eventTypeRepository.existsById(id)) {
+            log.warn("EventType with id '{}' not found", id);
+            throw new EventTypeNotFoundException("Event type with id " + id + " not found");
+        }
         eventTypeRepository.deleteById(id);
-
-        return ResponseEntity.noContent().build();
+        log.info("EventType with id '{}' deleted", id);
     }
 }
 
