@@ -3,7 +3,8 @@ package ua.shpp.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -22,9 +23,8 @@ public class RoomEntity {
 
     private String name;
 
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "room")
-    private List<ServiceEntity> serviceEntities;
+    @ManyToMany(mappedBy = "rooms")
+    private Set<ServiceEntity> services = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "branch_id")

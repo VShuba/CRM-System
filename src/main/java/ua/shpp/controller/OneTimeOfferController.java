@@ -1,6 +1,8 @@
 package ua.shpp.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +22,13 @@ public class OneTimeOfferController {
 
     private final OneTimeOfferService oneTimeOfferService;
 
+    @Operation(summary = "Create one-time offer type")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "One-time offer successfully created",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = OneTimeOfferDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Service or Event type id not fount", content = @Content),
+    })
     @PostMapping
     public ResponseEntity<OneTimeOfferDTO> create(
             @RequestBody OneTimeOfferDTO oneTimeOfferDTO) {
@@ -29,12 +38,26 @@ public class OneTimeOfferController {
         return ResponseEntity.created(location).body(service);
     }
 
+    @Operation(summary = "Get one-time offer by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "One-time offer successfully find",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = OneTimeOfferDTO.class))),
+            @ApiResponse(responseCode = "404", description = "One-time offer id not fount", content = @Content),
+    })
     @GetMapping("/{id}")
     public ResponseEntity<OneTimeOfferDTO> get(@PathVariable Long id) {
         var dto = oneTimeOfferService.get(id);
         return ResponseEntity.ok(dto);
     }
 
+    @Operation(summary = "Update one-time offer by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "One-time offer successfully updated",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = OneTimeOfferDTO.class))),
+            @ApiResponse(responseCode = "404", description = "One-time offer, Service, Event type id not fount", content = @Content),
+    })
     @PatchMapping
     public ResponseEntity<OneTimeOfferDTO> update(
             @RequestBody OneTimeOfferDTO oneTimeOfferDTO) {
@@ -48,8 +71,8 @@ public class OneTimeOfferController {
     }
 
 
-    @Operation(summary = "Delete a one‑time offer by its id",
-            description = "Delete a one‑time offer by its id")
+    @Operation(summary = "Delete a one‑time offer by id",
+            description = "Delete a one‑time offer by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Deleted successfully"),
     })

@@ -37,13 +37,23 @@ public class UserService {
         return repository.save(userEntity);
     }
 
-    public UserEntity getByUsername(String login) {
+    public UserEntity getByLogin(String login) {
         return repository.findByLogin(login)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
     }
 
-    public UserEntity getByLogin(String login) {
+    /**
+     * Finds a user by login (username).
+     *
+     * @deprecated Deprecated because the application no longer uses login/email as the username
+     * in the authentication context. Instead, JWT contains only the user ID,
+     * which is used as the principal name in the security context.
+     * <p>
+     * Use {findByLogin(Long)} instead to look up users by ID,
+     * or rely on {@code @AuthenticationPrincipal} to access the current user.
+     */
+    @Deprecated
+    public UserEntity getByUsername(String login) {
         return repository.findByLogin(login)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
@@ -54,8 +64,10 @@ public class UserService {
      * @return поточний користувач
      */
     public UserEntity getCurrentUser() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return getByUsername(username);
+        String userIDStr = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userID = Long.parseLong(userIDStr);
+
+        return repository.findById(userID).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     public UserEntity createOAuthUser(UserEntity login) {

@@ -46,7 +46,8 @@ public class EventTypeService {
         if (dto.oneTimeVisits() != null) {
             entity.getOneTimeVisits().addAll(
                     dto.oneTimeVisits().stream()
-                            .map(x -> oneTimeOfferMapper.dtoToEntity(x, serviceRepository))
+                            .map(x -> oneTimeOfferMapper
+                                    .dtoToEntity(x, serviceRepository, eventTypeRepository))
                             .peek(e -> e.setEventType(entity))
                             .toList()
             );
@@ -55,7 +56,8 @@ public class EventTypeService {
         if (dto.subscriptions() != null) {
             entity.getSubscriptions().addAll(
                     dto.subscriptions().stream()
-                            .map(x -> subscriptionOfferMapper.toEntity(x, serviceRepository))
+                            .map(x -> subscriptionOfferMapper
+                                    .toEntity(x, serviceRepository,eventTypeRepository))
                             .peek(e -> e.setEventType(entity))
                             .toList()
             );
@@ -97,7 +99,8 @@ public class EventTypeService {
 
         if (dto.oneTimeVisits() != null) {
             dto.oneTimeVisits().forEach(service -> {
-                OneTimeServiceEntity serviceEntity = oneTimeOfferMapper.dtoToEntity(service, serviceRepository);
+                OneTimeServiceEntity serviceEntity = oneTimeOfferMapper
+                        .dtoToEntity(service, serviceRepository,eventTypeRepository);
                 serviceEntity.setEventType(existing);
                 existing.getOneTimeVisits().add(serviceEntity);
             });
@@ -105,7 +108,8 @@ public class EventTypeService {
 
         if (dto.subscriptions() != null) {
             dto.subscriptions().forEach(service -> {
-                SubscriptionServiceEntity subscriptionEntity = subscriptionOfferMapper.toEntity(service, serviceRepository);
+                SubscriptionServiceEntity subscriptionEntity = subscriptionOfferMapper
+                        .toEntity(service, serviceRepository, eventTypeRepository);
                 subscriptionEntity.setEventType(existing);
                 existing.getSubscriptions().add(subscriptionEntity);
             });
