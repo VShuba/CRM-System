@@ -1,6 +1,7 @@
 package ua.shpp.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -41,6 +43,20 @@ public class GlobalExceptionHandler {
                                                                    HttpServletRequest request) {
         String errorMessage = ex.getBindingResult().getFieldErrors().stream()
                 .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, errorMessage, request);
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorResponse> handleHandlerMethodValidationException(
+            HandlerMethodValidationException ex, HttpServletRequest request) {
+
+        String errorMessage = ex.getParameterValidationResults().stream()
+                .flatMap(vr -> vr.getResolvableErrors().stream())
+                .map(error -> error.getCodes() != null && error.getCodes().length > 0
+                        ? error.getCodes()[0] + ": " + error.getDefaultMessage()
+                        : error.getDefaultMessage())
                 .collect(Collectors.joining("; "));
 
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, errorMessage, request);

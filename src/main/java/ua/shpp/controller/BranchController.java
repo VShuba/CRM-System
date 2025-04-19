@@ -81,7 +81,7 @@ public class BranchController {
     public ResponseEntity<BranchResponseDTO> updateWorkingHours(
             @PathVariable Long orgId,
             @PathVariable Long branchId,
-            @RequestBody @Valid List<WorkingHourDTO> requestDTO) {
+            @RequestBody @Valid List<@Valid WorkingHourDTO> requestDTO) {
         return ResponseEntity.ok(branchService.updateWorkingHours(orgId, branchId, requestDTO));
     }
 
