@@ -6,10 +6,16 @@ import ua.shpp.dto.OrganizationRequestDTO;
 import ua.shpp.dto.OrganizationResponseDTO;
 import ua.shpp.entity.Organization;
 import ua.shpp.entity.UserEntity;
+import ua.shpp.entity.UserOrganization;
+import ua.shpp.entity.UserOrganizationId;
 import ua.shpp.exception.OrganizationAlreadyExists;
 import ua.shpp.exception.OrganizationNotFound;
 import ua.shpp.mapper.OrganizationEntityToOrganizationDTOMapper;
+import ua.shpp.model.Role;
 import ua.shpp.repository.OrganizationRepository;
+import ua.shpp.repository.UserOrganizationRepository;
+
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +23,7 @@ public class OrganizationService {
 
     private final OrganizationRepository repository;
     private final UserService userService;
+    private final UserOrganizationRepository userOrganizationRepository;
 
     private final OrganizationEntityToOrganizationDTOMapper mapper;
 
@@ -33,8 +40,19 @@ public class OrganizationService {
                 .name(organizationRequestDTO.name())
                 .build();
 
-        repository.save(organization);
-        // Добавить связь между тем кто дергает и этой оргой 
+        Organization savedOrganization = repository.save(organization);
+
+        UserEntity currentUser = userService.getCurrentUser();
+
+        UserOrganization userOrganization = UserOrganization.builder()
+                .id(new UserOrganizationId(currentUser.getId(), organization.getId()))
+                .organization(savedOrganization)
+                .user(currentUser)
+                .joinedAt(LocalDate.now())
+                .role(Role.OWNER) // <- даємо OWNER'a тому хто створює організацію
+                .build();
+
+        userOrganizationRepository.save(userOrganization);
 
         return mapper.organizationEntityToOrganizationResponseDTO(organization);
     }
