@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 @Schema(description = "Request for creating or updating a service")
 public record ServiceRequestDTO(
 
@@ -19,11 +21,12 @@ public record ServiceRequestDTO(
         @NotNull(message = "Branch ID is required")
         Long branchId,
 
-        @Schema(
-                description = "ID of the room (optional, can be null during creation)",
-                example = "null",
-                nullable = true
-        )
-        Long roomId
+        // new List комнат
+        @Schema(description = "IDs of rooms used for this service", example = "[1, 2, 3]")
+        List<Long> roomIds,
+
+        // new List сотрудников
+        @Schema(description = "IDs of employees who provide this service", example = "[4, 5]")
+        List<Long> employeeIds
 ) {
 }

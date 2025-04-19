@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ua.shpp.dto.OrganizationRequestDTO;
 import ua.shpp.dto.OrganizationResponseDTO;
 import ua.shpp.entity.Organization;
+import ua.shpp.entity.UserEntity;
 import ua.shpp.exception.OrganizationAlreadyExists;
 import ua.shpp.exception.OrganizationNotFound;
 import ua.shpp.mapper.OrganizationEntityToOrganizationDTOMapper;
@@ -15,6 +16,7 @@ import ua.shpp.repository.OrganizationRepository;
 public class OrganizationService {
 
     private final OrganizationRepository repository;
+    private final UserService userService;
 
     private final OrganizationEntityToOrganizationDTOMapper mapper;
 
@@ -32,6 +34,7 @@ public class OrganizationService {
                 .build();
 
         repository.save(organization);
+        // Добавить связь между тем кто дергает и этой оргой 
 
         return mapper.organizationEntityToOrganizationResponseDTO(organization);
     }
