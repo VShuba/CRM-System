@@ -9,6 +9,7 @@ import ua.shpp.entity.ServiceEntity;
 import ua.shpp.exception.OfferNotFoundException;
 import ua.shpp.exception.ServiceNotFoundException;
 import ua.shpp.mapper.OneTimeOfferMapper;
+import ua.shpp.repository.EventTypeRepository;
 import ua.shpp.repository.OneTimeOfferRepository;
 import ua.shpp.repository.ServiceRepository;
 
@@ -19,10 +20,11 @@ public class OneTimeOfferService {
     private final OneTimeOfferMapper oneTimeOfferMapper;
     private final OneTimeOfferRepository oneTimeOfferRepository;
     private final ServiceRepository serviceRepository;
+    private final EventTypeRepository eventTypeRepository;
 
     public OneTimeOfferDTO create(OneTimeOfferDTO oneTimeOfferDTO) {
         log.debug("create() called with DTO: {}", oneTimeOfferDTO);
-        var entity = oneTimeOfferMapper.dtoToEntity(oneTimeOfferDTO,serviceRepository);
+        var entity = oneTimeOfferMapper.dtoToEntity(oneTimeOfferDTO,serviceRepository,eventTypeRepository);
         entity.setId(null);
         ServiceEntity serviceEntity = serviceRepository.findById(oneTimeOfferDTO.activity())
                 .orElseThrow(() -> new ServiceNotFoundException("Service not found"));
@@ -44,7 +46,7 @@ public class OneTimeOfferService {
         log.debug("update() called with DTO: {}", updateDto);
         var entity = oneTimeOfferRepository.findById(updateDto.id())
                 .orElseThrow(() -> new OfferNotFoundException(String.format("Offer id: %d, not found", updateDto.id())));
-        oneTimeOfferMapper.updateFromDto(updateDto, entity,serviceRepository);
+        oneTimeOfferMapper.updateFromDto(updateDto, entity,serviceRepository, eventTypeRepository);
         oneTimeOfferRepository.save(entity);
         log.info("Updated one-time offer (id={})", entity.getId());
         return oneTimeOfferMapper.entityToDto(entity);

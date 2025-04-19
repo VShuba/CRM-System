@@ -2,9 +2,12 @@ package ua.shpp.mapper;
 
 import org.mapstruct.*;
 import ua.shpp.dto.SubscriptionOfferDTO;
+import ua.shpp.entity.EventTypeEntity;
 import ua.shpp.entity.ServiceEntity;
 import ua.shpp.entity.SubscriptionServiceEntity;
+import ua.shpp.exception.EventTypeNotFoundException;
 import ua.shpp.exception.ServiceNotFoundException;
+import ua.shpp.repository.EventTypeRepository;
 import ua.shpp.repository.ServiceRepository;
 
 import java.time.Period;
@@ -19,20 +22,31 @@ public interface SubscriptionOfferMapper {
     @Mapping(target = "activity",
             source = "activity",
             qualifiedByName = "activityToId")
+    @Mapping(target = "eventTypeId",
+            source = "eventType",
+            qualifiedByName = "eventToId")
     SubscriptionOfferDTO toDto(SubscriptionServiceEntity entity);
 
     @Mapping(target = "termOfValidityInDays", qualifiedByName = "intToPeriod")
     @Mapping(target = "activity", source = "activity",
             qualifiedByName = "idToActivity")
+    @Mapping(target = "eventType",
+            source = "eventTypeId",
+            qualifiedByName = "idToEvent")
     SubscriptionServiceEntity toEntity(SubscriptionOfferDTO dto,
-                                       @Context ServiceRepository repository);
+                                       @Context ServiceRepository serviceRepository,
+                                       @Context EventTypeRepository eventTypeRepository);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "activity", source = "activity",
             qualifiedByName = "idToActivity")
+    @Mapping(target = "eventType",
+            source = "eventTypeId",
+            qualifiedByName = "idToEvent")
     void updateFromDto(SubscriptionOfferDTO dto,
                        @MappingTarget SubscriptionServiceEntity entity,
-                       @Context ServiceRepository repository);
+                       @Context ServiceRepository serviceRepository,
+                       @Context EventTypeRepository eventTypeRepository);
 
     @Named("periodToInt")
     static long durationToLong(Period period) {
@@ -67,5 +81,17 @@ public interface SubscriptionOfferMapper {
             }
         }
         return entityList;
+    }
+
+    @Named("eventToId")
+    static Long eventToId(EventTypeEntity entity) {
+        return entity != null ? entity.getId() : null;
+    }
+
+    @Named("idToEvent")
+    default EventTypeEntity idToEvent(Long id,
+                                      @Context EventTypeRepository repository) {
+        return repository.findById(id)
+                .orElseThrow(() -> new EventTypeNotFoundException("Event type not found: " + id));
     }
 }
