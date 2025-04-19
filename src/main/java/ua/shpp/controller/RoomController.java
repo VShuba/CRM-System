@@ -4,8 +4,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ua.shpp.dto.RoomRequestDTO;
-import ua.shpp.dto.RoomResponseDTO;
+import ua.shpp.dto.branch.room.RoomRequestDTO;
+import ua.shpp.dto.branch.room.RoomResponseDTO;
 import ua.shpp.service.RoomService;
 
 import java.net.URI;

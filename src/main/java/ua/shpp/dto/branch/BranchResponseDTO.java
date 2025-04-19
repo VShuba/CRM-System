@@ -1,6 +1,7 @@
-package ua.shpp.dto;
+package ua.shpp.dto.branch;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import ua.shpp.dto.branch.room.RoomResponseDTO;
 
 import java.util.List;
 

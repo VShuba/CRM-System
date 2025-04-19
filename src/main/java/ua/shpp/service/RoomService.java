@@ -2,8 +2,8 @@ package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ua.shpp.dto.RoomRequestDTO;
-import ua.shpp.dto.RoomResponseDTO;
+import ua.shpp.dto.branch.room.RoomRequestDTO;
+import ua.shpp.dto.branch.room.RoomResponseDTO;
 import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.RoomEntity;
 import ua.shpp.exception.RoomAlreadyExistsException;

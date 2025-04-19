@@ -4,9 +4,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.Named;
-import ua.shpp.dto.BranchRequestDTO;
-import ua.shpp.dto.BranchResponseDTO;
-import ua.shpp.dto.BranchShortResponseDTO;
+import ua.shpp.dto.branch.BranchRequestDTO;
+import ua.shpp.dto.branch.BranchResponseDTO;
+import ua.shpp.dto.branch.BranchShortResponseDTO;
 import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.Organization;
 

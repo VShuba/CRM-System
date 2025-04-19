@@ -1,4 +1,4 @@
-package ua.shpp.dto;
+package ua.shpp.dto.branch.room;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

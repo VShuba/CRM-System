@@ -1,6 +1,7 @@
 package ua.shpp.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import ua.shpp.dto.branch.BranchShortResponseDTO;
 
 import java.util.List;
 

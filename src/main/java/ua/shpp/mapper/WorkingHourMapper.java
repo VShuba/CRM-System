@@ -2,7 +2,7 @@ package ua.shpp.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import ua.shpp.dto.WorkingHourDTO;
+import ua.shpp.dto.branch.WorkingHourDTO;
 import ua.shpp.model.WorkingHour;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;

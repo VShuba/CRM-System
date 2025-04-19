@@ -1,4 +1,4 @@
-package ua.shpp.dto;
+package ua.shpp.dto.branch;
 
 import java.time.DayOfWeek;
 

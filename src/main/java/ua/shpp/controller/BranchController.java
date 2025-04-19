@@ -11,10 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ua.shpp.dto.BranchPatchRequestDTO;
-import ua.shpp.dto.BranchRequestDTO;
-import ua.shpp.dto.BranchResponseDTO;
-import ua.shpp.dto.WorkingHourDTO;
+import ua.shpp.dto.branch.BranchPatchRequestDTO;
+import ua.shpp.dto.branch.BranchRequestDTO;
+import ua.shpp.dto.branch.BranchResponseDTO;
+import ua.shpp.dto.branch.WorkingHourDTO;
 import ua.shpp.service.BranchService;
 
 import java.net.URI;
