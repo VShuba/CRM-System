@@ -26,9 +26,6 @@ public class OneTimeOfferService {
         log.debug("create() called with DTO: {}", oneTimeOfferDTO);
         var entity = oneTimeOfferMapper.dtoToEntity(oneTimeOfferDTO,serviceRepository,eventTypeRepository);
         entity.setId(null);
-        ServiceEntity serviceEntity = serviceRepository.findById(oneTimeOfferDTO.activity())
-                .orElseThrow(() -> new ServiceNotFoundException("Service not found"));
-        entity.setActivity(serviceEntity);
         entity = oneTimeOfferRepository.save(entity);
         log.info("Created one-time offer (id={})", entity.getId());
         return oneTimeOfferMapper.entityToDto(entity);
