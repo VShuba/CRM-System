@@ -14,7 +14,7 @@ public record SubscriptionOfferDTO(
         @Schema(description = "Event type id", example = "1")
         Long eventTypeId,
         @Schema(description = "List of services id", example = "[1,2]")
-        List<Long> activity,
+        List<Long> activitiesId,
         @Schema(description = "Number of visits", example = "5")
         Integer visits,
         @Schema(description = "Validity period in days", example = "30")

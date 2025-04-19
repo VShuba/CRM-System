@@ -19,8 +19,8 @@ import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 @Mapper(componentModel = SPRING)
 public interface SubscriptionOfferMapper {
     @Mapping(target = "termOfValidityInDays", qualifiedByName = "periodToInt")
-    @Mapping(target = "activity",
-            source = "activity",
+    @Mapping(target = "activitiesId",
+            source = "activities",
             qualifiedByName = "activityToId")
     @Mapping(target = "eventTypeId",
             source = "eventType",
@@ -28,7 +28,7 @@ public interface SubscriptionOfferMapper {
     SubscriptionOfferDTO toDto(SubscriptionServiceEntity entity);
 
     @Mapping(target = "termOfValidityInDays", qualifiedByName = "intToPeriod")
-    @Mapping(target = "activity", source = "activity",
+    @Mapping(target = "activities", source = "activitiesId",
             qualifiedByName = "idToActivity")
     @Mapping(target = "eventType",
             source = "eventTypeId",
@@ -38,7 +38,7 @@ public interface SubscriptionOfferMapper {
                                        @Context EventTypeRepository eventTypeRepository);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "activity", source = "activity",
+    @Mapping(target = "activities", source = "activitiesId",
             qualifiedByName = "idToActivity")
     @Mapping(target = "eventType",
             source = "eventTypeId",

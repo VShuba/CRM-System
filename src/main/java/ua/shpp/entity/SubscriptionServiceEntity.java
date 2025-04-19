@@ -28,7 +28,7 @@ public class SubscriptionServiceEntity {
             joinColumns = @JoinColumn(name = "subscription_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "activity_id", nullable = false)
     )
-    private List<ServiceEntity> activity = new ArrayList<>();
+    private List<ServiceEntity> activities = new ArrayList<>();
 
     @Column(nullable = false)
     private Integer visits;

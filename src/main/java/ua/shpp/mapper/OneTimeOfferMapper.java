@@ -19,7 +19,7 @@ public interface OneTimeOfferMapper {
 
     @Mapping(target = "durationInMinutes", source = "durationInMinutes",
             qualifiedByName = "durationToLong")
-    @Mapping(target = "activity",
+    @Mapping(target = "activityId",
             source = "activity",
             qualifiedByName = "activityToId")
     @Mapping(target = "eventTypeId", source = "eventType",
@@ -28,7 +28,7 @@ public interface OneTimeOfferMapper {
 
     @Mapping(target = "durationInMinutes", source = "durationInMinutes",
             qualifiedByName = "longToDuration")
-    @Mapping(target = "activity", source = "activity",
+    @Mapping(target = "activity", source = "activityId",
             qualifiedByName = "idToActivity")
     @Mapping(target = "eventType", source = "eventTypeId",
             qualifiedByName = "idToEvent")
@@ -38,7 +38,7 @@ public interface OneTimeOfferMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy =
             NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "activity", source = "activity",
+    @Mapping(target = "activity", source = "activityId",
             qualifiedByName = "idToActivity")
     @Mapping(target = "eventType", source = "eventTypeId",
             qualifiedByName = "idToEvent")

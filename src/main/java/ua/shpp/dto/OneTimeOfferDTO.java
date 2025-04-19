@@ -9,7 +9,7 @@ public record OneTimeOfferDTO(
         @Schema(description = "Service id", example = "1")
         Long id,
         @Schema(description = "Service id", example = "1")
-        Long activity,
+        Long activityId,
         @Schema(description = "Event type id", example = "1")
         Long eventTypeId,
         @Schema(description = "Duration in minutes", example = "60")

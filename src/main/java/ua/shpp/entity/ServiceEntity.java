@@ -40,7 +40,7 @@ public class ServiceEntity {
     )
     private Set<RoomEntity> rooms = new HashSet<>();
 
-    @ManyToMany(mappedBy = "activity", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "activities", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<SubscriptionServiceEntity> subscriptions = new ArrayList<>();
 
@@ -56,7 +56,7 @@ public class ServiceEntity {
     @PreRemove
     private void preRemove() {
         for (SubscriptionServiceEntity sub : new ArrayList<>(subscriptions)) {
-            sub.getActivity().remove(this);
+            sub.getActivities().remove(this);
         }
     }
 

@@ -24,28 +24,34 @@ public class OneTimeOfferService {
 
     public OneTimeOfferDTO create(OneTimeOfferDTO oneTimeOfferDTO) {
         log.debug("create() called with DTO: {}", oneTimeOfferDTO);
-        var entity = oneTimeOfferMapper.dtoToEntity(oneTimeOfferDTO,serviceRepository,eventTypeRepository);
+        var entity = oneTimeOfferMapper
+                .dtoToEntity(oneTimeOfferDTO, serviceRepository, eventTypeRepository);
         entity.setId(null);
         entity = oneTimeOfferRepository.save(entity);
         log.info("Created one-time offer (id={})", entity.getId());
+        log.debug("create() one-time offer Entity: {}", entity);
         return oneTimeOfferMapper.entityToDto(entity);
     }
 
     public OneTimeOfferDTO get(Long id) {
         log.debug("get() called with id: {}", id);
         var entity = oneTimeOfferRepository.findById(id)
-                .orElseThrow(() -> new OfferNotFoundException(String.format("Offer id: %d, not found", id)));
+                .orElseThrow(() -> new OfferNotFoundException(
+                        String.format("Offer id: %d, not found", id)));
         log.info("Fetching one-time offer (id={})", id);
+        log.debug("Fetching one-time offer entity: {}", entity);
         return oneTimeOfferMapper.entityToDto(entity);
     }
 
     public OneTimeOfferDTO update(OneTimeOfferDTO updateDto) {
         log.debug("update() called with DTO: {}", updateDto);
         var entity = oneTimeOfferRepository.findById(updateDto.id())
-                .orElseThrow(() -> new OfferNotFoundException(String.format("Offer id: %d, not found", updateDto.id())));
+                .orElseThrow(() -> new OfferNotFoundException(
+                        String.format("Offer id: %d, not found", updateDto.id())));
         oneTimeOfferMapper.updateFromDto(updateDto, entity,serviceRepository, eventTypeRepository);
         oneTimeOfferRepository.save(entity);
         log.info("Updated one-time offer (id={})", entity.getId());
+        log.debug("Updated one-time offer entity: {}", entity);
         return oneTimeOfferMapper.entityToDto(entity);
     }
 
