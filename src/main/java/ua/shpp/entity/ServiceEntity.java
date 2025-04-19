@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -31,9 +32,13 @@ public class ServiceEntity {
     @JoinColumn(name = "branch_id")
     private BranchEntity branch;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
-    private RoomEntity room; // может быть много комнат, переделать связь
+    @ManyToMany
+    @JoinTable(
+            name = "service_room",
+            joinColumns = @JoinColumn(name = "service_id"),
+            inverseJoinColumns = @JoinColumn(name = "room_id")
+    )
+    private Set<RoomEntity> rooms = new HashSet<>();
 
     @ManyToMany(mappedBy = "activity", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -56,5 +61,5 @@ public class ServiceEntity {
     }
 
     @ManyToMany(mappedBy = "services")
-    Set<EmployeeEntity> employees;
+    Set<EmployeeEntity> employees; // сделать тоже самое что и с комнатами
 }
