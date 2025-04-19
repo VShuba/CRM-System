@@ -37,4 +37,6 @@ public class BranchEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "branch_working_hours", joinColumns = @JoinColumn(name = "branch_id"))
     private List<WorkingHour> workingHours = new ArrayList<>();
+
+    //todo add EventTypeEntity
 }

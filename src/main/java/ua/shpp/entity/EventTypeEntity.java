@@ -31,4 +31,6 @@ public class EventTypeEntity {
     @OneToMany(mappedBy = "eventType", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<SubscriptionServiceEntity> subscriptions;
+
+    //todo add BranchEntity
 }
