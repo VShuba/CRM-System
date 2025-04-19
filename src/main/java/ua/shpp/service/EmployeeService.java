@@ -1,10 +1,11 @@
-package ua.shpp.entity;
+package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ua.shpp.dto.EmployeeRequestDTO;
 import ua.shpp.dto.EmployeeResponseDTO;
+import ua.shpp.entity.EmployeeEntity;
 import ua.shpp.mapper.EmployeeMapper;
 import ua.shpp.repository.EmployeeRepository;
 

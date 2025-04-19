@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 import ua.shpp.dto.EmployeeRequestDTO;
 import ua.shpp.dto.EmployeeResponseDTO;
-import ua.shpp.entity.EmployeeService;
+import ua.shpp.service.EmployeeService;
 
 @Controller
 @RequestMapping("/api/admin")
