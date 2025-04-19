@@ -9,16 +9,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+import ua.shpp.entity.UserEntity;
+import ua.shpp.model.Role;
 import ua.shpp.security.service.JwtService;
 
 import java.io.IOException;
-import java.util.Collections;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -53,11 +54,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 if (jwtService.isTokenValid(jwt)) {
                     log.debug("Token valid for user with id: {}", userId);
+                    String role = jwtService.extractAuthority(jwt);
+                    UserDetails userDetails = UserEntity.builder()
+                            .id(Long.valueOf(userId))
+                            .role(Role.valueOf(role))
+                            .build();
+
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            userId,
+                            userDetails,
                             null,
-                            Collections.singletonList(new SimpleGrantedAuthority(jwtService.extractAuthority(jwt)))
-                    );
+                            userDetails.getAuthorities());
 
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
