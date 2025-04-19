@@ -11,6 +11,7 @@ import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.Organization;
 import ua.shpp.exception.BranchNotFoundException;
 import ua.shpp.exception.BranchOrganizationMismatchException;
+import ua.shpp.exception.BranchAlreadyExistsException;
 import ua.shpp.exception.OrganizationNotFound;
 import ua.shpp.mapper.BranchEntityToBranchDTOMapper;
 import ua.shpp.mapper.WorkingHourMapper;
@@ -31,6 +32,10 @@ public class BranchService {
 
     public BranchResponseDTO create(Long orgId, BranchRequestDTO requestDTO) {
 
+        if (branchRepository.existsByName(requestDTO.name())) {
+            throw new BranchAlreadyExistsException("Branch with name " + requestDTO.name() + " already exists");
+        }
+
         Organization org = organizationRepository.findById(orgId)
                 .orElseThrow(() -> new OrganizationNotFound("Organization not found"));
 
@@ -50,6 +55,10 @@ public class BranchService {
     }
 
     public BranchResponseDTO updateName(Long orgId, Long branchId, BranchPatchRequestDTO request) {
+
+        if (branchRepository.existsByName(request.name())) {
+            throw new BranchAlreadyExistsException("Branch with name " + request.name() + " already exists");
+        }
 
         BranchEntity branchEntity = validateBranch(orgId, branchId);
         branchEntity.setName(request.name());

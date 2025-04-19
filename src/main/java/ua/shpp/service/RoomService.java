@@ -47,6 +47,10 @@ public class RoomService {
     public RoomResponseDTO patch(Long orgId, Long branchId, Long roomId, RoomRequestDTO requestDTO) {
         branchService.validateBranch(orgId, branchId);
 
+        if (roomRepository.existsByNameAndBranchId(requestDTO.name(), branchId)) {
+            throw new RoomAlreadyExistsException("Room with name " + requestDTO.name() + " already exists in this branch");
+        }
+
         RoomEntity room = validateRoom(branchId, roomId);
 
         room.setName(requestDTO.name());

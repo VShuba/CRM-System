@@ -98,6 +98,12 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Branch Organization Mismatch", request);
     }
 
+    @ExceptionHandler(BranchAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleBranchAlreadyExistsException(BranchAlreadyExistsException ex,
+                                                                            HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.CONFLICT, "Branch Already Exists", request);
+    }
+
 
     @ExceptionHandler(OfferNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleOfferNotFound(OfferNotFoundException ex,
