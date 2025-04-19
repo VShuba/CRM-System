@@ -1,6 +1,8 @@
 package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.ServiceRequestDTO;
 import ua.shpp.dto.ServiceResponseDTO;
@@ -76,6 +78,12 @@ public class ServiceService {
 
         repository.delete(service);
     }
+
+    public Page<String> getAllServiceNames(Pageable pageable) {
+        return repository.findAllServiceNames(pageable);
+    }
+
+    // get all pageable return ONLY NAMES
 
     // Отримуємо філію за ID
     private BranchEntity getBranchById(Long id) {

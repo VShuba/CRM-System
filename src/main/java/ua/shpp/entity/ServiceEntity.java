@@ -24,8 +24,10 @@ public class ServiceEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "service_name", nullable = false, unique = true)
     private String name;
 
+    @Column(name = "service_color", nullable = false)
     private String color; // HEX-code - like #FF0000
 
     @ManyToOne
@@ -61,5 +63,5 @@ public class ServiceEntity {
     }
 
     @ManyToMany(mappedBy = "services")
-    Set<EmployeeEntity> employees; // сделать тоже самое что и с комнатами
+    Set<EmployeeEntity> employees;
 }

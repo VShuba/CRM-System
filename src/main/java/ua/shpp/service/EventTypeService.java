@@ -42,6 +42,7 @@ public class EventTypeService {
 
         entity.setOneTimeVisits(Optional.ofNullable(entity.getOneTimeVisits()).orElseGet(ArrayList::new));
         entity.setSubscriptions(Optional.ofNullable(entity.getSubscriptions()).orElseGet(ArrayList::new));
+        // 1 Entity - 2 null
 
         if (dto.oneTimeVisits() != null) {
             entity.getOneTimeVisits().addAll(

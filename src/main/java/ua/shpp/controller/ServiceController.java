@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +49,21 @@ public class ServiceController {
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResponseDTO> getService(@PathVariable Long id) {
         return new ResponseEntity<>(serviceService.get(id), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get all service names", description = "Returns a paginated list of service names")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paginated service names retrieved successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class)))
+    })
+    @GetMapping("/names")
+    public ResponseEntity<Page<String>> getAllServiceNames(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return new ResponseEntity<>(
+                serviceService.getAllServiceNames(PageRequest.of(page, size)),
+                HttpStatus.OK);
     }
 
     @Operation(summary = "Update service", description = "Updates a service by its ID")
