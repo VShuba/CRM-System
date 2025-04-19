@@ -20,6 +20,7 @@ public record BranchResponseDTO(
         @Schema(description = "List of rooms")
         List<RoomResponseDTO> rooms,
 
+        @Schema(description = "List of working hours")
         List<WorkingHourDTO> workingHours
 ) {
 }
