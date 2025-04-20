@@ -1,7 +1,6 @@
 package ua.shpp.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -165,6 +164,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleWrongInvitationRecipient(
             WrongInvitationRecipient ex, HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    //For user organizations
+    @ExceptionHandler(UserOrganizationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserOrganizationNotFoundException(
+            UserOrganizationNotFoundException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
 

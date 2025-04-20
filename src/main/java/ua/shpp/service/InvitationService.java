@@ -77,8 +77,7 @@ public class InvitationService {
 
 
         UserOrganization userOrganization = UserOrganization.builder()
-                .id(new UserOrganizationId(recipient.getId()
-                        ,
+                .id(new UserOrganizationId(recipient.getId(),
                         invitationEntity.getOrganization().getId()
                 ))
                 .user(recipient)

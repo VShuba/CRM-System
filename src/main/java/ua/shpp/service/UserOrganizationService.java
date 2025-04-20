@@ -5,6 +5,7 @@ import ua.shpp.dto.UserOrganizationDTO;
 import ua.shpp.dto.UserOrganizationIdDTO;
 import ua.shpp.entity.UserOrganization;
 import ua.shpp.entity.UserOrganizationId;
+import ua.shpp.exception.UserOrganizationNotFoundException;
 import ua.shpp.model.Role;
 import ua.shpp.repository.UserOrganizationRepository;
 
@@ -28,7 +29,7 @@ public class UserOrganizationService {
 
         UserOrganization userOrganization
                 = userOrganizationRepository.findById(userOrganizationId)
-                .orElseThrow(() -> new RuntimeException("User Organization Not Found"));
+                .orElseThrow(() -> new UserOrganizationNotFoundException("User Organization Not Found"));
         userOrganization.setRole(role);
         userOrganizationRepository.save(userOrganization);
         return new UserOrganizationDTO(new UserOrganizationIdDTO(
@@ -37,11 +38,13 @@ public class UserOrganizationService {
         ), userOrganization.getRole());
     }
 
-    public void deleteUserOrganizationRole(Long userId, Long organizationId) {
+    public void deleteUserOrganizationRole(Long organizationId, Long userId) {
         UserOrganizationId userOrganizationId = new UserOrganizationId(
                 userId,
                 organizationId
         );
+        userOrganizationRepository.findById(userOrganizationId)
+                .orElseThrow(() -> new UserOrganizationNotFoundException("User Organization Not Found"));
         userOrganizationRepository.deleteById(userOrganizationId);
     }
 
