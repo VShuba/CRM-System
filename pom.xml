@@ -10,7 +10,7 @@
     </parent>
     <groupId>ua</groupId>
     <artifactId>shpp</artifactId>
-    <version>0.0.30</version>
+    <version>0.0.31</version>
     <name>crm-system</name>
     <description>crm-system</description>
     <url/>
@@ -56,7 +56,6 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>runtime</scope>
         </dependency>
         <!--  start     Ticket Scrum-33# -->
         <dependency>
