@@ -20,8 +20,8 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @PostMapping(path = "/employee", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    private ResponseEntity<EmployeeResponseDTO> addEmployee(@RequestPart MultipartFile avatarImg,
-                                                            @RequestPart EmployeeRequestDTO employeeDTO) {
+    private ResponseEntity<EmployeeResponseDTO> addEmployee(@RequestPart(name = "avatar") MultipartFile avatarImg,
+                                                            @RequestPart(name = "employee") EmployeeRequestDTO employeeDTO) {
         EmployeeResponseDTO employeeResponseDTO = employeeService.createEmployee(avatarImg, employeeDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(employeeResponseDTO);
