@@ -6,6 +6,7 @@ import ua.shpp.model.WorkingHour;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -38,5 +39,7 @@ public class BranchEntity {
     @CollectionTable(name = "branch_working_hours", joinColumns = @JoinColumn(name = "branch_id"))
     private List<WorkingHour> workingHours = new ArrayList<>();
 
+    @OneToMany(mappedBy = "branch")
+    private Set<EmployeeEntity> employees;
     //todo add EventTypeEntity
 }

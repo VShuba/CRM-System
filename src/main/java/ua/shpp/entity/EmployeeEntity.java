@@ -12,11 +12,16 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
+@Table(name = "employee", uniqueConstraints = @UniqueConstraint(columnNames = {"branch_id", "email"}))
 public class EmployeeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "branch_id", nullable = false)
+    private BranchEntity branch;
 
     @Column(name = "first_name", nullable = false)
     private String firstName;
