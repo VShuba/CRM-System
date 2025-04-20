@@ -1,10 +1,13 @@
 package ua.shpp.dto;
 
-import ua.shpp.entity.ServiceEntity;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Set;
+import java.util.List;
 
-public record EmployeeResponseDTO(String firstName, String lastName, String email, String phone, String base64Avatar,
-                                  Set<ServiceEntity> services) {
-
+public record EmployeeResponseDTO(@JsonProperty("branch_id") Long branchId,
+                                  @JsonProperty("employee_id") Long id,
+                                  @JsonProperty("first_name") String firstName,
+                                  @JsonProperty("last_name") String lastName, String email, String phone,
+                                  @JsonProperty("base64_avatar") String base64Avatar,
+                                  @JsonProperty("services_ids") List<Long> servicesIds) {
 }
