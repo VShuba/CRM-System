@@ -41,5 +41,8 @@ public class BranchEntity {
 
     @OneToMany(mappedBy = "branch")
     private Set<EmployeeEntity> employees;
-    //todo add EventTypeEntity
+
+    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EventTypeEntity> eventTypes = new ArrayList<>();
+
 }

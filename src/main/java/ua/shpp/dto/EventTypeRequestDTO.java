@@ -2,21 +2,26 @@ package ua.shpp.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
 @Schema(description = "Request to event_type")
 public record EventTypeRequestDTO(
-        @Schema(description = "Event type name", example = "Групові")
-        @Size(min = 3, max = 50, message = "Довжина назви типу події має становити від 3 до 50 символів")
+        @Schema(description = "Event type name", example = "Group")
+        @Size(min = 3, max = 50, message = "The event type name must be between 3 and 50 characters long")
         @NotBlank
         String name,
 
-        @Schema(description = "Список разових послуг", example = "[]")
+        @Schema(description = "Branch id this event type belongs to", example = "1")
+        @NotNull
+        Long branchId,
+
+        @Schema(description = "List of one-time services", example = "[]")
         List<OneTimeOfferDTO> oneTimeVisits,
 
-        @Schema(description = "Список абонементів", example = "[]")
+        @Schema(description = "List of subscriptions", example = "[]")
         List<SubscriptionOfferDTO> subscriptions
 ) {
 }

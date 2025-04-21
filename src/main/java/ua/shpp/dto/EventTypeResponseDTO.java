@@ -10,15 +10,18 @@ public record EventTypeResponseDTO(
         @Schema(description = "Id of event type", example = "1")
         Long id,
 
-        @Schema(description = "Event type name", example = "Групові")
-        @Size(min = 3, max = 50, message = "Довжина назви типу події має становити від 3 до 50 символів")
+        @Schema(description = "Event type name", example = "Group")
+        @Size(min = 3, max = 50, message = "The event type name must be between 3 and 50 characters long")
         @NotBlank
         String name,
 
-        @Schema(description = "Список разових послуг")
+        @Schema(description = "Branch name", example = "Office 1")
+        String branchName,
+
+        @Schema(description = "List of one-time services")
         List<OneTimeOfferDTO> oneTimeVisits,
 
-        @Schema(description = "Список абонементів")
+        @Schema(description = "List of subscriptions")
         List<SubscriptionOfferDTO> subscriptions
 ) {
 }

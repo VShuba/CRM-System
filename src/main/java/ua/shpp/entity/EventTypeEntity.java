@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,11 +27,13 @@ public class EventTypeEntity {
 
     @OneToMany(mappedBy = "eventType", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<OneTimeServiceEntity> oneTimeVisits;
+    private List<OneTimeServiceEntity> oneTimeVisits = new ArrayList<>();
 
     @OneToMany(mappedBy = "eventType", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<SubscriptionServiceEntity> subscriptions;
+    private List<SubscriptionServiceEntity> subscriptions = new ArrayList<>();
 
-    //todo add BranchEntity
+    @ManyToOne
+    @JoinColumn(name = "branch_id", nullable = false)
+    private BranchEntity branch;
 }

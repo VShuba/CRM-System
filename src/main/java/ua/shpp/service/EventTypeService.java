@@ -8,11 +8,13 @@ import ua.shpp.dto.EventTypeResponseDTO;
 import ua.shpp.entity.EventTypeEntity;
 import ua.shpp.entity.OneTimeServiceEntity;
 import ua.shpp.entity.SubscriptionServiceEntity;
+import ua.shpp.exception.BranchNotFoundException;
 import ua.shpp.exception.EventTypeAlreadyExistsException;
 import ua.shpp.exception.EventTypeNotFoundException;
 import ua.shpp.mapper.EventTypeMapper;
 import ua.shpp.mapper.OneTimeOfferMapper;
 import ua.shpp.mapper.SubscriptionOfferMapper;
+import ua.shpp.repository.BranchRepository;
 import ua.shpp.repository.EventTypeRepository;
 import ua.shpp.repository.ServiceRepository;
 
@@ -29,6 +31,7 @@ public class EventTypeService {
     private final OneTimeOfferMapper oneTimeOfferMapper;
     private final SubscriptionOfferMapper subscriptionOfferMapper;
     private final ServiceRepository serviceRepository;
+    private final BranchRepository branchRepository;
 
     public EventTypeResponseDTO create(EventTypeRequestDTO dto) {
         log.info("Creating new EventType with name: {}", dto.name());
@@ -38,11 +41,7 @@ public class EventTypeService {
             throw new EventTypeAlreadyExistsException("Event type with name " + dto.name() + " already exists");
         }
 
-        EventTypeEntity entity = eventTypeMapper.toEntity(dto, serviceRepository);
-
-        entity.setOneTimeVisits(Optional.ofNullable(entity.getOneTimeVisits()).orElseGet(ArrayList::new));
-        entity.setSubscriptions(Optional.ofNullable(entity.getSubscriptions()).orElseGet(ArrayList::new));
-        // 1 Entity - 2 null
+        EventTypeEntity entity = eventTypeMapper.toEntity(dto, serviceRepository, branchRepository);
 
         if (dto.oneTimeVisits() != null) {
             entity.getOneTimeVisits().addAll(
@@ -58,7 +57,7 @@ public class EventTypeService {
             entity.getSubscriptions().addAll(
                     dto.subscriptions().stream()
                             .map(x -> subscriptionOfferMapper
-                                    .toEntity(x, serviceRepository,eventTypeRepository))
+                                    .toEntity(x, serviceRepository, eventTypeRepository))
                             .peek(e -> e.setEventType(entity))
                             .toList()
             );
@@ -95,13 +94,16 @@ public class EventTypeService {
         }
 
         existing.setName(dto.name());
+        existing.setBranch(branchRepository.findById(dto.branchId())
+                .orElseThrow(() -> new BranchNotFoundException("Branch not found with id: " + dto.branchId())));
+
         existing.getOneTimeVisits().clear();
         existing.getSubscriptions().clear();
 
         if (dto.oneTimeVisits() != null) {
             dto.oneTimeVisits().forEach(service -> {
                 OneTimeServiceEntity serviceEntity = oneTimeOfferMapper
-                        .dtoToEntity(service, serviceRepository,eventTypeRepository);
+                        .dtoToEntity(service, serviceRepository, eventTypeRepository);
                 serviceEntity.setEventType(existing);
                 existing.getOneTimeVisits().add(serviceEntity);
             });
