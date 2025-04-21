@@ -49,8 +49,52 @@ public class EmployeeService {
 
         List<ServiceEntity> existingServicesEntity = findExistingServicesById(employeeDTO.existingServicesIds());
 
-        Set<EmployeeServiceCreateDTO> newServices = employeeDTO.newServicesDTO();
+        List<ServiceEntity> newServiceEntities = saveNewServices(employeeDTO.newServicesDTO(), branch);
+
+        newServiceEntities.addAll(existingServicesEntity);
+
+        byte[] resizedBytesAvatar = ImageUtil.resizeImage(avatarImg, AVATAR_WIDTH, AVATAR_HEIGHT);
+
+        log.debug("Mapping EmployeeRequestDTO to EmployeeEntity");
+        EmployeeEntity employeeEntity = employeeMapper.EmployeeRequestDTOToEmployeeEntity(employeeDTO);
+        log.debug("After mapping: employee entity id: {}, branch: {}, services: {}", employeeEntity.getId(),
+                employeeEntity.getBranch(), employeeEntity.getServices());
+
+        employeeEntity.setBranch(branch);
+        log.debug("After set branch: employee entity id: {}, branchId: {}, services: {}", employeeEntity.getId(),
+                employeeEntity.getBranch().getId(), employeeEntity.getServices());
+        employeeEntity.setServices(new HashSet<>(newServiceEntities));
+
+        employeeEntity.setAvatar(resizedBytesAvatar);
+
+        employeeEntity = employeeRepository.save(employeeEntity);
+
+        String base64Avatar = ImageUtil.convertImageToBase64(resizedBytesAvatar);
+
+        return employeeMapper.employeeEntityToEmployeeResponseDTO(employeeEntity, base64Avatar);
+    }
+
+    /**
+     * Save a list of new {@link ServiceEntity} to db based on provided list of {@link EmployeeServiceCreateDTO}
+     * <p>
+     * If the provided set of IDs is not empty, the method will:
+     * <li>Create new {@link ServiceEntity} objects based on the provided {@link EmployeeServiceCreateDTO}</li>
+     * <li>Validate that all services that provided to create are not exist in db using {@link #checkNewServicesUniqueInBranch(Set, Long)}</li>
+     * <p>
+     * If the set is empty, it returns an empty list.
+     *
+     * @param newServices a set of service DTOs representing the new services to be created and saved in the database.
+     * @param branch      the {@link BranchEntity} that will be assigned to each new service.
+     * @return a list of saved {@link ServiceEntity} objects.
+     * @throws RuntimeException if any error occurs during the saving process (e.g., database issues).
+     */
+    private List<ServiceEntity> saveNewServices(Set<EmployeeServiceCreateDTO> newServices, BranchEntity branch) {
+        if (newServices.isEmpty()) {
+            log.debug("New services list is empty");
+            return new ArrayList<>();
+        }
         log.debug("New services: {}", newServices);
+        checkNewServicesUniqueInBranch(newServices, branch.getId());
 
         List<ServiceEntity> newServiceEntities = newServices.stream()
                 .map(dto -> {
@@ -67,29 +111,7 @@ public class EmployeeService {
                 newServiceEntities.stream().map(ServiceEntity::getName).collect(Collectors.toList()),
                 newServiceEntities.stream().map(ServiceEntity::getId).collect(Collectors.toList()));
 
-        newServiceEntities = serviceRepository.saveAll(newServiceEntities);
-
-
-        byte[] resizedBytesAvatar = ImageUtil.resizeImage(avatarImg, AVATAR_WIDTH, AVATAR_HEIGHT);
-
-        log.debug("Mapping EmployeeRequestDTO to EmployeeEntity");
-        EmployeeEntity employeeEntity = employeeMapper.EmployeeRequestDTOToEmployeeEntity(employeeDTO);
-        log.debug("After mapping: employee entity id: {}, branch: {}, services: {}", employeeEntity.getId(),
-                employeeEntity.getBranch(), employeeEntity.getServices());
-
-        employeeEntity.setBranch(branch);
-        log.debug("After set branch: employee entity id: {}, branchId: {}, services: {}", employeeEntity.getId(),
-                employeeEntity.getBranch().getId(), employeeEntity.getServices());
-        newServiceEntities.addAll(existingServicesEntity);
-        employeeEntity.setServices(new HashSet<>(newServiceEntities));
-
-        employeeEntity.setAvatar(resizedBytesAvatar);
-
-        employeeEntity = employeeRepository.save(employeeEntity);
-
-        String base64Avatar = ImageUtil.convertImageToBase64(resizedBytesAvatar);
-
-        return employeeMapper.employeeEntityToEmployeeResponseDTO(employeeEntity, base64Avatar);
+        return serviceRepository.saveAll(newServiceEntities);
     }
 
     /**
@@ -99,7 +121,6 @@ public class EmployeeService {
      *
      * <li>Fetch matching service entities from the database</li>
      * <li>Validate that all expected services with IDs actually exist using {@link #checkExistingServicesById(Set, List)}</li>
-     *
      * <p>
      * If the set is empty, it returns an empty list.
      *
@@ -145,5 +166,24 @@ public class EmployeeService {
             throw new RuntimeException("There are no services with id " + notFoundServiceIds);
         }
         log.info("All provided service IDs are valid and exist in the database.");
+    }
+
+    /**
+     * Checks if any of the provided services already exist in the database for the specified branchId.
+     * If one or more services already exist, an exception is thrown.
+     *
+     * @param newServices a set of services to be created
+     * @param branchId    the ID of the branch
+     * @throws RuntimeException if one or more of the provided service names already exist in the specified branch
+     */
+    private void checkNewServicesUniqueInBranch(Set<EmployeeServiceCreateDTO> newServices, Long branchId) {
+        List<String> newServiceNames = newServices.stream()
+                .map(EmployeeServiceCreateDTO::name)
+                .toList();
+        List<String> existingServiceNames = serviceRepository.findAllServiceNamesByNamesAndBranch(newServiceNames, branchId);
+
+        if (!existingServiceNames.isEmpty()) {
+            throw new IllegalArgumentException("Сервіси з такими іменами вже існують у гілці: " + existingServiceNames);
+        }
     }
 }
