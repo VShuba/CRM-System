@@ -23,12 +23,15 @@ public class EventTypeController {
 
     private final EventTypeService eventTypeService;
 
-    @Operation(summary = "Create event type")
+    @Operation(summary = "Create event type",
+            description = "Creates a new type of event, including one-time and subscription services tied to a branch")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Event type successfully created",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = EventTypeResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Incorrect data", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Branch not found for the specified branchId",
+                    content = @Content),
             @ApiResponse(responseCode = "409", description = "An event type with this name already exists",
                     content = @Content)
     })
@@ -38,7 +41,8 @@ public class EventTypeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "Get event type by ID (useful when copying)")
+    @Operation(summary = "Get event type by ID (useful when copying)",
+            description = "Returns the event type by ID. Can be used to copy data when creating a new type")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Event type found",
                     content = @Content(mediaType = "application/json",
@@ -51,13 +55,15 @@ public class EventTypeController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Update event type")
+    @Operation(summary = "Update event type",
+            description = "Updates the event type with a new name, services, and branch link")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Event type updated",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = EventTypeResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Incorrect data", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Event type not found", content = @Content)
+            @ApiResponse(responseCode = "404", description = "Event type not found", content = @Content),
+            @ApiResponse(responseCode = "409", description = "New event type name already exists", content = @Content)
     })
     @PatchMapping("/{id}")
     public ResponseEntity<EventTypeResponseDTO> update(@PathVariable Long id,
@@ -66,7 +72,8 @@ public class EventTypeController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Delete event type")
+    @Operation(summary = "Delete event type",
+            description = "Deletes the event type by ID. If the ID is not found, returns an error")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "The event type has been deleted"),
             @ApiResponse(responseCode = "404", description = "Event type not found")
