@@ -47,17 +47,7 @@ public class EmployeeService {
 
         ImageUtil.checkMaxImgSizeInMB(avatarImg, MAX_AVATAR_SIZE_MB);
 
-        List<ServiceEntity> existingServicesEntity = new ArrayList<>();
-        Set<Long> expectedExistingServicesIds = employeeDTO.existingServicesIds();
-
-        if (!expectedExistingServicesIds.isEmpty()) {
-            log.info("Finding in db service entities with ids: {}", expectedExistingServicesIds);
-            existingServicesEntity = serviceRepository.findAllById(expectedExistingServicesIds);
-            log.info("Found services with names: {}, ids: {}", existingServicesEntity.stream().map(ServiceEntity::getName),
-                    expectedExistingServicesIds);
-
-            checkExistingServicesById(expectedExistingServicesIds, existingServicesEntity);
-        }
+        List<ServiceEntity> existingServicesEntity = findExistingServicesById(employeeDTO.existingServicesIds());
 
         Set<EmployeeServiceCreateDTO> newServices = employeeDTO.newServicesDTO();
         log.debug("New services: {}", newServices);
@@ -100,6 +90,36 @@ public class EmployeeService {
         String base64Avatar = ImageUtil.convertImageToBase64(resizedBytesAvatar);
 
         return employeeMapper.employeeEntityToEmployeeResponseDTO(employeeEntity, base64Avatar);
+    }
+
+    /**
+     * Retrieves a list of existing {@link ServiceEntity} from the database by their IDs.
+     * <p>
+     * If the provided set of IDs is not empty, the method will:
+     *
+     * <li>Fetch matching service entities from the database</li>
+     * <li>Validate that all expected services with IDs actually exist using {@link #checkExistingServicesById(Set, List)}</li>
+     *
+     * <p>
+     * If the set is empty, it returns an empty list.
+     *
+     * @param expectedExistingServicesIds a set of service IDs that are expected to exist in the database.
+     * @return a list of {@link ServiceEntity} corresponding to the provided IDs.
+     * @throws RuntimeException if any of the provided IDs do not exist in the database.
+     */
+    private List<ServiceEntity> findExistingServicesById(Set<Long> expectedExistingServicesIds) {
+        List<ServiceEntity> existingServicesEntity = new ArrayList<>();
+
+        if (!expectedExistingServicesIds.isEmpty()) {
+            log.info("Looking up services in DB by IDs: {}", expectedExistingServicesIds);
+            existingServicesEntity = serviceRepository.findAllById(expectedExistingServicesIds);
+            log.info("Found services with names: {}, ids: {}", existingServicesEntity.stream().map(ServiceEntity::getName),
+                    expectedExistingServicesIds);
+
+            checkExistingServicesById(expectedExistingServicesIds, existingServicesEntity);
+        }
+
+        return existingServicesEntity;
     }
 
     /**
