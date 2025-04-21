@@ -2,6 +2,7 @@ package ua.shpp.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -66,5 +67,17 @@ public class ImageUtil {
             }
         }
         throw new RuntimeException("Unable to determine image format");
+    }
+
+    public static void checkMaxImgSizeInMB(MultipartFile img, int maxImgSizeInMB) {
+        int kilobyte = 1024;
+        long imgSize = img.getSize();
+        double imageSizeInMB = (double) imgSize / (kilobyte * kilobyte);
+        log.info("Image size: {} MB", String.format("%.2f", imageSizeInMB));
+
+        DataSize maxAvatarSize = DataSize.ofMegabytes(maxImgSizeInMB);
+        if (imgSize > maxAvatarSize.toBytes()) {
+            throw new RuntimeException("Image size exceeds the maximum allowed size of " + maxImgSizeInMB + " MB");
+        }
     }
 }

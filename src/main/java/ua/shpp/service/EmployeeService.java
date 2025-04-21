@@ -35,39 +35,32 @@ public class EmployeeService {
     private final int MAX_AVATAR_SIZE_MB = 3;
 
     public EmployeeResponseDTO createEmployee(MultipartFile avatarImg, EmployeeRequestDTO employeeDTO) {
-        log.info("Find by id: {} branch", employeeDTO.branchId());
+        log.debug("Find by id: {} branch", employeeDTO.branchId());
         BranchEntity branch = branchRepository.findById(employeeDTO.branchId())
                 .orElseThrow(() -> new RuntimeException("Branch with id " + employeeDTO.branchId() + " not found"));
-        log.info("Branch was found with name: {}, employees num: {}, services num: {}",
+        log.debug("Branch was found with name: {}, employees num: {}, services num: {}",
                 branch.getName(), branch.getEmployees().size(), branch.getServiceEntities().size());
 
-        Set<Long> expectedExistingServicesIds = employeeDTO.existingServicesIds();
-        log.info("Passed as existing services ids: {}", expectedExistingServicesIds);
-
-        log.info("Finding in db service entities with ids: {}", expectedExistingServicesIds);
-        List<ServiceEntity> existingServicesEntity = serviceRepository.findAllById(expectedExistingServicesIds);
-        log.info("Found services with names: {}, ids: {}", existingServicesEntity.stream().map(ServiceEntity::getName),
-                expectedExistingServicesIds);
-
-        checkExistingServicesById(employeeDTO.existingServicesIds(), existingServicesEntity);
-
-        int kilobyte = 1024;
-        double imageSizeInMB = (double) avatarImg.getSize() / (kilobyte * kilobyte);
-        log.info("Image size: {} MB", String.format("%.2f", imageSizeInMB));
-        if (avatarImg.getSize() > MAX_AVATAR_SIZE_MB * kilobyte * kilobyte) {
-            throw new RuntimeException("File size exceeds the maximum allowed size of " + MAX_AVATAR_SIZE_MB + " MB");
+        if (employeeRepository.existsByEmailAndBranchId(employeeDTO.email(), branch.getId())) {
+            throw new RuntimeException("Employee with email " + employeeDTO.email() + " already exists");
         }
-        log.info("Mapping EmployeeRequestDTO to EmployeeEntity");
-        EmployeeEntity employeeEntity = employeeMapper.EmployeeRequestDTOToEmployeeEntity(employeeDTO);
-        log.info("After mapping: employee entity id: {}, branch: {}, services: {}", employeeEntity.getId(),
-                employeeEntity.getBranch(), employeeEntity.getServices());
 
-        employeeEntity.setBranch(branch);
-        log.info("After set branch: employee entity id: {}, branchId: {}, services: {}", employeeEntity.getId(),
-                employeeEntity.getBranch().getId(), employeeEntity.getServices());
+        ImageUtil.checkMaxImgSizeInMB(avatarImg, MAX_AVATAR_SIZE_MB);
+
+        List<ServiceEntity> existingServicesEntity = new ArrayList<>();
+        Set<Long> expectedExistingServicesIds = employeeDTO.existingServicesIds();
+
+        if (!expectedExistingServicesIds.isEmpty()) {
+            log.info("Finding in db service entities with ids: {}", expectedExistingServicesIds);
+            existingServicesEntity = serviceRepository.findAllById(expectedExistingServicesIds);
+            log.info("Found services with names: {}, ids: {}", existingServicesEntity.stream().map(ServiceEntity::getName),
+                    expectedExistingServicesIds);
+
+            checkExistingServicesById(expectedExistingServicesIds, existingServicesEntity);
+        }
 
         Set<EmployeeServiceCreateDTO> newServices = employeeDTO.newServicesDTO();
-        log.info("New services: {}", newServices);
+        log.debug("New services: {}", newServices);
 
         List<ServiceEntity> newServiceEntities = newServices.stream()
                 .map(dto -> {
@@ -80,17 +73,25 @@ public class EmployeeService {
                             .build();
                 }).collect(Collectors.toCollection(ArrayList::new));
 
-
-        log.info("New services names: {}, ids: {}",
+        log.debug("New services names: {}, ids: {}",
                 newServiceEntities.stream().map(ServiceEntity::getName).collect(Collectors.toList()),
                 newServiceEntities.stream().map(ServiceEntity::getId).collect(Collectors.toList()));
 
         newServiceEntities = serviceRepository.saveAll(newServiceEntities);
 
-        newServiceEntities.addAll(existingServicesEntity);
-        employeeEntity.setServices(new HashSet<>(newServiceEntities));
 
         byte[] resizedBytesAvatar = ImageUtil.resizeImage(avatarImg, AVATAR_WIDTH, AVATAR_HEIGHT);
+
+        log.debug("Mapping EmployeeRequestDTO to EmployeeEntity");
+        EmployeeEntity employeeEntity = employeeMapper.EmployeeRequestDTOToEmployeeEntity(employeeDTO);
+        log.debug("After mapping: employee entity id: {}, branch: {}, services: {}", employeeEntity.getId(),
+                employeeEntity.getBranch(), employeeEntity.getServices());
+
+        employeeEntity.setBranch(branch);
+        log.debug("After set branch: employee entity id: {}, branchId: {}, services: {}", employeeEntity.getId(),
+                employeeEntity.getBranch().getId(), employeeEntity.getServices());
+        newServiceEntities.addAll(existingServicesEntity);
+        employeeEntity.setServices(new HashSet<>(newServiceEntities));
 
         employeeEntity.setAvatar(resizedBytesAvatar);
 
