@@ -61,7 +61,7 @@ public class RoomService {
     }
 
     public RoomResponseDTO delete(Long orgId, Long branchId, Long roomId) {
-        validateRoom(orgId, branchId);
+        validateRoom(branchId, roomId);
 
         RoomEntity room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RoomNotFoundException("Room with id " + roomId + " not found"));
