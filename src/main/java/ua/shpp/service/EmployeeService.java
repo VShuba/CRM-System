@@ -71,13 +71,13 @@ public class EmployeeService {
 
         List<ServiceEntity> newServiceEntities = newServices.stream()
                 .map(dto -> {
-                    ServiceEntity service = new ServiceEntity();
-                    service.setName(dto.name());
-                    service.setColor(dto.color());
-                    service.setBranch(branch);
-                    log.info("Adding new service with name: {}, color: {}, branchId: {}", service.getName(),
-                            service.getColor(), service.getBranch().getId());
-                    return service;
+                    log.debug("Adding new service with name: {}, color: {}, branchId: {}",
+                            dto.name(), dto.color(), branch.getId());
+                    return ServiceEntity.builder()
+                            .name(dto.name())
+                            .color(dto.color())
+                            .branch(branch)
+                            .build();
                 }).collect(Collectors.toCollection(ArrayList::new));
 
 
