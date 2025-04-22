@@ -2,6 +2,9 @@ package ua.shpp.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.branch.room.RoomRequestDTO;
@@ -37,6 +40,14 @@ public class RoomController {
             @PathVariable(name = "roomId") Long roomId) {
 
         return ResponseEntity.ok(service.get(orgId, branchId, roomId));
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<RoomResponseDTO>> getAllRooms(
+            @PathVariable(name = "orgId") Long orgId,
+            @PathVariable(name = "branchId") Long branchId,
+            @ParameterObject Pageable pageRequest) {
+        return ResponseEntity.ok(service.getAll(orgId, branchId, pageRequest));
     }
 
     @PatchMapping("/{roomId}")

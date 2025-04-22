@@ -1,6 +1,8 @@
 package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.branch.room.RoomRequestDTO;
 import ua.shpp.dto.branch.room.RoomResponseDTO;
@@ -44,6 +46,14 @@ public class RoomService {
         return mapper.roomEntityToRoomDTO(room);
     }
 
+    public Page<RoomResponseDTO> getAll(Long orgId, Long branchId, Pageable pageRequest) {
+        branchService.validateBranch(orgId, branchId);
+
+        Page<RoomEntity> roomEntities = roomRepository.findAllByBranchId(branchId, pageRequest);
+
+        return roomEntities.map(mapper::roomEntityToRoomDTO);
+    }
+
     public RoomResponseDTO patch(Long orgId, Long branchId, Long roomId, RoomRequestDTO requestDTO) {
         branchService.validateBranch(orgId, branchId);
 
@@ -81,5 +91,4 @@ public class RoomService {
 
         return room;
     }
-
 }
