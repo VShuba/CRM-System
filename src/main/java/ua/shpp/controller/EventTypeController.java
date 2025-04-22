@@ -1,6 +1,7 @@
 package ua.shpp.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.EventTypeRequestDTO;
 import ua.shpp.dto.EventTypeResponseDTO;
 import ua.shpp.service.EventTypeService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/event_types")
@@ -41,6 +44,19 @@ public class EventTypeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(summary = "Get all event types by branch ID",
+            description = "Returns all event types that belong to a specific branch")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of event types returned",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = EventTypeResponseDTO.class))))
+    })
+    @GetMapping("/branch/{branchId}")
+    public ResponseEntity<List<EventTypeResponseDTO>> getAllByBranch(@PathVariable Long branchId) {
+        List<EventTypeResponseDTO> response = eventTypeService.getAllByBranch(branchId);
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "Get event type by ID (useful when copying)",
             description = "Returns the event type by ID. Can be used to copy data when creating a new type")
     @ApiResponses(value = {
@@ -65,7 +81,7 @@ public class EventTypeController {
             @ApiResponse(responseCode = "404", description = "Event type not found", content = @Content),
             @ApiResponse(responseCode = "409", description = "New event type name already exists", content = @Content)
     })
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<EventTypeResponseDTO> update(@PathVariable Long id,
                                                        @RequestBody @Valid EventTypeRequestDTO dto) {
         EventTypeResponseDTO response = eventTypeService.update(id, dto);

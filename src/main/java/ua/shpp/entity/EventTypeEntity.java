@@ -22,7 +22,7 @@ public class EventTypeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @OneToMany(mappedBy = "eventType", cascade = CascadeType.ALL, orphanRemoval = true)
