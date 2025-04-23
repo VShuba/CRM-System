@@ -32,7 +32,7 @@ public class BranchService {
 
     public BranchResponseDTO create(Long orgId, BranchRequestDTO requestDTO) {
 
-        if (branchRepository.existsByName(requestDTO.name())) {
+        if (branchRepository.existsByNameAndOrganizationId(requestDTO.name(), orgId)) {
             throw new BranchAlreadyExistsException("Branch with name " + requestDTO.name() + " already exists");
         }
 
@@ -56,7 +56,7 @@ public class BranchService {
 
     public BranchResponseDTO updateName(Long orgId, Long branchId, BranchPatchRequestDTO request) {
 
-        if (branchRepository.existsByName(request.name())) {
+        if (branchRepository.existsByNameAndOrganizationId(request.name(), orgId)) {
             throw new BranchAlreadyExistsException("Branch with name " + request.name() + " already exists");
         }
 
