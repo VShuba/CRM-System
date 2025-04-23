@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>CRM: Структура базы данных</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: sans-serif;
+      background-color: #333; /* тёмно-серый фон */
+      overflow: hidden;
+    }
+
+    #container {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      cursor: grab;
+      position: relative;
+    }
+
+    #container:active {
+      cursor: grabbing;
+    }
+
+    #viewport {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #imgWrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: top left;
+    }
+
+    img {
+      display: block;
+      user-select: none;
+      pointer-events: none;
+      max-width: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="container">
+  <div id="viewport">
+    <div id="imgWrapper">
+      <img id="dbImage" src="schema.png" alt="DB Structure">
+    </div>
+  </div>
+</div>
+
+<script>
+  const container = document.getElementById('container');
+  const wrapper = document.getElementById('imgWrapper');
+  const image = document.getElementById('dbImage');
+  const viewport = document.getElementById('viewport');
+
+  let scale = 1;
+  let minScale = 1;
+  let offsetX = 0;
+  let offsetY = 0;
+  let startX, startY;
+  let isDragging = false;
+
+  function updateTransform() {
+    wrapper.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+  }
+
+  function clampOffsets() {
+    const scaledWidth = image.naturalWidth * scale;
+    const scaledHeight = image.naturalHeight * scale;
+    const maxOffsetX = Math.max(0, (scaledWidth - viewport.clientWidth));
+    const maxOffsetY = Math.max(0, (scaledHeight - viewport.clientHeight));
+
+    offsetX = Math.min(Math.max(offsetX, -maxOffsetX), 0);
+    offsetY = Math.min(Math.max(offsetY, -maxOffsetY), 0);
+  }
+
+  function fitToScreen() {
+    const scaleX = viewport.clientWidth / image.naturalWidth;
+    const scaleY = viewport.clientHeight / image.naturalHeight;
+    scale = minScale = Math.min(scaleX, scaleY);
+    offsetX = 0;
+    offsetY = 0;
+    updateTransform();
+  }
+
+  container.addEventListener('wheel', (e) => {
+    e.preventDefault();
+
+    const rect = viewport.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const dx = (mouseX - offsetX) / scale;
+    const dy = (mouseY - offsetY) / scale;
+
+    const delta = e.deltaY < 0 ? 1.1 : 0.9;
+    const newScale = Math.min(Math.max(minScale, scale * delta), 5);
+
+    offsetX = mouseX - dx * newScale;
+    offsetY = mouseY - dy * newScale;
+    scale = newScale;
+
+    clampOffsets();
+    updateTransform();
+  });
+
+  container.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+  });
+
+  container.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+
+  container.addEventListener('mouseleave', () => {
+    isDragging = false;
+  });
+
+  container.addEventListener('mousemove', (e) => {
+    if (!isDragging || scale <= minScale) return;
+
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    startX = e.clientX;
+    startY = e.clientY;
+    offsetX += dx;
+    offsetY += dy;
+
+    clampOffsets();
+    updateTransform();
+  });
+
+  image.onload = () => {
+    fitToScreen();
+  };
+</script>
+
+</body>
+</html>

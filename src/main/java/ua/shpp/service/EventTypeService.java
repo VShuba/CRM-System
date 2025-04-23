@@ -19,6 +19,7 @@ import ua.shpp.repository.EventTypeRepository;
 import ua.shpp.repository.ServiceRepository;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,9 +37,10 @@ public class EventTypeService {
     public EventTypeResponseDTO create(EventTypeRequestDTO dto) {
         log.info("Creating new EventType with name: {}", dto.name());
 
-        if (eventTypeRepository.existsByName(dto.name())) {
-            log.warn("EventType with name '{}' already exists", dto.name());
-            throw new EventTypeAlreadyExistsException("Event type with name " + dto.name() + " already exists");
+        if (eventTypeRepository.existsByNameAndBranchId(dto.name(), dto.branchId())) {
+            log.warn("EventType with name '{}' already exists in branch '{}'", dto.name(), dto.branchId());
+            throw new EventTypeAlreadyExistsException("Event type with name " + dto.name()
+                    + " already exists in this branch");
         }
 
         EventTypeEntity entity = eventTypeMapper.toEntity(dto, serviceRepository, branchRepository);
@@ -69,6 +71,14 @@ public class EventTypeService {
         return eventTypeMapper.toResponseDTO(saved);
     }
 
+    public List<EventTypeResponseDTO> getAllByBranch(Long branchId) {
+        List<EventTypeEntity> eventTypes = eventTypeRepository.findAllByBranchId(branchId);
+
+        return eventTypes.stream()
+                .map(eventTypeMapper::toResponseDTO)
+                .toList();
+    }
+
     public EventTypeResponseDTO get(Long id) {
         log.info("Retrieving EventType with id: {}", id);
         EventTypeEntity entity = eventTypeRepository.findById(id)
@@ -82,21 +92,29 @@ public class EventTypeService {
 
     public EventTypeResponseDTO update(Long id, EventTypeRequestDTO dto) {
         log.info("Updating EventType with id: {}", id);
+
         EventTypeEntity existing = eventTypeRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("EventType with id '{}' not found", id);
                     return new EventTypeNotFoundException("Event type with id " + id + " not found");
                 });
 
-        if (eventTypeRepository.existsByName(dto.name()) && !existing.getName().equals(dto.name())) {
-            log.warn("EventType with name '{}' already exists", dto.name());
-            throw new EventTypeAlreadyExistsException("Event type with name " + dto.name() + " already exists");
+        // Перевірка чи змінюється назва або бренч
+        boolean isNameChanged = !existing.getName().equals(dto.name());
+        boolean isBranchChanged = !existing.getBranch().getId().equals(dto.branchId());
+
+        // Якщо ім’я змінено або бренч змінено — перевіряємо на унікальність
+        if ((isNameChanged || isBranchChanged)
+                && eventTypeRepository.existsByNameAndBranchId(dto.name(), dto.branchId())) {
+            log.warn("EventType with name '{}' already exists in branch '{}'", dto.name(), dto.branchId());
+            throw new EventTypeAlreadyExistsException("Event type with name " + dto.name() + " already exists in this branch");
         }
 
         existing.setName(dto.name());
         existing.setBranch(branchRepository.findById(dto.branchId())
                 .orElseThrow(() -> new BranchNotFoundException("Branch not found with id: " + dto.branchId())));
 
+        // Повне оновлення: очищення старих візитів і підписок
         existing.getOneTimeVisits().clear();
         existing.getSubscriptions().clear();
 
