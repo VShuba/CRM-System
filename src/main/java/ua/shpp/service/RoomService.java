@@ -10,7 +10,7 @@ import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.RoomEntity;
 import ua.shpp.exception.RoomAlreadyExistsException;
 import ua.shpp.exception.RoomNotFoundException;
-import ua.shpp.mapper.RoomEntityToRoomDTOMapper;
+import ua.shpp.mapper.RoomMapper;
 import ua.shpp.repository.RoomRepository;
 
 @Service
@@ -19,7 +19,7 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
     private final BranchService branchService;
-    private final RoomEntityToRoomDTOMapper mapper;
+    private final RoomMapper mapper;
 
     public RoomResponseDTO create(Long orgId, Long branchId, RoomRequestDTO requestDTO) {
         BranchEntity branchEntity = branchService.validateBranch(orgId, branchId);
@@ -35,7 +35,7 @@ public class RoomService {
 
         roomRepository.save(roomEntity);
 
-        return mapper.roomEntityToRoomDTO(roomEntity);
+        return mapper.toDTO(roomEntity);
     }
 
     public RoomResponseDTO get(Long orgId, Long branchId, Long roomId) {
@@ -43,7 +43,7 @@ public class RoomService {
 
         RoomEntity room = validateRoom(branchId, roomId);
 
-        return mapper.roomEntityToRoomDTO(room);
+        return mapper.toDTO(room);
     }
 
     public Page<RoomResponseDTO> getAll(Long orgId, Long branchId, Pageable pageRequest) {
@@ -51,7 +51,7 @@ public class RoomService {
 
         Page<RoomEntity> roomEntities = roomRepository.findAllByBranchId(branchId, pageRequest);
 
-        return roomEntities.map(mapper::roomEntityToRoomDTO);
+        return roomEntities.map(mapper::toDTO);
     }
 
     public RoomResponseDTO patch(Long orgId, Long branchId, Long roomId, RoomRequestDTO requestDTO) {
@@ -67,7 +67,7 @@ public class RoomService {
 
         roomRepository.save(room);
 
-        return mapper.roomEntityToRoomDTO(room);
+        return mapper.toDTO(room);
     }
 
     public RoomResponseDTO delete(Long orgId, Long branchId, Long roomId) {
@@ -78,7 +78,7 @@ public class RoomService {
 
         roomRepository.delete(room);
 
-        return mapper.roomEntityToRoomDTO(room);
+        return mapper.toDTO(room);
     }
 
     private RoomEntity validateRoom(Long branchId, Long roomId) {

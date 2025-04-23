@@ -11,7 +11,7 @@ import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.Organization;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
-        uses = RoomEntityToRoomDTOMapper.class)
+        uses = RoomMapper.class)
 public interface BranchMapper {
 
     @Mapping(target = "organizationId", source = "organization", qualifiedByName = "organizationIdFromOrganization")
