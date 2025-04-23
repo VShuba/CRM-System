@@ -2,6 +2,10 @@ package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.SubscriptionOfferDTO;
 import ua.shpp.exception.OfferNotFoundException;
@@ -31,7 +35,7 @@ public class SubscriptionOfferService {
         return subscriptionOfferMapper.toDto(entity);
     }
 
-    public SubscriptionOfferDTO get(Long id) {
+    public SubscriptionOfferDTO getById(Long id) {
         log.debug("get() called with id: {}", id);
         var entity = subscriptionOfferRepository.findById(id)
                 .orElseThrow(() -> new OfferNotFoundException(
@@ -39,6 +43,16 @@ public class SubscriptionOfferService {
         log.info("Fetching subscription offer (id={})", id);
         log.debug("Fetching subscription offer entity: {}", entity);
         return subscriptionOfferMapper.toDto(entity);
+    }
+
+    public Page<SubscriptionOfferDTO> getAll(int page, int size, String sort, Boolean sortAsc){
+        Sort.Order order = Sort.Order.by(sort);
+        Pageable pageable = Boolean.TRUE.equals(sortAsc)
+                ? PageRequest.of(page, size, Sort.by(order).ascending())
+                : PageRequest.of(page, size, Sort.by(order).descending());
+        return subscriptionOfferRepository
+                .findAll(pageable)
+                .map(subscriptionOfferMapper::toDto);
     }
 
     public SubscriptionOfferDTO update(SubscriptionOfferDTO updateDto) {

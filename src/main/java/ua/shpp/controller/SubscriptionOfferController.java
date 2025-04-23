@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.OneTimeOfferDTO;
@@ -46,9 +47,24 @@ public class SubscriptionOfferController {
             @ApiResponse(responseCode = "404", description = "Subscription offer id not fount", content = @Content),
     })
     @GetMapping("/{id}")
-    public ResponseEntity<SubscriptionOfferDTO> get(@PathVariable Long id) {
-        var dto = subscriptionOfferService.get(id);
+    public ResponseEntity<SubscriptionOfferDTO> getById(@PathVariable Long id) {
+        var dto = subscriptionOfferService.getById(id);
         return ResponseEntity.ok(dto);
+    }
+
+    @Operation(summary = "Get all subscription offers")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Subscription offers successfully find",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = OneTimeOfferDTO.class))),
+    })
+    @GetMapping
+    public ResponseEntity<Page<SubscriptionOfferDTO>> getAll(@RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "10") int size,
+                                                        @RequestParam(defaultValue = "id") String sort,
+                                                        @RequestParam(defaultValue = "true") Boolean sortAsc) {
+        Page<SubscriptionOfferDTO> result = subscriptionOfferService.getAll(page, size, sort, sortAsc);
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "Update subscription  offer by id")

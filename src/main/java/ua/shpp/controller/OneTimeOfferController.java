@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.OneTimeOfferDTO;
@@ -46,9 +47,24 @@ public class OneTimeOfferController {
             @ApiResponse(responseCode = "404", description = "One-time offer id not fount", content = @Content),
     })
     @GetMapping("/{id}")
-    public ResponseEntity<OneTimeOfferDTO> get(@PathVariable Long id) {
-        var dto = oneTimeOfferService.get(id);
+    public ResponseEntity<OneTimeOfferDTO> getById(@PathVariable Long id) {
+        var dto = oneTimeOfferService.getById(id);
         return ResponseEntity.ok(dto);
+    }
+
+    @Operation(summary = "Get all one-time offers")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "One-time offers successfully find",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = OneTimeOfferDTO.class))),
+    })
+    @GetMapping
+    public ResponseEntity<Page<OneTimeOfferDTO>> getAll( @RequestParam(defaultValue = "0") int page,
+                                                         @RequestParam(defaultValue = "10") int size,
+                                                         @RequestParam(defaultValue = "id") String sort,
+                                                         @RequestParam(defaultValue = "true") Boolean sortAsc) {
+        Page<OneTimeOfferDTO> result = oneTimeOfferService.getAll(page, size, sort, sortAsc);
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "Update one-time offer by id")
@@ -77,7 +93,7 @@ public class OneTimeOfferController {
             @ApiResponse(responseCode = "204", description = "Deleted successfully"),
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<OneTimeOfferDTO> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         oneTimeOfferService.delete(id);
         return ResponseEntity.noContent().build();
     }

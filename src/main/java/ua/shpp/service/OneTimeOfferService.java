@@ -3,11 +3,13 @@ package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.OneTimeOfferDTO;
-import ua.shpp.entity.ServiceEntity;
 import ua.shpp.exception.OfferNotFoundException;
-import ua.shpp.exception.ServiceNotFoundException;
 import ua.shpp.mapper.OneTimeOfferMapper;
 import ua.shpp.repository.EventTypeRepository;
 import ua.shpp.repository.OneTimeOfferRepository;
@@ -33,7 +35,7 @@ public class OneTimeOfferService {
         return oneTimeOfferMapper.entityToDto(entity);
     }
 
-    public OneTimeOfferDTO get(Long id) {
+    public OneTimeOfferDTO getById(Long id) {
         log.debug("get() called with id: {}", id);
         var entity = oneTimeOfferRepository.findById(id)
                 .orElseThrow(() -> new OfferNotFoundException(
@@ -41,6 +43,16 @@ public class OneTimeOfferService {
         log.info("Fetching one-time offer (id={})", id);
         log.debug("Fetching one-time offer entity: {}", entity);
         return oneTimeOfferMapper.entityToDto(entity);
+    }
+
+    public Page<OneTimeOfferDTO> getAll(int page, int size, String sort, Boolean sortAsc){
+        Sort.Order order = Sort.Order.by(sort);
+        Pageable pageable = Boolean.TRUE.equals(sortAsc)
+                ? PageRequest.of(page, size, Sort.by(order).ascending())
+                : PageRequest.of(page, size, Sort.by(order).descending());
+        return oneTimeOfferRepository
+                .findAll(pageable)
+                .map(oneTimeOfferMapper::entityToDto);
     }
 
     public OneTimeOfferDTO update(OneTimeOfferDTO updateDto) {
