@@ -9,11 +9,11 @@ import ua.shpp.dto.branch.BranchResponseDTO;
 import ua.shpp.dto.branch.WorkingHourDTO;
 import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.Organization;
+import ua.shpp.exception.BranchAlreadyExistsException;
 import ua.shpp.exception.BranchNotFoundException;
 import ua.shpp.exception.BranchOrganizationMismatchException;
-import ua.shpp.exception.BranchAlreadyExistsException;
 import ua.shpp.exception.OrganizationNotFound;
-import ua.shpp.mapper.BranchEntityToBranchDTOMapper;
+import ua.shpp.mapper.BranchMapper;
 import ua.shpp.mapper.WorkingHourMapper;
 import ua.shpp.model.WorkingHour;
 import ua.shpp.repository.BranchRepository;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class BranchService {
     private final OrganizationRepository organizationRepository;
     private final BranchRepository branchRepository;
-    private final BranchEntityToBranchDTOMapper branchMapper;
+    private final BranchMapper branchMapper;
     private final WorkingHourMapper workingHourMapper;
 
     public BranchResponseDTO create(Long orgId, BranchRequestDTO requestDTO) {
@@ -46,12 +46,12 @@ public class BranchService {
 
         branchRepository.save(branch);
 
-        return branchMapper.branchEntityToBranchResponseDTO(branch);
+        return branchMapper.toResponseDTO(branch);
     }
 
     public BranchResponseDTO get(Long orgId, Long branchId) {
         BranchEntity branchEntity = validateBranch(orgId, branchId);
-        return branchMapper.branchEntityToBranchResponseDTO(branchEntity);
+        return branchMapper.toResponseDTO(branchEntity);
     }
 
     public BranchResponseDTO updateName(Long orgId, Long branchId, BranchPatchRequestDTO request) {
@@ -64,7 +64,7 @@ public class BranchService {
         branchEntity.setName(request.name());
         branchRepository.save(branchEntity);
 
-        return branchMapper.branchEntityToBranchResponseDTO(branchEntity);
+        return branchMapper.toResponseDTO(branchEntity);
     }
 
     public BranchResponseDTO updateWorkingHours(Long orgId, Long branchId, @Valid List<WorkingHourDTO> workingHourDTOS) {
@@ -74,7 +74,7 @@ public class BranchService {
         branchEntity.setWorkingHours(workingHours);
         branchRepository.save(branchEntity);
 
-        return branchMapper.branchEntityToBranchResponseDTO(branchEntity);
+        return branchMapper.toResponseDTO(branchEntity);
     }
 
     public void delete(Long orgId, Long branchId) {
