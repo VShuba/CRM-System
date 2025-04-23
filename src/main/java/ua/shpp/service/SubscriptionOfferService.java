@@ -45,13 +45,9 @@ public class SubscriptionOfferService {
         return subscriptionOfferMapper.toDto(entity);
     }
 
-    public Page<SubscriptionOfferDTO> getAll(int page, int size, String sort, Boolean sortAsc){
-        Sort.Order order = Sort.Order.by(sort);
-        Pageable pageable = Boolean.TRUE.equals(sortAsc)
-                ? PageRequest.of(page, size, Sort.by(order).ascending())
-                : PageRequest.of(page, size, Sort.by(order).descending());
+    public Page<SubscriptionOfferDTO> getAllByEventTypeId(Long eventTypeId,Pageable pageRequest){
         return subscriptionOfferRepository
-                .findAll(pageable)
+                .findAllByEventTypeId(eventTypeId, pageRequest)
                 .map(subscriptionOfferMapper::toDto);
     }
 

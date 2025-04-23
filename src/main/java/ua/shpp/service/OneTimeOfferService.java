@@ -4,9 +4,7 @@ package ua.shpp.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.OneTimeOfferDTO;
 import ua.shpp.exception.OfferNotFoundException;
@@ -45,13 +43,9 @@ public class OneTimeOfferService {
         return oneTimeOfferMapper.entityToDto(entity);
     }
 
-    public Page<OneTimeOfferDTO> getAll(int page, int size, String sort, Boolean sortAsc){
-        Sort.Order order = Sort.Order.by(sort);
-        Pageable pageable = Boolean.TRUE.equals(sortAsc)
-                ? PageRequest.of(page, size, Sort.by(order).ascending())
-                : PageRequest.of(page, size, Sort.by(order).descending());
+    public Page<OneTimeOfferDTO> getAllByEventTypeId(Long eventTypeId, Pageable pageRequest){
         return oneTimeOfferRepository
-                .findAll(pageable)
+                .findAllByEventTypeId(eventTypeId, pageRequest)
                 .map(oneTimeOfferMapper::entityToDto);
     }
 

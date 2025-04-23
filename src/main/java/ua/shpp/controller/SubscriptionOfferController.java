@@ -1,13 +1,17 @@
 package ua.shpp.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.OneTimeOfferDTO;
@@ -52,18 +56,21 @@ public class SubscriptionOfferController {
         return ResponseEntity.ok(dto);
     }
 
-    @Operation(summary = "Get all subscription offers")
+
+    @Operation(summary = "Get all subscription offers for a given Event Type ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Subscription offers successfully find",
+            @ApiResponse(responseCode = "200", description = "Subscription offers for a given Event Type ID successfully found",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = OneTimeOfferDTO.class))),
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = SubscriptionOfferDTO.class)))),
     })
     @GetMapping
-    public ResponseEntity<Page<SubscriptionOfferDTO>> getAll(@RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "10") int size,
-                                                        @RequestParam(defaultValue = "id") String sort,
-                                                        @RequestParam(defaultValue = "true") Boolean sortAsc) {
-        Page<SubscriptionOfferDTO> result = subscriptionOfferService.getAll(page, size, sort, sortAsc);
+    public ResponseEntity<Page<SubscriptionOfferDTO>> getAllByEventTypeId(@Parameter(
+                                                                                  description = "ID of the Event Type to filter offers",
+                                                                                  required = true) @RequestParam(defaultValue = "1") Long eventTypeId,
+                                                                          @ParameterObject() Pageable pageRequest) {
+        Page<SubscriptionOfferDTO> result = subscriptionOfferService
+                .getAllByEventTypeId(eventTypeId, pageRequest);
         return ResponseEntity.ok(result);
     }
 
