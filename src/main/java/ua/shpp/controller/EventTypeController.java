@@ -1,6 +1,7 @@
 package ua.shpp.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,6 +10,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -66,8 +70,8 @@ public class EventTypeController {
             @ApiResponse(responseCode = "404", description = "Event type not found", content = @Content)
     })
     @GetMapping("/{id}")
-    public ResponseEntity<EventTypeResponseDTO> get(@PathVariable Long id) {
-        EventTypeResponseDTO response = eventTypeService.get(id);
+    public ResponseEntity<EventTypeResponseDTO> getById(@PathVariable Long id) {
+        EventTypeResponseDTO response = eventTypeService.getById(id);
         return ResponseEntity.ok(response);
     }
 
@@ -98,5 +102,29 @@ public class EventTypeController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         eventTypeService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Get filtered and paginated event types",
+            description = "Returns event types filtered by optional name, branchId or serviceId. Supports pagination and sorting.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Page of event types returned",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = EventTypeResponseDTO.class)))
+    })
+    @GetMapping
+    public ResponseEntity<Page<EventTypeResponseDTO>> getFiltered(
+            @Parameter(description = "Filter by event type name (optional)")
+            @RequestParam(required = false) String name,
+
+            @Parameter(description = "Filter by branch ID (optional)")
+            @RequestParam(required = false) Long branchId,
+
+            @Parameter(description = "Filter by service ID (optional, either one-time or subscription)")
+            @RequestParam(required = false) Long serviceId,
+
+            @ParameterObject Pageable pageable) {
+
+        Page<EventTypeResponseDTO> page = eventTypeService.getFiltered(name, branchId, serviceId, pageable);
+        return ResponseEntity.ok(page);
     }
 }

@@ -173,5 +173,18 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
+    // for Client
+
+    @ExceptionHandler(ClientNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleClientNotFound(ClientNotFoundException ex,
+                                                              HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Client not found", request);
+    }
+
+    @ExceptionHandler(ClientOrganizationMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleClientOrganizationMismatch(ClientOrganizationMismatchException ex,
+                                                                          HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Client-Organization Mismatch", request);
+    }
 
 }

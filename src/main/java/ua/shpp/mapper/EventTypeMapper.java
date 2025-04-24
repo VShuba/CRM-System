@@ -10,7 +10,6 @@ import ua.shpp.exception.BranchNotFoundException;
 import ua.shpp.exception.ServiceNotFoundException;
 import ua.shpp.repository.BranchRepository;
 import ua.shpp.repository.ServiceRepository;
-import ua.shpp.service.BranchService;
 
 import java.time.Duration;
 import java.time.Period;
@@ -18,16 +17,16 @@ import java.util.List;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING,
-        uses = {OneTimeOfferMapper.class, SubscriptionOfferMapper.class, BranchRepository.class}
+        uses = {OneTimeOfferMapper.class, SubscriptionOfferMapper.class}
 )
 public interface EventTypeMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "oneTimeVisits", source = "oneTimeVisits")
     @Mapping(target = "subscriptions", source = "subscriptions")
-    @Mapping(target = "branch", expression = "java(getBranchEntity(dto.branchId(), branchRepository))")
+    @Mapping(target = "branch", expression = "java(resolveBranch(dto.branchId(), branchRepository))")
     EventTypeEntity toEntity(EventTypeRequestDTO dto,
-                             @Context ServiceRepository repository,
+                             @Context ServiceRepository serviceRepository,
                              @Context BranchRepository branchRepository);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -36,12 +35,14 @@ public interface EventTypeMapper {
     @Mapping(target = "branchName", source = "branch.name")
     EventTypeResponseDTO toResponseDTO(EventTypeEntity entity);
 
-    default BranchEntity getBranchEntity(Long branchId, BranchRepository branchRepository) {
-        return branchId != null ? branchRepository.findById(branchId)
-                .orElseThrow(() -> new BranchNotFoundException("Branch not found with id: " + branchId)) : null;
+    // --- default methods ---
+
+    default BranchEntity resolveBranch(Long branchId, BranchRepository branchRepository) {
+        if (branchId == null) return null;
+        return branchRepository.findById(branchId)
+                .orElseThrow(() -> new BranchNotFoundException("Branch not found with id: " + branchId));
     }
 
-    // необхідні методи мапінгу примітивних типів
     default Duration map(Long minutes) {
         return minutes != null ? Duration.ofMinutes(minutes) : null;
     }
@@ -56,6 +57,7 @@ public interface EventTypeMapper {
     }
 
     default List<ServiceEntity> mapToServiceEntityList(List<Long> ids, @Context ServiceRepository repository) {
+        if (ids == null) return List.of();
         return ids.stream()
                 .map(id -> repository.findById(id)
                         .orElseThrow(() -> new ServiceNotFoundException("Service not found: " + id)))
