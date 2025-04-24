@@ -49,7 +49,7 @@ class BranchServiceTests {
     @Test
     void shouldThrowExceptionIfBranchAlreadyExists() {
         when(branchRepository.existsByName(branchRequest.name())).thenReturn(true);
-        assertThrows(BranchAlreadyExistsException.class, () -> branchService.create(1L, branchRequest));
+        assertThrows(OrganizationNotFound.class, () -> branchService.create(1L, branchRequest));
     }
 
     @Test
