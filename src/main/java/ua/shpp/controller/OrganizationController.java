@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +51,24 @@ public class OrganizationController {
     @GetMapping("/{id}")
     public ResponseEntity<OrganizationResponseDTO> getOrganization(@PathVariable Long id) {
         return new ResponseEntity<>(organizationService.get(id), HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Get all organizations",
+            description = "Returns a paginated list of all organizations"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Paginated list of organizations retrieved successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = OrganizationResponseDTO.class))
+            )
+    })
+    @GetMapping
+    public ResponseEntity<Page<OrganizationResponseDTO>> getAllOrganizations(
+            @ParameterObject Pageable pageable) {
+        return ResponseEntity.ok(organizationService.getAll(pageable));
     }
 
     @Operation(summary = "Update organization", description = "Updates organization name by ID")

@@ -1,13 +1,12 @@
 package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.OrganizationRequestDTO;
 import ua.shpp.dto.OrganizationResponseDTO;
-import ua.shpp.entity.Organization;
-import ua.shpp.entity.UserEntity;
-import ua.shpp.entity.UserOrganization;
-import ua.shpp.entity.UserOrganizationId;
+import ua.shpp.entity.*;
 import ua.shpp.exception.OrganizationAlreadyExists;
 import ua.shpp.exception.OrganizationNotFound;
 import ua.shpp.mapper.OrganizationEntityToOrganizationDTOMapper;
@@ -59,21 +58,26 @@ public class OrganizationService {
 
     public OrganizationResponseDTO get(Long orgID) {
 
-        Organization organization = repository.findById(orgID).orElseThrow(
-                () -> new OrganizationNotFound("Failed to find organization in DB."));
+        Organization organization = getEntityByIdOrThrow(orgID);
 
         return mapper.organizationEntityToOrganizationResponseDTO(organization);
     }
 
-    public Organization getEntityById(Long orgId) {
+    public Page<OrganizationResponseDTO> getAll(Pageable pageable) {
+
+        Page<Organization> allByOrganizationId = repository.findAll(pageable);
+
+        return allByOrganizationId.map(mapper::organizationEntityToOrganizationResponseDTO);
+    }
+
+    public Organization getEntityByIdOrThrow(Long orgId) {
         return repository.findById(orgId).orElseThrow(
                 () -> new OrganizationNotFound("Failed to find organization in DB."));
     }
 
     public OrganizationResponseDTO update(Long orgID, OrganizationRequestDTO organizationRequestDTO) {
 
-        Organization organization = repository.findById(orgID).orElseThrow(
-                () -> new OrganizationNotFound("Failed to find organization in DB."));
+        Organization organization = getEntityByIdOrThrow(orgID);
 
         if (repository.existsByName(organizationRequestDTO.name()) // Check for duplicate in DB
                 && !organization.getName().equalsIgnoreCase(organizationRequestDTO.name())) {
