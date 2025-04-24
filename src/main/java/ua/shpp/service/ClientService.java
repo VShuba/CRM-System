@@ -25,7 +25,7 @@ public class ClientService {
     public ClientResponseDto createClient(Long orgId, ClientRequestDto requestDto) {
         log.info("Creating new client for organization ID: {}", orgId);
 
-        Organization organization = organizationService.getEntityById(orgId);
+        Organization organization = organizationService.getEntityByIdOrThrow(orgId);
         ClientEntity entity = ClientEntity.builder()
                 .name(requestDto.name())
                 .phone(requestDto.phone())
@@ -49,7 +49,7 @@ public class ClientService {
                     return new ClientNotFoundException(clientId);
                 });
 
-        Organization organization = organizationService.getEntityById(orgId);
+        Organization organization = organizationService.getEntityByIdOrThrow(orgId);
 
         if (!client.getOrganization().getId().equals(orgId)) {
             log.warn("Client organization mismatch: client {} does not belong to organization {}", clientId, orgId);
