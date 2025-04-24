@@ -65,7 +65,7 @@ public class OrganizationService {
         return mapper.organizationEntityToOrganizationResponseDTO(organization);
     }
 
-    Organization getEntityById(Long orgId) {
+    public Organization getEntityById(Long orgId) {
         return repository.findById(orgId).orElseThrow(
                 () -> new OrganizationNotFound("Failed to find organization in DB."));
     }

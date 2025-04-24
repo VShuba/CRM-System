@@ -10,6 +10,8 @@ import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.EmployeeEntity;
 import ua.shpp.entity.RoomEntity;
 import ua.shpp.entity.ServiceEntity;
+import ua.shpp.exception.BranchNotFoundException;
+import ua.shpp.exception.RoomNotFoundException;
 import ua.shpp.exception.ServiceNotFoundException;
 import ua.shpp.mapper.ServiceEntityToDTOMapper;
 import ua.shpp.repository.BranchRepository;
@@ -83,12 +85,16 @@ public class ServiceService {
         return repository.findAllServiceNames(pageable);
     }
 
-    // get all pageable return ONLY NAMES
+    public Page<ServiceResponseDTO> getAll(Long branchId, Pageable pageable) {
+
+        Page<ServiceEntity> allByBranchId = repository.findAllByBranchId(getBranchById(branchId).getId(), pageable);
+        return allByBranchId.map(mapper::toResponse);
+    }
 
     // Отримуємо філію за ID
     private BranchEntity getBranchById(Long id) {
         return branchRepository.findById(id)
-                .orElseThrow(() -> new ServiceNotFoundException("Branch not found"));
+                .orElseThrow(() -> new BranchNotFoundException("Branch not found"));
     }
 
     // Отримуємо кімнати за списком ID
@@ -98,7 +104,7 @@ public class ServiceService {
         }
         Set<RoomEntity> rooms = new HashSet<>(roomRepository.findAllById(roomIds));
         if (rooms.size() != roomIds.size()) {
-            throw new ServiceNotFoundException("One or more rooms not found");
+            throw new RoomNotFoundException("One or more rooms not found");
         }
         return rooms;
     }

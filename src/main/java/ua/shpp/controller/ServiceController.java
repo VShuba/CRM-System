@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -64,6 +65,27 @@ public class ServiceController {
         return new ResponseEntity<>(
                 serviceService.getAllServiceNames(PageRequest.of(page, size)),
                 HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Get all services by branch ID",
+            description = "Returns a paginated list of services for the specified branch"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Paginated list of services retrieved successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ServiceResponseDTO.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Invalid branch ID", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content)
+    })
+    @GetMapping("/branch/{branchId}")
+    public ResponseEntity<Page<ServiceResponseDTO>> getAllServices(
+            @PathVariable Long branchId,
+            @ParameterObject Pageable pageable) {
+        return ResponseEntity.ok(serviceService.getAll(branchId, pageable));
     }
 
     @Operation(summary = "Update service", description = "Updates a service by its ID")
