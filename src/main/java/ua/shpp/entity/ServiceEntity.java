@@ -64,4 +64,13 @@ public class ServiceEntity {
 
     @ManyToMany(mappedBy = "services")
     Set<EmployeeEntity> employees;
+
+    @OneToMany(
+            mappedBy = "serviceEntity",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    private List<ScheduleEventEntity> scheduleEvents = new ArrayList<>();
 }

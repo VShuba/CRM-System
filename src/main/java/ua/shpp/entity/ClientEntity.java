@@ -1,9 +1,14 @@
 package ua.shpp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import ua.shpp.entity.payment.OneTimeInfoEntity;
+import ua.shpp.entity.payment.SubscriptionInfoEntity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Getter
@@ -34,4 +39,21 @@ public class ClientEntity {
     @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
 
+    @OneToMany(
+            mappedBy = "client",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    private List<OneTimeInfoEntity> oneTimeInfo = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "client",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    private List<SubscriptionInfoEntity> subscriptionInfo = new ArrayList<>();
 }
