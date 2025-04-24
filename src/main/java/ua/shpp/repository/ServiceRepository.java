@@ -14,4 +14,6 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, Long> {
 
     @Query(nativeQuery = true, value = "SELECT service_name FROM services WHERE service_name IN (:names) AND branch_id = :branchId")
     List<String> findAllServiceNamesByNamesAndBranch(List<String> names, Long branchId);
+
+    Page<ServiceEntity> findAllByBranchId(Long branchId, Pageable pageable);
 }
