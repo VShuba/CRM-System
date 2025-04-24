@@ -1,7 +1,10 @@
 package ua.shpp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import ua.shpp.entity.payment.OneTimeInfoEntity;
+import ua.shpp.entity.payment.SubscriptionInfoEntity;
 
 import java.time.Period;
 import java.util.ArrayList;
@@ -49,4 +52,13 @@ public class SubscriptionServiceEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "event_type_id", nullable = false)
     private EventTypeEntity eventType;
+
+    @OneToMany(
+            mappedBy = "subscriptionService",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    private List<SubscriptionInfoEntity> subscriptionTimeInfo = new ArrayList<>();
 }

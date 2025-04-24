@@ -1,12 +1,17 @@
 package ua.shpp.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.OneTimeOfferDTO;
@@ -46,9 +51,25 @@ public class OneTimeOfferController {
             @ApiResponse(responseCode = "404", description = "One-time offer id not fount", content = @Content),
     })
     @GetMapping("/{id}")
-    public ResponseEntity<OneTimeOfferDTO> get(@PathVariable Long id) {
-        var dto = oneTimeOfferService.get(id);
+    public ResponseEntity<OneTimeOfferDTO> getById(@PathVariable Long id) {
+        var dto = oneTimeOfferService.getById(id);
         return ResponseEntity.ok(dto);
+    }
+
+    @Operation(summary = "Get all one-time offers for a given Event Type ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "One-time offers for a given Event Type ID successfully found",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = OneTimeOfferDTO.class)))),
+    })
+    @GetMapping
+    public ResponseEntity<Page<OneTimeOfferDTO>> getAllByEventTypeId(@Parameter(
+                                                                             description = "ID of the Event Type to filter offers",
+                                                                             required = true) @RequestParam(defaultValue = "1") Long eventTypeId,
+                                                                     @ParameterObject() Pageable pageRequest) {
+        Page<OneTimeOfferDTO> result = oneTimeOfferService.getAllByEventTypeId(eventTypeId, pageRequest);
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "Update one-time offer by id")
@@ -77,7 +98,7 @@ public class OneTimeOfferController {
             @ApiResponse(responseCode = "204", description = "Deleted successfully"),
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<OneTimeOfferDTO> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         oneTimeOfferService.delete(id);
         return ResponseEntity.noContent().build();
     }

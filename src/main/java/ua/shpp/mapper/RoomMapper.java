@@ -7,6 +7,6 @@ import ua.shpp.entity.RoomEntity;
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
 @Mapper(componentModel = SPRING)
-public interface RoomEntityToRoomDTOMapper {
-    RoomResponseDTO roomEntityToRoomDTO(RoomEntity source);
+public interface RoomMapper {
+    RoomResponseDTO toDTO(RoomEntity source);
 }

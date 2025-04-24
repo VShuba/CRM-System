@@ -12,7 +12,7 @@ import ua.shpp.exception.BranchAlreadyExistsException;
 import ua.shpp.exception.BranchNotFoundException;
 import ua.shpp.exception.BranchOrganizationMismatchException;
 import ua.shpp.exception.OrganizationNotFound;
-import ua.shpp.mapper.BranchEntityToBranchDTOMapper;
+import ua.shpp.mapper.BranchMapper;
 import ua.shpp.mapper.WorkingHourMapper;
 import ua.shpp.model.WorkingHour;
 import ua.shpp.repository.BranchRepository;
@@ -30,7 +30,7 @@ class BranchServiceTests {
     private BranchService branchService;
     private BranchRepository branchRepository;
     private OrganizationRepository organizationRepository;
-    private BranchEntityToBranchDTOMapper branchMapper;
+    private BranchMapper branchMapper;
     private WorkingHourMapper workingHourMapper;
 
     private BranchRequestDTO branchRequest;
@@ -39,7 +39,7 @@ class BranchServiceTests {
     void setUp() {
         branchRepository = mock(BranchRepository.class);
         organizationRepository = mock(OrganizationRepository.class);
-        branchMapper = mock(BranchEntityToBranchDTOMapper.class);
+        branchMapper = mock(BranchMapper.class);
         workingHourMapper = mock(WorkingHourMapper.class);
 
         branchService = new BranchService(organizationRepository, branchRepository, branchMapper, workingHourMapper);
@@ -68,7 +68,7 @@ class BranchServiceTests {
         when(branchRepository.existsByName(branchRequest.name())).thenReturn(false);
         when(organizationRepository.findById(1L)).thenReturn(Optional.of(org));
         when(branchRepository.save(any(BranchEntity.class))).thenReturn(branchEntity);
-        when(branchMapper.branchEntityToBranchResponseDTO(branchEntity)).thenReturn(responseDTO);
+        when(branchMapper.toResponseDTO(branchEntity)).thenReturn(responseDTO);
 
         BranchResponseDTO result = branchService.create(1L, branchRequest);
         assertEquals(responseDTO, result);
@@ -104,7 +104,7 @@ class BranchServiceTests {
         when(branchRepository.existsByName("newName")).thenReturn(false);
         when(branchRepository.findById(1L)).thenReturn(Optional.of(branch));
         when(branchRepository.save(any())).thenReturn(branch);
-        when(branchMapper.branchEntityToBranchResponseDTO(branch)).thenReturn(responseDTO);
+        when(branchMapper.toResponseDTO(branch)).thenReturn(responseDTO);
 
         BranchResponseDTO result = branchService.updateName(1L, 1L, patchRequest);
         assertEquals(responseDTO, result);
@@ -125,7 +125,7 @@ class BranchServiceTests {
         when(branchRepository.findById(1L)).thenReturn(Optional.of(branch));
         when(workingHourMapper.toEntity(dto)).thenReturn(entity);
         when(branchRepository.save(any())).thenReturn(branch);
-        when(branchMapper.branchEntityToBranchResponseDTO(branch)).thenReturn(responseDTO);
+        when(branchMapper.toResponseDTO(branch)).thenReturn(responseDTO);
 
         BranchResponseDTO result = branchService.updateWorkingHours(1L, 1L, List.of(dto));
         assertEquals(responseDTO, result);
