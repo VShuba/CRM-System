@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +62,19 @@ public class BranchController {
             @PathVariable Long orgId,
             @PathVariable Long branchId) {
         return new ResponseEntity<>(branchService.get(orgId, branchId), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get all branches", description = "Get all branches of organization by orgId")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Branches found"),
+            @ApiResponse(responseCode = "404", description = "Branches not found", content = @Content)
+    })
+    @GetMapping
+    public ResponseEntity<Page<BranchResponseDTO>> getAllBranch(
+            @PathVariable Long orgId,
+            @ParameterObject Pageable pageable) {
+        Page<BranchResponseDTO> page = branchService.getAll(orgId, pageable);
+        return ResponseEntity.ok(page);
     }
 
     @Operation(summary = "Update branch name", description = "Updates the name of an existing branch")

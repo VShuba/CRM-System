@@ -2,6 +2,8 @@ package ua.shpp.service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.branch.BranchPatchRequestDTO;
 import ua.shpp.dto.branch.BranchRequestDTO;
@@ -52,6 +54,13 @@ public class BranchService {
     public BranchResponseDTO get(Long orgId, Long branchId) {
         BranchEntity branchEntity = validateBranch(orgId, branchId);
         return branchMapper.toResponseDTO(branchEntity);
+    }
+
+    public Page<BranchResponseDTO> getAll(Long orgId, Pageable pageable) {
+        if (!organizationRepository.existsById(orgId))
+            throw new OrganizationNotFound("Organization with id: " + orgId + " not found");
+        Page<BranchEntity> allByOrganizationId = branchRepository.findAllByOrganizationId(orgId, pageable);
+        return allByOrganizationId.map(branchMapper::toResponseDTO);
     }
 
     public BranchResponseDTO updateName(Long orgId, Long branchId, BranchPatchRequestDTO request) {
