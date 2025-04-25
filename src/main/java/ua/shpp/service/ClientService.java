@@ -14,6 +14,8 @@ import ua.shpp.exception.ClientOrganizationMismatchException;
 import ua.shpp.mapper.ClientEntityMapper;
 import ua.shpp.repository.ClientRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -93,5 +95,10 @@ public class ClientService {
         log.info("Fetched {} clients for organization ID: {}", page.getTotalElements(), orgId);
 
         return page.map(clientEntityMapper::toDto);
+    }
+
+    public List<ClientResponseDto> getClientsByKeyword(String keyword, Long orgId) {
+
+        return clientEntityMapper.toDtoList(clientRepository.findByKeyword(keyword, orgId));
     }
 }
