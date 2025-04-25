@@ -16,6 +16,8 @@ import ua.shpp.dto.ClientRequestDto;
 import ua.shpp.dto.ClientResponseDto;
 import ua.shpp.service.ClientService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/organizations/{orgId}/clients")
 @RequiredArgsConstructor
@@ -85,4 +87,10 @@ public class ClientController {
         Page<ClientResponseDto> clients = clientService.getClientsByOrganization(orgId, pageable);
         return ResponseEntity.ok(clients);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ClientResponseDto>> getClientByKeyword(@PathVariable Long orgId, @RequestParam String keyword) {
+        return ResponseEntity.ok().body(clientService.getClientsByKeyword(keyword, orgId));
+    }
+
 }

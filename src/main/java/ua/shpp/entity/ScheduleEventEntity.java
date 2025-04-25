@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 
 @Entity
@@ -39,4 +40,8 @@ public class ScheduleEventEntity {
     //   Налаштувати максимальну кількість людей для запису
     @Column(name = "number_of_people")
     private Byte numberOfPeople;
+
+    @OneToMany(mappedBy = "scheduleEvent")
+    @Column(name = "event_clients")
+    private List<EventClientEntity> eventClients;
 }

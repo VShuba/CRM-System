@@ -2,6 +2,8 @@ package ua.shpp.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ua.shpp.dto.EmployeeRequestDTO;
 import ua.shpp.dto.EmployeeResponseDTO;
+import ua.shpp.exception.InvalidJsonFormatException;
 import ua.shpp.service.EmployeeService;
 
 @RestController
@@ -28,8 +31,12 @@ public class EmployeeController {
 
     @PostMapping(path = "/employee",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<EmployeeResponseDTO> addEmployee(@RequestPart(name = "avatar") MultipartFile avatarImg,
-                                                            @RequestPart(name = "employee") String employeeDTOStr) {
+    @Operation(summary = "Add new employee with avatar and JSON data")
+    public ResponseEntity<EmployeeResponseDTO> addEmployee(@RequestPart(name = "avatar") MultipartFile avatarImg,
+                                                           @Schema(description = "JSON-formatted employee data (EmployeeRequestDTO) as string",
+                                                                   requiredMode = Schema.RequiredMode.REQUIRED,
+                                                                   implementation = EmployeeRequestDTO.class)
+                                                           @RequestPart(name = "employee") String employeeDTOStr) {
         try {
             EmployeeRequestDTO employeeRequestDTO = objectMapper.readValue(employeeDTOStr, EmployeeRequestDTO.class);
             log.info("Deserialized string into EmployeeRequestDTO: {}", employeeRequestDTO.toString());
@@ -38,7 +45,7 @@ public class EmployeeController {
 
             return ResponseEntity.status(HttpStatus.CREATED).body(employeeResponseDTO);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new InvalidJsonFormatException("Invalid JSON format for EmployeeRequestDTO", e);
         }
     }
 }

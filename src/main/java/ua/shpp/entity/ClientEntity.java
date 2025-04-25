@@ -56,4 +56,9 @@ public class ClientEntity {
     )
     @JsonIgnore
     private List<SubscriptionInfoEntity> subscriptionInfo = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "client"
+    )
+    private List<EventClientEntity> userEvents;
 }

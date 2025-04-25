@@ -122,7 +122,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(OfferNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleOfferNotFound(OfferNotFoundException ex,
-                                                               HttpServletRequest request) {
+                                                             HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Offer not found", request);
     }
 
@@ -130,13 +130,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EventTypeNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEventTypeNotFound(EventTypeNotFoundException ex,
-                                                             HttpServletRequest request) {
+                                                                 HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Event type not found", request);
     }
 
     @ExceptionHandler(EventTypeAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleEventTypeAlreadyExists(EventTypeAlreadyExistsException ex,
-                                                                 HttpServletRequest request) {
+                                                                      HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.CONFLICT, "Event type Already Exists", request);
     }
 
@@ -187,4 +187,9 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Client-Organization Mismatch", request);
     }
 
+    // for Employee
+    @ExceptionHandler(InvalidJsonFormatException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidJsonFormatException(InvalidJsonFormatException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Invalid JSON format for EmployeeRequestDTO", request);
+    }
 }

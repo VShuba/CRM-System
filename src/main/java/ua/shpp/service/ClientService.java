@@ -14,6 +14,8 @@ import ua.shpp.exception.ClientOrganizationMismatchException;
 import ua.shpp.mapper.ClientEntityMapper;
 import ua.shpp.repository.ClientRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,7 +27,7 @@ public class ClientService {
     public ClientResponseDto createClient(Long orgId, ClientRequestDto requestDto) {
         log.info("Creating new client for organization ID: {}", orgId);
 
-        Organization organization = organizationService.getEntityById(orgId);
+        Organization organization = organizationService.getEntityByIdOrThrow(orgId);
         ClientEntity entity = ClientEntity.builder()
                 .name(requestDto.name())
                 .phone(requestDto.phone())
@@ -49,7 +51,7 @@ public class ClientService {
                     return new ClientNotFoundException(clientId);
                 });
 
-        Organization organization = organizationService.getEntityById(orgId);
+        Organization organization = organizationService.getEntityByIdOrThrow(orgId);
 
         if (!client.getOrganization().getId().equals(orgId)) {
             log.warn("Client organization mismatch: client {} does not belong to organization {}", clientId, orgId);
@@ -93,5 +95,10 @@ public class ClientService {
         log.info("Fetched {} clients for organization ID: {}", page.getTotalElements(), orgId);
 
         return page.map(clientEntityMapper::toDto);
+    }
+
+    public List<ClientResponseDto> getClientsByKeyword(String keyword, Long orgId) {
+
+        return clientEntityMapper.toDtoList(clientRepository.findByKeyword(keyword, orgId));
     }
 }
