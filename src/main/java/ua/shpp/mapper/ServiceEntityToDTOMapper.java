@@ -23,7 +23,7 @@ public class ServiceEntityToDTOMapper {
 
         Set<String> employeeNames = entity.getEmployees() != null
                 ? entity.getEmployees().stream()
-                .map(EmployeeEntity::getLastName)
+                .map(EmployeeEntity::getName)
                 .collect(Collectors.toSet())
                 : Set.of();
 
@@ -37,4 +37,3 @@ public class ServiceEntityToDTOMapper {
         );
     }
 }
-
