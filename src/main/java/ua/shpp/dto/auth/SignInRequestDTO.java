@@ -9,7 +9,7 @@ import lombok.Data;
 @Schema(description = "Sign in request")
 public class SignInRequestDTO {
 
-    @Schema(description = "User login", example = "my_login")
+    @Schema(description = "User login", example = "test@gmail.com")
     @Size(min = 5, max = 50, message = "Login length must be min = 5 and max = 50 characters")
     @NotBlank(message = "Login cannot be blank")
     private String login;
