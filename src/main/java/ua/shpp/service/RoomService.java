@@ -28,10 +28,7 @@ public class RoomService {
             throw new RoomAlreadyExistsException("Room with name " + requestDTO.name() + " already exists in this branch");
         }
 
-        RoomEntity roomEntity = RoomEntity.builder()
-                .name(requestDTO.name())
-                .branch(branchEntity)
-                .build();
+        RoomEntity roomEntity = mapper.toEntity(requestDTO, branchEntity);
 
         roomRepository.save(roomEntity);
 
