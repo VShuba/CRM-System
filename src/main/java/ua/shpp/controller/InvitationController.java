@@ -9,7 +9,7 @@ import ua.shpp.dto.InvitationRequestDTO;
 import ua.shpp.dto.ResponseInvitationDTO;
 import ua.shpp.service.InvitationService;
 
-@RestController()
+@RestController
 @RequestMapping("/api/invitations")
 public class InvitationController {
 
@@ -20,7 +20,7 @@ public class InvitationController {
     }
 
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<ResponseInvitationDTO> createInvitation(
             @RequestBody InvitationRequestDTO invitationRequestDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

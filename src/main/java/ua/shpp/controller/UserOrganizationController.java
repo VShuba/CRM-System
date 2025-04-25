@@ -17,7 +17,7 @@ public class UserOrganizationController {
     }
 
     @DeleteMapping("organizations/{organizationId}/user/{userId}")
-    public ResponseEntity deleteUserOrganization(@PathVariable Long organizationId, @PathVariable Long userId) {
+    public ResponseEntity<Void> deleteUserOrganization(@PathVariable Long organizationId, @PathVariable Long userId) {
         userOrganizationService.deleteUserOrganizationRole(organizationId, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

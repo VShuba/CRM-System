@@ -34,7 +34,7 @@ public class ServiceController {
                             schema = @Schema(implementation = ServiceResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
     })
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<ServiceResponseDTO> createService(
             @RequestBody @Valid ServiceRequestDTO requestDTO) {
         return new ResponseEntity<>(serviceService.create(requestDTO), HttpStatus.CREATED);

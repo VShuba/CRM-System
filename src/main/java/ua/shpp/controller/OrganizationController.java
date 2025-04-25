@@ -35,7 +35,7 @@ public class OrganizationController {
             @ApiResponse(responseCode = "409", description = "An organization with this name already exists",
                     content = @Content)
     })
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<OrganizationResponseDTO> createOrganization(
             @RequestBody @Valid OrganizationRequestDTO requestDTO) {
         return new ResponseEntity<>(organizationService.create(requestDTO), HttpStatus.CREATED);
