@@ -12,16 +12,23 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "employee", uniqueConstraints = @UniqueConstraint(columnNames = {"branch_id", "email"}))
+@Table(name = "employee")
 public class EmployeeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "branch_id", nullable = false)
-    private BranchEntity branch;
+    @ManyToMany
+    @JoinTable(
+            name = "employee_branch",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "branch_id"),
+            uniqueConstraints = {
+                    @UniqueConstraint(columnNames = {"employee_id", "branch_id"})
+            }
+    )
+    private Set<BranchEntity> branches = new HashSet<>();
 
     @Column(nullable = false)
     private String name;

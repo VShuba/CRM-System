@@ -59,11 +59,11 @@ public class EmployeeService {
         log.debug("Mapping EmployeeRequestDTO to EmployeeEntity");
         EmployeeEntity employeeEntity = employeeMapper.EmployeeRequestDTOToEmployeeEntity(employeeDTO);
         log.debug("After mapping: employee entity id: {}, branch: {}, services: {}", employeeEntity.getId(),
-                employeeEntity.getBranch(), employeeEntity.getServices());
+                branch.getId(), employeeEntity.getServices());
 
-        employeeEntity.setBranch(branch);
+        employeeEntity.getBranches().add(branch);
         log.debug("After set branch: employee entity id: {}, branchId: {}, services: {}", employeeEntity.getId(),
-                employeeEntity.getBranch().getId(), employeeEntity.getServices());
+                branch.getId(), employeeEntity.getServices());
         employeeEntity.setServices(new HashSet<>(newServiceEntities));
 
         employeeEntity.setAvatar(resizedBytesAvatar);
