@@ -42,7 +42,7 @@ public class EmployeeService {
         log.debug("Branch was found with name: {}, employees num: {}, services num: {}",
                 branch.getName(), branch.getEmployees().size(), branch.getServiceEntities().size());
 
-        if (employeeRepository.existsByEmailAndBranchId(employeeDTO.email(), branch.getId())) {
+        if (employeeExistsInBranchByEmail(employeeDTO.email(), branch)) {
             throw new RuntimeException("Employee with email " + employeeDTO.email() + " already exists");
         }
 
@@ -200,5 +200,10 @@ public class EmployeeService {
         if (!existingServiceNames.isEmpty()) {
             throw new IllegalArgumentException("Сервіси з такими іменами вже існують у гілці: " + existingServiceNames);
         }
+    }
+
+    private static boolean employeeExistsInBranchByEmail(String email, BranchEntity branch) {
+        return branch.getEmployees().stream()
+                .anyMatch(e -> e.getEmail().equals(email));
     }
 }

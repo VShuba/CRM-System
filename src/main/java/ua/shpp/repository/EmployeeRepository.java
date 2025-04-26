@@ -6,8 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import ua.shpp.entity.EmployeeEntity;
 
 public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long> {
-    boolean existsByEmailAndBranchId(String email, Long branchId);
-
     @Modifying
     @Query(nativeQuery = true, value = """
             DELETE FROM employee_service WHERE employee_id = :id;
