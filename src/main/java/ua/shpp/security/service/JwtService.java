@@ -27,11 +27,6 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    @Deprecated
-    public String extractEmail(String token) {
-        return extractClaim(token, claims -> claims.get("email", String.class));
-    }
-
     public String extractAuthority(String token) {
         return extractClaim(token, claims -> claims.get("role", String.class));
     }
@@ -44,13 +39,6 @@ public class JwtService {
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
         final Claims claims = extractAllClaims(token);
         return claimsResolvers.apply(claims);
-    }
-
-    @Deprecated
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        boolean valid = extractUserName(token).equals(userDetails.getUsername()) && isTokenNotExpired(token);
-        log.debug("Token validation: {}, valid: {}", userDetails.getUsername(), valid);
-        return valid;
     }
 
     public boolean isTokenValid(String token) {

@@ -37,7 +37,7 @@ class JwtServiceTests {
         String token = jwtService.generateToken(userEntity);
 
         assertNotNull(token);
-        assertTrue(jwtService.isTokenValid(token, userEntity));
+        assertTrue(jwtService.isTokenValid(token));
     }
 
     @Test
@@ -48,9 +48,9 @@ class JwtServiceTests {
         claims.put("role", userEntity.getRole());
 
         String token = jwtService.generateToken(claims, userEntity);
-        String email = jwtService.extractEmail(token);
+        String role = jwtService.extractAuthority(token);
 
-        assertEquals(userEntity.getEmail(), email);
+        assertEquals(userEntity.getRole().name(), role);
     }
 
     @Test
@@ -65,6 +65,6 @@ class JwtServiceTests {
     void shouldReturnFalseForInvalidToken() {
         String fakeToken = "invalid-token";
 
-        assertThrows(Exception.class, () -> jwtService.isTokenValid(fakeToken, userEntity));
+        assertThrows(Exception.class, () -> jwtService.isTokenValid(fakeToken));
     }
 }
