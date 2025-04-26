@@ -48,13 +48,13 @@ public class JwtService {
 
     @Deprecated
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        boolean valid = extractUserName(token).equals(userDetails.getUsername()) && !isTokenExpired(token);
+        boolean valid = extractUserName(token).equals(userDetails.getUsername()) && isTokenNotExpired(token);
         log.debug("Token validation: {}, valid: {}", userDetails.getUsername(), valid);
         return valid;
     }
 
     public boolean isTokenValid(String token) {
-        boolean valid = !isTokenExpired(token);
+        boolean valid = isTokenNotExpired(token);
         log.debug("Token validation for user with id: {}, valid: {}", extractUserName(token), valid);
         return valid;
     }
@@ -68,8 +68,8 @@ public class JwtService {
                 .signWith(getSigningKey()).compact();
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    private boolean isTokenNotExpired(String token) {
+        return !extractExpiration(token).before(new Date());
     }
 
     private Date extractExpiration(String token) {
