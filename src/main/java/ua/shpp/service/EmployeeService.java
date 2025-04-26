@@ -1,5 +1,6 @@
 package ua.shpp.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,20 @@ public class EmployeeService {
         String base64Avatar = ImageUtil.convertImageToBase64(resizedBytesAvatar);
 
         return employeeMapper.employeeEntityToEmployeeResponseDTO(employeeEntity, base64Avatar);
+    }
+
+    /**
+     * Deletes an employee. First, removes all related records in the employee_service table,
+     * and then deletes the employee from the employee table.
+     *
+     * @param id the ID of the employee to be deleted
+     * @return true if the employee existed and was deleted, false if the employee was not found
+     */
+    @Transactional
+    public boolean deleteEmployee(Long id) {
+        int deletedRecords = employeeRepository.deleteEmployeeAndRelatedRecords(id);
+        log.info("Records deleted: {}", deletedRecords);
+        return deletedRecords > 0;
     }
 
     /**
