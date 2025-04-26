@@ -78,6 +78,6 @@ public class SecurityConfiguration {
 
     @Bean
     JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(handlerExceptionResolver, jwtService, userDetailsService());
+        return new JwtAuthenticationFilter(handlerExceptionResolver, jwtService);
     }
 }
