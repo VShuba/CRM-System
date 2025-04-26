@@ -12,8 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ua.shpp.dto.EmployeeRequestDTO;
-import ua.shpp.dto.EmployeeResponseDTO;
+import ua.shpp.dto.employee.EmployeeRequestDTO;
+import ua.shpp.dto.employee.EmployeeResponseDTO;
 import ua.shpp.exception.InvalidJsonFormatException;
 import ua.shpp.service.EmployeeService;
 

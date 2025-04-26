@@ -1,4 +1,4 @@
-package ua.shpp.dto;
+package ua.shpp.dto.employee;
 
 public record EmployeeServiceCreateDTO(String name, String color) {
 }

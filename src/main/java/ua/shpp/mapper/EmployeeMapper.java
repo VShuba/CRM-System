@@ -3,8 +3,8 @@ package ua.shpp.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import ua.shpp.dto.EmployeeRequestDTO;
-import ua.shpp.dto.EmployeeResponseDTO;
+import ua.shpp.dto.employee.EmployeeRequestDTO;
+import ua.shpp.dto.employee.EmployeeResponseDTO;
 import ua.shpp.entity.EmployeeEntity;
 import ua.shpp.entity.ServiceEntity;
 

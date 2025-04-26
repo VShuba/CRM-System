@@ -1,4 +1,4 @@
-package ua.shpp.dto;
+package ua.shpp.dto.employee;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
