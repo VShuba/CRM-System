@@ -2,12 +2,14 @@ package ua.shpp.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ua.shpp.model.ClientEventStatus;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 @EqualsAndHashCode()
 @Table(name = "event_clients")
 public class EventClientEntity {
@@ -24,5 +26,7 @@ public class EventClientEntity {
     @JoinColumn(name = "event_id")
     private ScheduleEventEntity scheduleEvent;
 
+    @Enumerated(EnumType.STRING)
+    private ClientEventStatus clientEventStatus;
 
 }
