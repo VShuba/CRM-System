@@ -10,10 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ua.shpp.dto.EmployeeRequestDTO;
 import ua.shpp.dto.EmployeeResponseDTO;
@@ -46,6 +43,15 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.CREATED).body(employeeResponseDTO);
         } catch (JsonProcessingException e) {
             throw new InvalidJsonFormatException("Invalid JSON format for EmployeeRequestDTO", e);
+        }
+    }
+
+    @DeleteMapping("/employee/{id}")
+    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+        if (employeeService.deleteEmployee(id)) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }
