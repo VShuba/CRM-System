@@ -63,7 +63,7 @@ public class ServiceEntity {
     }
 
     @ManyToMany(mappedBy = "services")
-    Set<EmployeeEntity> employees;
+    Set<EmployeeEntity> employees = new HashSet<>();
 
     @OneToMany(
             mappedBy = "serviceEntity",
