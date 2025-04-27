@@ -12,7 +12,7 @@ import ua.shpp.entity.OneTimeServiceEntity;
 @Getter
 @Setter
 @Table(name = "one_time_info")
-public class OneTimeInfoEntity {
+public non-sealed class OneTimeInfoEntity implements Checkable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,9 +27,6 @@ public class OneTimeInfoEntity {
 
     @Column(nullable = false)
     private Boolean visitUsed;
-
-    @Column(nullable = false)
-    private Boolean paid;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "check_id", referencedColumnName = "id", nullable = false)

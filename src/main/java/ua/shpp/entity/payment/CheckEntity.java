@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 import ua.shpp.model.PaymentMethod;
 import ua.shpp.util.CheckNumberGeneratorUtil;
 
@@ -25,7 +26,6 @@ public class CheckEntity {
     @Column(name = "check_number", nullable = false, updatable = false)
     private String checkNumber;
 
-    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

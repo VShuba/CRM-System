@@ -4,44 +4,55 @@ import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import ua.shpp.dto.OneTimeInfoRequestDto;
-import ua.shpp.dto.OneTimeInfoResponseDto;
+import ua.shpp.dto.SubscriptionInfoRequestDto;
+import ua.shpp.dto.SubscriptionInfoResponseDto;
 import ua.shpp.entity.ClientEntity;
-import ua.shpp.entity.OneTimeServiceEntity;
+import ua.shpp.entity.SubscriptionServiceEntity;
 import ua.shpp.entity.payment.CheckEntity;
-import ua.shpp.entity.payment.OneTimeInfoEntity;
+import ua.shpp.entity.payment.SubscriptionInfoEntity;
 import ua.shpp.exception.CheckNotFoundException;
 import ua.shpp.exception.ClientNotFoundException;
 import ua.shpp.exception.OfferNotFoundException;
 import ua.shpp.repository.CheckRepository;
 import ua.shpp.repository.ClientRepository;
-import ua.shpp.repository.OneTimeOfferRepository;
+import ua.shpp.repository.SubscriptionOfferRepository;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
 @Mapper(componentModel = SPRING)
-public interface OneTimeInfoMapper {
+public interface SubscriptionInfoMapper {
     @Mapping(target = "clientId", source = "client",
             qualifiedByName = "clientToId")
-    @Mapping(target = "oneTimeId", source = "oneTimeService",
-            qualifiedByName = "oneTimeToId")
+    @Mapping(target = "subscriptionId", source = "subscriptionService",
+            qualifiedByName = "subscriptionToId")
     @Mapping(target = "checkId", source = "paymentCheck",
             qualifiedByName = "checkToId")
-    OneTimeInfoResponseDto toDto(OneTimeInfoEntity entity);
+    SubscriptionInfoResponseDto toDto(SubscriptionInfoEntity entity);
 
     @Mapping(target = "client", source = "clientId",
             qualifiedByName = "idToClient")
-    @Mapping(target = "oneTimeService", source = "oneTimeId",
-            qualifiedByName = "idToOneTime")
+    @Mapping(target = "subscriptionService", source = "subscriptionId",
+            qualifiedByName = "idToOffer")
 //    @Mapping(target = "paymentCheck", source = "checkId",
 //            qualifiedByName = "idToCheck")
-    OneTimeInfoEntity toEntity(OneTimeInfoRequestDto dto,
-                               @Context ClientRepository clientRepository,
-                               @Context OneTimeOfferRepository oneTimeOfferRepository,
-                               @Context CheckRepository checkRepository);
+    SubscriptionInfoEntity toEntity(SubscriptionInfoRequestDto dto,
+                                    @Context ClientRepository clientRepository,
+                                    @Context SubscriptionOfferRepository offerRepository,
+                                    @Context CheckRepository checkRepository);
+
 
     @Named("clientToId")
     static Long clientToId(ClientEntity entity) {
+        return entity != null ? entity.getId() : null;
+    }
+
+    @Named("subscriptionToId")
+    static Long subscriptionToId(SubscriptionServiceEntity entity) {
+        return entity != null ? entity.getId() : null;
+    }
+
+    @Named("checkToId")
+    static Long checkToId(CheckEntity entity) {
         return entity != null ? entity.getId() : null;
     }
 
@@ -52,21 +63,11 @@ public interface OneTimeInfoMapper {
                 .orElseThrow(() -> new ClientNotFoundException(id));
     }
 
-    @Named("oneTimeToId")
-    static Long oneTimeToId(OneTimeServiceEntity entity) {
-        return entity != null ? entity.getId() : null;
-    }
-
-    @Named("idToOneTime")
-    default OneTimeServiceEntity idToOneTime(Long id,
-                                             @Context OneTimeOfferRepository repository) {
+    @Named("idToOffer")
+    default SubscriptionServiceEntity idToOffer(Long id,
+                                                @Context SubscriptionOfferRepository repository) {
         return repository.findById(id)
                 .orElseThrow(() -> new OfferNotFoundException(String.format("Offer id: %d, not found", id)));
-    }
-
-    @Named("checkToId")
-    static Long checkToId(CheckEntity entity) {
-        return entity != null ? entity.getId() : null;
     }
 
     @Named("idToCheck")

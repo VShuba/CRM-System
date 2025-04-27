@@ -192,4 +192,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidJsonFormatException(InvalidJsonFormatException ex, HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Invalid JSON format for EmployeeRequestDTO", request);
     }
+
+    // for Event
+    @ExceptionHandler(EventNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEventException(EventNotFoundException ex,
+                                                                       HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Event not found", request);
+    }
+
+    // for Deal
+    @ExceptionHandler(DealNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEventException(DealNotFoundException ex,
+                                                              HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Deal not found", request);
+    }
+
+    @ExceptionHandler(VisitAlreadyUsedException.class)
+    public ResponseEntity<ErrorResponse> handleEventException(VisitAlreadyUsedException ex,
+                                                              HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Visit already used", request);
+    }
 }

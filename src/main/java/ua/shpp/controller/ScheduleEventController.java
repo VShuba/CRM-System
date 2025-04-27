@@ -34,8 +34,7 @@ public class ScheduleEventController {
             @ApiResponse(responseCode = "404", description = "Service id not fount", content = @Content),
     })
     @PostMapping
-    public ResponseEntity<ScheduleEventDto> create(
-            @RequestBody ScheduleEventDto scheduleEventDto) {
+    public ResponseEntity<ScheduleEventDto> create(@RequestBody ScheduleEventDto scheduleEventDto) {
         var event = scheduleEventService.create(scheduleEventDto);
         URI location = URI.create("/api/schedule/event/" + event.id());
 
@@ -79,8 +78,7 @@ public class ScheduleEventController {
             )
             @PathVariable
             @DateTimeFormat(pattern = "dd-MM-yyyy")
-            LocalDate end
-    ) {
+            LocalDate end) {
         var dto = scheduleEventService.getAllBetweenDates(start, end);
         return ResponseEntity.ok(dto);
     }

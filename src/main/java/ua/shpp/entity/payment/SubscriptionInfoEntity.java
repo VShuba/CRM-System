@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Table(name = "subscription_info")
-public class SubscriptionInfoEntity {
+public non-sealed class SubscriptionInfoEntity implements Checkable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,8 +33,6 @@ public class SubscriptionInfoEntity {
     @Column(name = "expiration_date", nullable = false, updatable = false)
     private LocalDate expirationDate;
 
-    @Column(nullable = false)
-    private Boolean paid;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "check_id", referencedColumnName = "id", nullable = false)
