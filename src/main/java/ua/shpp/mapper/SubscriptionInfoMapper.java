@@ -1,9 +1,6 @@
 package ua.shpp.mapper;
 
-import org.mapstruct.Context;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 import ua.shpp.dto.SubscriptionInfoRequestDto;
 import ua.shpp.dto.SubscriptionInfoResponseDto;
 import ua.shpp.entity.ClientEntity;
@@ -33,8 +30,6 @@ public interface SubscriptionInfoMapper {
             qualifiedByName = "idToClient")
     @Mapping(target = "subscriptionService", source = "subscriptionId",
             qualifiedByName = "idToOffer")
-//    @Mapping(target = "paymentCheck", source = "checkId",
-//            qualifiedByName = "idToCheck")
     SubscriptionInfoEntity toEntity(SubscriptionInfoRequestDto dto,
                                     @Context ClientRepository clientRepository,
                                     @Context SubscriptionOfferRepository offerRepository,
@@ -75,5 +70,19 @@ public interface SubscriptionInfoMapper {
                                   @Context CheckRepository repository) {
         return repository.findById(id)
                 .orElseThrow(() -> new CheckNotFoundException(String.format("Check id: %d, not found", id)));
+    }
+
+    @AfterMapping
+    default void setBranch(SubscriptionInfoRequestDto dto, @MappingTarget SubscriptionInfoEntity entity,
+                           @Context SubscriptionOfferRepository offerRepository) {
+        entity.setVisits(
+                offerRepository
+                        .findById(
+                                dto.subscriptionId())
+                        .orElseThrow(
+                                () -> new OfferNotFoundException(
+                                        String.format("Offer id: %d, not found", dto.subscriptionId())))
+                        .getVisits()
+        );
     }
 }
