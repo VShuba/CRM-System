@@ -76,15 +76,16 @@ public class EmployeeService {
     }
 
     /**
-     * Deletes an employee. First, removes all related records in the employee_service table,
-     * and then deletes the employee from the employee table.
+     * Deletes the relation between an employee and a branch, removes related services for this employee,
+     * and deletes the employee record if no other branch associations exist.
      *
-     * @param id the ID of the employee to be deleted
-     * @return true if the employee existed and was deleted, false if the employee was not found
+     * @param employeeId the ID of the employee to be modified or deleted
+     * @param branchId the ID of the branch from which the employee will be unlinked
+     * @return true if any records were affected, false otherwise
      */
     @Transactional
-    public boolean deleteEmployee(Long id) {
-        int deletedRecords = employeeRepository.deleteEmployeeAndRelatedRecords(id);
+    public boolean deleteEmployee(Long employeeId, Long branchId) {
+        int deletedRecords = employeeRepository.deleteEmployeeAndRelatedRecords(employeeId, branchId);
         log.info("Records deleted: {}", deletedRecords);
         return deletedRecords > 0;
     }
