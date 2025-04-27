@@ -25,9 +25,10 @@ public class EmployeeEntity {
             joinColumns = @JoinColumn(name = "employee_id"),
             inverseJoinColumns = @JoinColumn(name = "branch_id"),
             uniqueConstraints = {
-                    @UniqueConstraint(columnNames = {"employee_id", "branch_id"})
+                    @UniqueConstraint(name = "uniqueEmployeeAndBranchIds", columnNames = {"employee_id", "branch_id"})
             }
     )
+    @Builder.Default
     private Set<BranchEntity> branches = new HashSet<>();
 
     @Column(nullable = false)
@@ -48,5 +49,6 @@ public class EmployeeEntity {
             joinColumns = @JoinColumn(name = "employee_id"),
             inverseJoinColumns = @JoinColumn(name = "service_id")
     )
+    @Builder.Default
     private Set<ServiceEntity> services = new HashSet<>();
 }
