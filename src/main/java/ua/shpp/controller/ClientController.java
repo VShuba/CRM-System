@@ -93,4 +93,10 @@ public class ClientController {
         return ResponseEntity.ok().body(clientService.getClientsByKeyword(keyword, orgId));
     }
 
+    @DeleteMapping("/{clientId}")
+    public ResponseEntity<Void> deleteClient(@PathVariable Long orgId, @PathVariable Long clientId) {
+        clientService.delete(orgId, clientId);
+        return ResponseEntity.ok().build();
+    }
+
 }
