@@ -93,6 +93,11 @@ public class ClientController {
         return ResponseEntity.ok().body(clientService.getClientsByKeyword(keyword, orgId));
     }
 
+    @Operation(summary = "Delete user by id", description = "Deletes user in organization by orgId and userId")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Client successfully deleted"),
+            @ApiResponse(responseCode = "404", description = "Client not found")
+    })
     @DeleteMapping("/{clientId}")
     public ResponseEntity<Void> deleteClient(@PathVariable Long orgId, @PathVariable Long clientId) {
         clientService.delete(orgId, clientId);
