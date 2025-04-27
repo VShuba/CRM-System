@@ -81,7 +81,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "400", description = "Invalid branch ID", content = @Content),
             @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content)
     })
-    @GetMapping("/branch/{branchId}")
+    @GetMapping("/branches/{branchId}")
     public ResponseEntity<Page<ServiceResponseDTO>> getAllServices(
             @PathVariable Long branchId,
             @ParameterObject Pageable pageable) {
