@@ -3,7 +3,6 @@ package ua.shpp.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import ua.shpp.entity.payment.OneTimeInfoEntity;
 import ua.shpp.entity.payment.SubscriptionInfoEntity;
 
 import java.time.Period;
