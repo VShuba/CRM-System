@@ -76,12 +76,15 @@ public class EmployeeService {
     }
 
     /**
-     * Deletes the relation between an employee and a branch, removes related services for this employee,
-     * and deletes the employee record if no other branch associations exist.
+     * Unbinds an employee from a specific branch by deleting the relationship
+     * between the employee and the branch, and removes the employee's related
+     * service associations for that branch, meaning the employee will no longer
+     * be associated with any services provided at that branch.
      *
-     * @param employeeId the ID of the employee to be modified or deleted
-     * @param branchId the ID of the branch from which the employee will be unlinked
-     * @return true if any records were affected, false otherwise
+     * @param employeeId the ID of the employee to be unlinked from the branch
+     * @param branchId   the ID of the branch to unlink the employee from
+     * @return true if the employee was unbounded from the branch (i.e., if any records were deleted),
+     * false if the employee was not found in the branch (no records were affected)
      */
     @Transactional
     public boolean unbindEmployeeFromBranch(Long employeeId, Long branchId) {
