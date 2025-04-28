@@ -2,7 +2,7 @@ package ua.shpp.model;
 
 public enum ClientEventStatus {
     ASSIGNED(0),
-    POSTPONED(1),
+    SKIPPED(1),
     USED(1);
 
     private final int order;
@@ -12,7 +12,7 @@ public enum ClientEventStatus {
     }
 
     public static boolean checkIfStatusChangePossible(ClientEventStatus oldStatus, ClientEventStatus newStatus) {
-        if (oldStatus == POSTPONED || oldStatus == USED) {
+        if (oldStatus == SKIPPED || oldStatus == USED) {
             return false;
         }
         return oldStatus.order < newStatus.order;

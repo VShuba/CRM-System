@@ -1,6 +1,8 @@
 package ua.shpp.service;
 
 import org.springframework.stereotype.Service;
+import ua.shpp.dto.ClientRequestDto;
+import ua.shpp.dto.ClientResponseDto;
 import ua.shpp.dto.EventClientDto;
 import ua.shpp.entity.ClientEntity;
 import ua.shpp.entity.EventClientEntity;
@@ -21,15 +23,17 @@ public class EventClientService {
     private final EventClientRepository eventClientRepository;
     private final ClientRepository clientRepository;
     private final ScheduleEventRepository scheduleEventRepository;
+    private final ClientService clientService;
 
-    public EventClientService(EventClientRepository eventClientRepository, ClientRepository clientRepository, ScheduleEventRepository scheduleEventRepository) {
+    public EventClientService(EventClientRepository eventClientRepository, ClientRepository clientRepository, ScheduleEventRepository scheduleEventRepository, ClientService clientService) {
         this.eventClientRepository = eventClientRepository;
         this.clientRepository = clientRepository;
         this.scheduleEventRepository = scheduleEventRepository;
+        this.clientService = clientService;
     }
 
 
-    public void addClientToEvent(Long clientId, Long eventId) {
+    public EventClientDto addClientToEvent(Long clientId, Long eventId) {
 
         ClientEntity clientEntity = clientRepository.findById(clientId)
                 .orElseThrow(() -> new ClientNotFoundException(clientId));
@@ -42,7 +46,12 @@ public class EventClientService {
                 .clientEventStatus(ClientEventStatus.ASSIGNED)
                 .build();
 
-        eventClientRepository.save(eventClientEntity);
+        EventClientEntity savedEventClient = eventClientRepository.save(eventClientEntity);
+        return new EventClientDto(
+                savedEventClient.getEventUserId().getClientId(),
+                savedEventClient.getEventUserId().getEventId(),
+                savedEventClient.getClientEventStatus()
+        );
     }
 
     public EventClientDto changeClientStatus(EventClientDto eventClientDto) {
@@ -62,4 +71,8 @@ public class EventClientService {
     }
 
 
+    public EventClientDto addClientAndAssignEvent(Long eventId, Long orgId, ClientRequestDto eventClientDto) {
+        ClientResponseDto client = clientService.createClient(orgId, eventClientDto);
+        return addClientToEvent(client.id(), eventId);
+    }
 }
