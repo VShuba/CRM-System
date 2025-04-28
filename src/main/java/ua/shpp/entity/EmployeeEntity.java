@@ -18,15 +18,15 @@ public class EmployeeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne
+    @JoinColumn(name = "organization_id")
+    Organization organization;
 
     @ManyToMany
     @JoinTable(
             name = "employee_branch",
             joinColumns = @JoinColumn(name = "employee_id"),
-            inverseJoinColumns = @JoinColumn(name = "branch_id"),
-            uniqueConstraints = {
-                    @UniqueConstraint(name = "uniqueEmployeeAndBranchIds", columnNames = {"employee_id", "branch_id"})
-            }
+            inverseJoinColumns = @JoinColumn(name = "branch_id")
     )
     @Builder.Default
     private Set<BranchEntity> branches = new HashSet<>();
