@@ -44,4 +44,14 @@ public class ScheduleEventEntity {
     @OneToMany(mappedBy = "scheduleEvent")
     @Column(name = "event_clients")
     private List<EventClientEntity> eventClients;
+
+    // Додано, щоб прив’язати конкретну подію до співробітника, який її проводить
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trainer_id")
+    private EmployeeEntity trainer;
+
+    // Додано, щоб зв’язати конкретну подію з кімнатою, де вона відбувається
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
+    private RoomEntity room;
 }

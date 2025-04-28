@@ -6,7 +6,7 @@ import ua.shpp.dto.UserOrganizationIdDTO;
 import ua.shpp.entity.UserOrganization;
 import ua.shpp.entity.UserOrganizationId;
 import ua.shpp.exception.UserOrganizationNotFoundException;
-import ua.shpp.model.Role;
+import ua.shpp.model.OrgRole;
 import ua.shpp.repository.UserOrganizationRepository;
 
 @Service
@@ -20,7 +20,7 @@ public class UserOrganizationService {
     }
 
     public UserOrganizationDTO changeUserOrganizationRole(
-            Long userId, Long organizationId, Role role
+            Long userId, Long organizationId, OrgRole role
     ) {
         UserOrganizationId userOrganizationId = new UserOrganizationId(
                 userId,

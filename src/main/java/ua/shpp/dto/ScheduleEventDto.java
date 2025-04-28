@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-
 public record ScheduleEventDto(Long id,
                                Long serviceId,
                                @Schema(example = "12-04-2025", type = "string", format = "date")
@@ -20,5 +19,10 @@ public record ScheduleEventDto(Long id,
                                LocalTime endTime,
                                Boolean repeatEvent,
                                @Schema(type = "integer", example = "4", description = "Number of people")
-                               byte numberOfPeople) {
+                               byte numberOfPeople,
+                               @Schema(description = "Trainer ID", example = "1")
+                               Long trainerId,
+                               @Schema(description = "Room ID", example = "1")
+                               Long roomId
+) {
 }

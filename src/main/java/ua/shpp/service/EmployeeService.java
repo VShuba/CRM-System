@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ua.shpp.dto.employee.EmployeeRequestDTO;
+import ua.shpp.dto.employee.EmployeeCreateRequestDTO;
 import ua.shpp.dto.employee.EmployeeResponseDTO;
 import ua.shpp.dto.employee.EmployeeServiceCreateDTO;
 import ua.shpp.entity.BranchEntity;
@@ -35,7 +35,7 @@ public class EmployeeService {
     private final int AVATAR_HEIGHT = 75;
     private final int MAX_AVATAR_SIZE_MB = 3;
 
-    public EmployeeResponseDTO createEmployee(MultipartFile avatarImg, EmployeeRequestDTO employeeDTO) {
+    public EmployeeResponseDTO createEmployee(MultipartFile avatarImg, EmployeeCreateRequestDTO employeeDTO) {
         log.debug("Find by id: {} branch", employeeDTO.branchId());
         BranchEntity branch = branchRepository.findById(employeeDTO.branchId())
                 .orElseThrow(() -> new RuntimeException("Branch with id " + employeeDTO.branchId() + " not found"));

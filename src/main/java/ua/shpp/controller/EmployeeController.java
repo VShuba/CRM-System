@@ -12,8 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ua.shpp.dto.employee.EmployeeDeleteRequestDTO;
-import ua.shpp.dto.employee.EmployeeRequestDTO;
+import ua.shpp.dto.employee.EmployeeBranchDeleteRequestDTO;
+import ua.shpp.dto.employee.EmployeeCreateRequestDTO;
 import ua.shpp.dto.employee.EmployeeResponseDTO;
 import ua.shpp.exception.InvalidJsonFormatException;
 import ua.shpp.service.EmployeeService;
@@ -31,14 +31,26 @@ public class EmployeeController {
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new employee with avatar and JSON data")
     public ResponseEntity<EmployeeResponseDTO> addEmployee(@RequestPart(name = "avatar") MultipartFile avatarImg,
-                                                           @Schema(description = "JSON-formatted employee data (EmployeeRequestDTO) as string",
+                                                           @Schema(description = "JSON-formatted employee data (EmployeeCreateRequestDTO) as string",
                                                                    requiredMode = Schema.RequiredMode.REQUIRED,
-                                                                   implementation = EmployeeRequestDTO.class)
+                                                                   implementation = EmployeeCreateRequestDTO.class)
                                                            @RequestPart(name = "employee") String employeeDTOStr) {
         try {
-            EmployeeRequestDTO employeeRequestDTO = objectMapper.readValue(employeeDTOStr, EmployeeRequestDTO.class);
-            log.info("Deserialized string into EmployeeRequestDTO: {}", employeeRequestDTO.toString());
+            EmployeeCreateRequestDTO employeeCreateRequestDTO = objectMapper.readValue(employeeDTOStr, EmployeeCreateRequestDTO.class);
+            log.info("Deserialized string into EmployeeRequestDTO: {}", employeeCreateRequestDTO.toString());
 
+            EmployeeResponseDTO employeeResponseDTO = employeeService.createEmployee(avatarImg, employeeCreateRequestDTO);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(employeeResponseDTO);
+        } catch (JsonProcessingException e) {
+            throw new InvalidJsonFormatException("Invalid JSON format for EmployeeRequestDTO", e);
+        }
+    }
+
+    @PostMapping("/employee")
+    @Operation(summary = "Add employee to branch")
+    public ResponseEntity<EmployeeResponseDTO> addEmployeeToBranch(@RequestBody EmployeeAddToBranchdRequestDTO employeeAddToBranchdRequestDTO) {
+        try {
             EmployeeResponseDTO employeeResponseDTO = employeeService.createEmployee(avatarImg, employeeRequestDTO);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(employeeResponseDTO);
@@ -48,7 +60,8 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/employee")
-    public ResponseEntity<Void> deleteEmployeeFromBranch(@RequestBody EmployeeDeleteRequestDTO requestDTO) {
+    @Operation(summary = "Delete employee from branch")
+    public ResponseEntity<Void> deleteEmployeeFromBranch(@RequestBody EmployeeBranchDeleteRequestDTO requestDTO) {
         if (employeeService.unbindEmployeeFromBranch(requestDTO.employeeId(), requestDTO.branchId())) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {

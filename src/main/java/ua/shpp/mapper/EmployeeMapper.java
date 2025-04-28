@@ -3,7 +3,7 @@ package ua.shpp.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import ua.shpp.dto.employee.EmployeeRequestDTO;
+import ua.shpp.dto.employee.EmployeeCreateRequestDTO;
 import ua.shpp.dto.employee.EmployeeResponseDTO;
 import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.EmployeeEntity;
@@ -17,7 +17,7 @@ import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 @Mapper(componentModel = SPRING)
 public interface EmployeeMapper {
 
-    EmployeeEntity EmployeeRequestDTOToEmployeeEntity(EmployeeRequestDTO requestDTO);
+    EmployeeEntity EmployeeRequestDTOToEmployeeEntity(EmployeeCreateRequestDTO requestDTO);
 
     @Mapping(target = "base64Avatar", source = "base64Avatar")
     @Mapping(target = "branchIds", source = "employeeEntity.branches", qualifiedByName = "mapBranchesToIds")

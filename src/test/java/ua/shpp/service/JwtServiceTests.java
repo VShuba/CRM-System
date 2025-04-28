@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ua.shpp.entity.UserEntity;
-import ua.shpp.model.Role;
+import ua.shpp.model.GlobalRole;
 import ua.shpp.security.service.JwtService;
 
 import java.util.HashMap;
@@ -28,7 +28,7 @@ class JwtServiceTests {
                 .login("testuser@example.com")
                 .email("test@mail.com")
                 .password("secretPassword")
-                .role(Role.OWNER)
+                .globalRole(GlobalRole.USER) // <-- UPD
                 .build();
     }
 
@@ -45,12 +45,12 @@ class JwtServiceTests {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", userEntity.getId());
         claims.put("email", userEntity.getEmail());
-        claims.put("role", userEntity.getRole());
+        claims.put("role", userEntity.getGlobalRole());
 
         String token = jwtService.generateToken(claims, userEntity);
         String role = jwtService.extractAuthority(token);
 
-        assertEquals(userEntity.getRole().name(), role);
+        assertEquals(userEntity.getGlobalRole().name(), role);
     }
 
     @Test
