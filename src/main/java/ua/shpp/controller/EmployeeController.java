@@ -48,8 +48,8 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/employee")
-    public ResponseEntity<Void> deleteEmployee(@RequestBody EmployeeDeleteRequestDTO requestDTO) {
-        if (employeeService.deleteEmployee(requestDTO.employeeId(), requestDTO.branchId())) {
+    public ResponseEntity<Void> deleteEmployeeFromBranch(@RequestBody EmployeeDeleteRequestDTO requestDTO) {
+        if (employeeService.unbindEmployeeFromBranch(requestDTO.employeeId(), requestDTO.branchId())) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

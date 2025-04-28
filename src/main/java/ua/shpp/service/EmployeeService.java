@@ -84,8 +84,8 @@ public class EmployeeService {
      * @return true if any records were affected, false otherwise
      */
     @Transactional
-    public boolean deleteEmployee(Long employeeId, Long branchId) {
-        int deletedRecords = employeeRepository.deleteEmployeeAndRelatedRecords(employeeId, branchId);
+    public boolean unbindEmployeeFromBranch(Long employeeId, Long branchId) {
+        int deletedRecords = employeeRepository.unbindEmployeeFromBranch(employeeId, branchId);
         log.info("Records deleted: {}", deletedRecords);
         return deletedRecords > 0;
     }
