@@ -12,7 +12,9 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "employee")
+@Table(name = "employee", uniqueConstraints = {
+        @UniqueConstraint(name = "unique_employee_email_organization", columnNames = {"organization_id", "email"})
+})
 public class EmployeeEntity {
 
     @Id
