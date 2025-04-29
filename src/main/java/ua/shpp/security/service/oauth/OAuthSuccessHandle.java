@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import ua.shpp.dto.auth.JwtAuthenticationResponseDTO;
 import ua.shpp.entity.UserEntity;
 import ua.shpp.model.GlobalRole;
-import ua.shpp.model.Role;
 import ua.shpp.security.service.JwtService;
 import ua.shpp.service.UserService;
 
@@ -53,13 +52,13 @@ public class OAuthSuccessHandle implements AuthenticationSuccessHandler {
                 .login(oAuthUser.getAttribute(EMAIL))
                 .email(oAuthUser.getAttribute(EMAIL))
                 .password(passwordGeneratorService.generateRandomPassword(RANDOM_PASSWORD_LENGTH))
-                .role(GlobalRole.USER)
+                .globalRole(GlobalRole.USER)
                 .build();
         userService.createOAuthUser(userEntity);
         log.info("userEntity id: {}", userEntity.getId());
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", userEntity.getId());
-        claims.put("role", userEntity.getRole());
+        claims.put("role", userEntity.getGlobalRole());
 
         var jwt = jwtService.generateToken(claims, userEntity);
         response.setContentType("application/json");

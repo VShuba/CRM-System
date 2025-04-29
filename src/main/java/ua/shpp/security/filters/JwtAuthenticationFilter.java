@@ -16,7 +16,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import ua.shpp.entity.UserEntity;
 import ua.shpp.model.GlobalRole;
-import ua.shpp.model.Role;
 import ua.shpp.security.service.JwtService;
 
 import java.io.IOException;
@@ -56,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     String role = jwtService.extractAuthority(jwt);
                     UserDetails userDetails = UserEntity.builder()
                             .id(Long.valueOf(userId))
-                            .role(GlobalRole.valueOf(role))
+                            .globalRole(GlobalRole.valueOf(role))
                             .build();
 
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
