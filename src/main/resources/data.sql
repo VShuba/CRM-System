@@ -1,7 +1,7 @@
 -- Create user. Password(10 rounds): my_1secret1_password
-INSERT INTO users (email, login, password, role)
+INSERT INTO users (email, login, password, global_role)
 VALUES ('test@gmail.com', 'test@gmail.com',
-        '$2a$10$vIm9sed1.P4N7dTL.d4SZer2HQYj4Yjlkttb/mOEYhrS4LRfQ5viq', 'ADMIN');
+        '$2a$10$vIm9sed1.P4N7dTL.d4SZer2HQYj4Yjlkttb/mOEYhrS4LRfQ5viq', 'SUPER_ADMIN');
 
 -- Create organization
 INSERT INTO organizations (name)

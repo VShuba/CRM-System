@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.UserOrganizationDTO;
+import ua.shpp.model.OrgRole;
 import ua.shpp.model.Role;
 import ua.shpp.service.UserOrganizationService;
 
@@ -25,7 +26,7 @@ public class UserOrganizationController {
     @PutMapping("organizations/{organizationId}/user/{userId}")
     public ResponseEntity<UserOrganizationDTO> updateUserOrganizationRole(@PathVariable Long organizationId,
                                                                           @PathVariable Long userId,
-                                                                          @RequestBody Role role) {
+                                                                          @RequestBody OrgRole role) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userOrganizationService.changeUserOrganizationRole(userId, organizationId, role));
     }

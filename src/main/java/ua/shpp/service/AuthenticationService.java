@@ -11,7 +11,7 @@ import ua.shpp.dto.auth.JwtAuthenticationResponseDTO;
 import ua.shpp.dto.auth.SignInRequestDTO;
 import ua.shpp.dto.auth.SignUpRequestDTO;
 import ua.shpp.entity.UserEntity;
-import ua.shpp.model.Role;
+import ua.shpp.model.GlobalRole;
 import ua.shpp.security.service.JwtService;
 
 import java.util.HashMap;
@@ -33,7 +33,7 @@ public class AuthenticationService {
                 .login(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.OWNER)
+                .globalRole(GlobalRole.USER)
                 .build();
 
         userService.create(userEntity);
@@ -59,7 +59,7 @@ public class AuthenticationService {
 
     private JwtAuthenticationResponseDTO generateTokenByUser(UserEntity userEntity) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", userEntity.getRole());
+        claims.put("role", userEntity.getGlobalRole());
 
         String jwt = jwtService.generateToken(claims, userEntity);
         return new JwtAuthenticationResponseDTO(jwt);
