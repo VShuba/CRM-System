@@ -3,7 +3,6 @@ package ua.shpp.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import ua.shpp.model.OrgRole;
-import ua.shpp.model.Role;
 
 import java.time.LocalDate;
 

@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.UserOrganizationDTO;
 import ua.shpp.model.OrgRole;
-import ua.shpp.model.Role;
 import ua.shpp.service.UserOrganizationService;
 
 @RestController

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import ua.shpp.model.InvitationStatus;
 import ua.shpp.model.OrgRole;
-import ua.shpp.model.Role;
 
 import java.time.LocalDateTime;
 

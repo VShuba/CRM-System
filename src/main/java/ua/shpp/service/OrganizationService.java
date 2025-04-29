@@ -11,7 +11,6 @@ import ua.shpp.exception.OrganizationAlreadyExists;
 import ua.shpp.exception.OrganizationNotFound;
 import ua.shpp.mapper.OrganizationEntityToOrganizationDTOMapper;
 import ua.shpp.model.OrgRole;
-import ua.shpp.model.Role;
 import ua.shpp.repository.OrganizationRepository;
 import ua.shpp.repository.UserOrganizationRepository;
 

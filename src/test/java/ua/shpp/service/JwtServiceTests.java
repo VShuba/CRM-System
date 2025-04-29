@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ua.shpp.entity.UserEntity;
-import ua.shpp.model.Role;
+import ua.shpp.model.GlobalRole;
 import ua.shpp.security.service.JwtService;
 
 import java.util.HashMap;
@@ -28,7 +28,7 @@ class JwtServiceTests {
                 .login("testuser@example.com")
                 .email("test@mail.com")
                 .password("secretPassword")
-                .globalRole(Role.OWNER)
+                .globalRole(GlobalRole.USER) // <-- UPD
                 .build();
     }
 
