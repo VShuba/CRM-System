@@ -8,6 +8,7 @@ import ua.shpp.dto.ResponseInvitationDTO;
 import ua.shpp.entity.*;
 import ua.shpp.exception.*;
 import ua.shpp.model.InvitationStatus;
+import ua.shpp.model.OrgRole;
 import ua.shpp.model.Role;
 import ua.shpp.repository.InvitationRepository;
 import ua.shpp.repository.OrganizationRepository;
@@ -29,7 +30,7 @@ public class InvitationService {
 
     private final UserOrganizationRepository userOrganizationRepository;
 
-    private final Role DEFAULT_INVITE_ROLE = Role.MANAGER;
+    private final Role DEFAULT_INVITE_ROLE = Role.MANAGER; // no need? instead using new enum OrgRole -> ADMIN, MANAGER
     private final int DEFAULT_EXPIRATION_DAYS = 10;
 
     public InvitationService(InvitationRepository invitationRepository, UserRepository userRepository, OrganizationRepository organizationRepository, UserOrganizationRepository userOrganizationRepository) {
@@ -51,7 +52,7 @@ public class InvitationService {
         String invitationLink = getBase64UUID();
         InvitationEntity invitationEntity = InvitationEntity.builder()
                 .invitationId(invitationLink)
-                .role(DEFAULT_INVITE_ROLE)
+                .role(OrgRole.MANAGER) //TODO  <-- UPD по лінку він отримає роль manager`a
                 .creator(creator)
                 .expiresAt(LocalDateTime.now().plusDays(DEFAULT_EXPIRATION_DAYS))
                 .recipientEmail(invitationRequestDTO.email())

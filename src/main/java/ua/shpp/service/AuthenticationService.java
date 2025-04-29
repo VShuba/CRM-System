@@ -11,6 +11,7 @@ import ua.shpp.dto.auth.JwtAuthenticationResponseDTO;
 import ua.shpp.dto.auth.SignInRequestDTO;
 import ua.shpp.dto.auth.SignUpRequestDTO;
 import ua.shpp.entity.UserEntity;
+import ua.shpp.model.GlobalRole;
 import ua.shpp.model.Role;
 import ua.shpp.security.service.JwtService;
 
@@ -33,7 +34,7 @@ public class AuthenticationService {
                 .login(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.OWNER)
+                .role(GlobalRole.USER)
                 .build();
 
         userService.create(userEntity);

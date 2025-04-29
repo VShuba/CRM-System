@@ -10,6 +10,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 import ua.shpp.dto.auth.JwtAuthenticationResponseDTO;
 import ua.shpp.entity.UserEntity;
+import ua.shpp.model.GlobalRole;
 import ua.shpp.model.Role;
 import ua.shpp.security.service.JwtService;
 import ua.shpp.service.UserService;
@@ -52,7 +53,7 @@ public class OAuthSuccessHandle implements AuthenticationSuccessHandler {
                 .login(oAuthUser.getAttribute(EMAIL))
                 .email(oAuthUser.getAttribute(EMAIL))
                 .password(passwordGeneratorService.generateRandomPassword(RANDOM_PASSWORD_LENGTH))
-                .role(Role.OWNER)
+                .role(GlobalRole.USER)
                 .build();
         userService.createOAuthUser(userEntity);
         log.info("userEntity id: {}", userEntity.getId());
