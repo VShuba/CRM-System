@@ -11,6 +11,10 @@ public enum ClientEventStatus {
         this.order = i;
     }
 
+    public int getOrder() {
+        return order;
+    }
+
     public static boolean checkIfStatusChangePossible(ClientEventStatus oldStatus, ClientEventStatus newStatus) {
         if (oldStatus == SKIPPED || oldStatus == USED) {
             return false;
