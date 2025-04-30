@@ -2,6 +2,8 @@ package ua.shpp.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ua.shpp.entity.payment.OneTimeInfoEntity;
+import ua.shpp.entity.payment.SubscriptionInfoEntity;
 import ua.shpp.model.ClientEventStatus;
 
 @Entity
@@ -29,4 +31,13 @@ public class EventClientEntity {
     @Enumerated(EnumType.STRING)
     private ClientEventStatus clientEventStatus;
 
+    // Додано, щоб зв’язати відвідування конкретної події з придбаним OneTimeInfoEntity
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "one_time_info_id")
+    private OneTimeInfoEntity oneTimeInfo;
+
+    // Додано, щоб зв’язати відвідування конкретної події з SubscriptionInfoEntity
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subscription_info_id")
+    private SubscriptionInfoEntity subscriptionInfo;
 }

@@ -20,3 +20,7 @@ VALUES ('Room A', 1),
 INSERT INTO services (service_name, service_color, branch_id)
 VALUES ('Haircut', '#FF5733', 1),
        ('Massage', '#33FF57', 1);
+
+-- Create event_type
+INSERT INTO event_type (name, branch_id)
+VALUES ('Group',1);
