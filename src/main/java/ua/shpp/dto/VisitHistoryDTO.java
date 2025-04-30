@@ -8,38 +8,38 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Schema(description = "Історія візитів - відповідь")
+@Schema(description = "History of visits")
 public record VisitHistoryDTO(
-        @Schema(description = "Ідентифікатор історії візитів")
+        @Schema(description = "Visit history identifier")
         Long id,
 
-        @Schema(description = "Ідентифікатор клієнта")
+        @Schema(description = "Customer ID")
         Long clientId,
 
-        @Schema(description = "Колір привязаний до послуги")
+        @Schema(description = "Color is tied to the service")
         String serviceColor,
 
-        @Schema(description = "Назва послуги")
+        @Schema(description = "Name of the service")
         String serviceName,
 
-        @Schema(description = "Повне ім’я тренера")
+        @Schema(description = "Full name of the coach")
         String trainerFullName,
 
-        @Schema(description = "Дата візиту", example = "2025-04-27")
+        @Schema(description = "Date of visit", example = "2025-04-27")
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate date,
 
-        @Schema(description = "Час візиту", example = "15:30")
+        @Schema(description = "Time of visit", example = "15:30")
         @JsonFormat(pattern = "HH:mm")
         LocalTime time,
 
-        @Schema(description = "Приміщення, де проводилося заняття", example = "Головний зал")
+        @Schema(description = "The room where the class was held", example = "The main hall")
         String roomName,
 
-        @Schema(description = "Метод оплати", example = "CASH")
-        PaymentMethodForStory paymentMethodForStory,  // "CASH", "CARD" або "SUBSCRIPTION"
+        @Schema(description = "Payment method", example = "CASH")
+        PaymentMethodForStory paymentMethodForStory,  // "CASH", "CARD", "SUBSCRIPTION", "SKIPPED"
 
-        @Schema(description = "Сума, сплачена за візит. Якщо абонемент — null", example = "120.00")
+        @Schema(description = "Amount paid for the visit. If subscription is null", example = "120.00")
         BigDecimal amountPaid
 ) {
 }

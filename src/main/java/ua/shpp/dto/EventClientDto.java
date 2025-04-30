@@ -4,19 +4,20 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import ua.shpp.model.ClientEventStatus;
 
 public record EventClientDto(
-        @Schema(description = "Ідентифікатор клієнта", example = "1")
+        @Schema(description = "Customer ID", example = "1")
         Long clientId,
 
-        @Schema(description = "Ідентифікатор події, в якій бере участь клієнт (розклад події)", example = "1")
+        @Schema(description = "The identifier of the event in which the client is participating (event schedule)",
+                example = "1")
         Long scheduleId,
 
-        @Schema(description = "Статус участі клієнта в події ", example = "ASSIGNED")
+        @Schema(description = "Client participation status in the event", example = "ASSIGNED")
         ClientEventStatus clientEventStatus,
 
-        @Schema(description = "Ідентифікатор придбаного одноразового візиту (якщо є)")
+        @Schema(description = "Purchased single visit ID (if any)")
         Long oneTimeInfoId,
 
-        @Schema(description = "Ідентифікатор придбаного абонементу (якщо є)")
+        @Schema(description = "Purchased subscription ID (if applicable)")
         Long subscriptionInfoId
 ) {
 }

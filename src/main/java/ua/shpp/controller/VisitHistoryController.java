@@ -25,7 +25,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/history_visit")
-@Tag(name = "Visit History", description = "API для отримання історії візитів клієнта")
+@Tag(name = "Visit History", description = "API for retrieving customer visit history")
 public class VisitHistoryController {
     private final VisitHistoryService visitHistoryService;
 

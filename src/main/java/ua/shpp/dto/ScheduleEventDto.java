@@ -20,9 +20,9 @@ public record ScheduleEventDto(Long id,
                                Boolean repeatEvent,
                                @Schema(type = "integer", example = "4", description = "Number of people")
                                byte numberOfPeople,
-                               @Schema(description = "Ідентифікатор тренера", example = "1")
+                               @Schema(description = "Trainer ID", example = "1")
                                Long trainerId,
-                               @Schema(description = "Ідентифікатор кімнати", example = "1")
+                               @Schema(description = "Room ID", example = "1")
                                Long roomId
 ) {
 }

@@ -2,6 +2,8 @@ package ua.shpp.mapper;
 
 import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mapstruct.factory.Mappers;
 import ua.shpp.dto.VisitHistoryDTO;
 import ua.shpp.entity.*;
@@ -68,13 +70,12 @@ class VisitHistoryMapperTest {
         assertThat(result.getAmountPaid()).isNull();
     }
 
-    @Test
-    void toVisitHistoryEntity_withOneTimePayment_shouldMapAmountAndMethod() {
-        // given
-        PaymentMethod paymentMethod = PaymentMethod.CARD;
+    @ParameterizedTest
+    @CsvSource({"CARD, 100", "CASH, 100"})
+    void toVisitHistoryEntity_withOneTimePayment_shouldMapCorrectly(PaymentMethod method, BigDecimal amount) {
         CheckEntity check = new CheckEntity();
-        check.setPaymentMethod(paymentMethod);
-        check.setPrice(BigDecimal.valueOf(100));
+        check.setPaymentMethod(method);
+        check.setPrice(amount);
 
         OneTimeInfoEntity oneTimeInfo = new OneTimeInfoEntity();
         oneTimeInfo.setPaymentCheck(check);
@@ -84,36 +85,10 @@ class VisitHistoryMapperTest {
         eventClient.setClient(new ClientEntity());
         eventClient.setScheduleEvent(new ScheduleEventEntity());
 
-        // when
         VisitHistoryEntity result = visitHistoryMapper.toVisitHistoryEntity(eventClient);
 
-        // then
-        assertThat(result.getPaymentMethodForStory()).isEqualTo(PaymentMethodForStory.CARD);
-        assertThat(result.getAmountPaid()).isEqualTo(BigDecimal.valueOf(100));
-    }
-
-    @Test
-    void toVisitHistoryEntity_withOneTimePayment_shouldMapAmountAndMethod2() {
-        // given
-        PaymentMethod paymentMethod = PaymentMethod.CASH;
-        CheckEntity check = new CheckEntity();
-        check.setPaymentMethod(paymentMethod);
-        check.setPrice(BigDecimal.valueOf(100));
-
-        OneTimeInfoEntity oneTimeInfo = new OneTimeInfoEntity();
-        oneTimeInfo.setPaymentCheck(check);
-
-        EventClientEntity eventClient = new EventClientEntity();
-        eventClient.setOneTimeInfo(oneTimeInfo);
-        eventClient.setClient(new ClientEntity());
-        eventClient.setScheduleEvent(new ScheduleEventEntity());
-
-        // when
-        VisitHistoryEntity result = visitHistoryMapper.toVisitHistoryEntity(eventClient);
-
-        // then
-        assertThat(result.getPaymentMethodForStory()).isEqualTo(PaymentMethodForStory.CASH);
-        assertThat(result.getAmountPaid()).isEqualTo(BigDecimal.valueOf(100));
+        assertThat(result.getPaymentMethodForStory()).isEqualTo(PaymentMethodForStory.valueOf(method.name()));
+        assertThat(result.getAmountPaid()).isEqualTo(amount);
     }
 
     @Test
