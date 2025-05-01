@@ -33,9 +33,7 @@ public class ServiceEntity {
     @Column(name = "service_name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "service_color", nullable = false, length = 7,
-            columnDefinition = "VARCHAR(7) CHECK (service_color ~ '^#[0-9A-Fa-f]{6}$')"
-    )
+    @Column(name = "service_color", nullable = false, length = 7)
     private String color;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
