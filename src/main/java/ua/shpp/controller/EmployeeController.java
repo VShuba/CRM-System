@@ -47,18 +47,6 @@ public class EmployeeController {
         }
     }
 
-    @PostMapping("/employee")
-    @Operation(summary = "Add employee to branch")
-    public ResponseEntity<EmployeeResponseDTO> addEmployeeToBranch(@RequestBody EmployeeAddToBranchdRequestDTO employeeAddToBranchdRequestDTO) {
-        try {
-            EmployeeResponseDTO employeeResponseDTO = employeeService.createEmployee(avatarImg, employeeRequestDTO);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(employeeResponseDTO);
-        } catch (JsonProcessingException e) {
-            throw new InvalidJsonFormatException("Invalid JSON format for EmployeeRequestDTO", e);
-        }
-    }
-
     @DeleteMapping("/employee")
     @Operation(summary = "Delete employee from branch")
     public ResponseEntity<Void> deleteEmployeeFromBranch(@RequestBody EmployeeBranchDeleteRequestDTO requestDTO) {
