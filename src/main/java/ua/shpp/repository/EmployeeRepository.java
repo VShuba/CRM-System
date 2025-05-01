@@ -13,4 +13,6 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long> 
                                              AND service_id IN ( SELECT s.id FROM services s WHERE s.branch_id = :branchId );
             """)
     int unbindEmployeeFromBranch(Long id, Long branchId);
+
+    EmployeeEntity findByEmailAndBranchId(String email, Long branchId);
 }
