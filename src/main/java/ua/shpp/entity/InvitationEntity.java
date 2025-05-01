@@ -18,19 +18,25 @@ public class InvitationEntity {
     @Id
     String invitationId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "creator_id", nullable = false)
     UserEntity creator;
 
+    @Column(name = "recipient_email", nullable = false, length = 100)
     String recipientEmail;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 30)
     OrgRole role;
 
+    @Column(name = "expires_at", nullable = false)
     LocalDateTime expiresAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "organization_id", nullable = false)
     Organization organization;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 30)
     InvitationStatus status;
 }

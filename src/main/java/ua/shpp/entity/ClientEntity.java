@@ -23,16 +23,16 @@ public class ClientEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "phone")
+    @Column(name = "phone", nullable = false, length = 30)
     private String phone;
 
     @Column(name = "birthday")
     private LocalDate birthday;
 
-    @Column(name = "comment")
+    @Column(name = "comment", columnDefinition = "TEXT")
     private String comment;
 
     @ManyToOne(optional = false)
@@ -58,7 +58,11 @@ public class ClientEntity {
     private List<SubscriptionInfoEntity> subscriptionInfo = new ArrayList<>();
 
     @OneToMany(
-            mappedBy = "client"
+            mappedBy = "client",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
     )
+    @JsonIgnore
     private List<EventClientEntity> userEvents;
 }

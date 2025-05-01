@@ -13,6 +13,7 @@ import java.time.LocalTime;
 @Builder
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 public class VisitHistoryEntity {
@@ -24,23 +25,23 @@ public class VisitHistoryEntity {
     @Column(name = "client_id", nullable = false)
     private Long clientId;
 
-    @Column(name = "service_color", nullable = false)
+    @Column(name = "service_color", nullable = false, length = 20)
     private String serviceColor;
 
-    @Column(name = "service_name", nullable = false)
+    @Column(name = "service_name", nullable = false, length = 100)
     private String serviceName;
 
-    @Column(name = "trainer_full_name")
+    @Column(name = "trainer_full_name", length = 150)
     private String trainerFullName;
+
+    @Column(name = "room_name", length = 100)
+    private String roomName;
 
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
     @Column(name = "time", nullable = false)
     private LocalTime time;
-
-    @Column(name = "room_name")
-    private String roomName;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")

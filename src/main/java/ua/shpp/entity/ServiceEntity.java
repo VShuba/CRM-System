@@ -4,22 +4,25 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
-@ToString
+@ToString(exclude = {"subscriptions", "oneTimeServices", "scheduleEvents", "employees"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(
         name = "services",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"service_name", "branch_id"})
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"service_name", "branch_id"})
+        },
+        indexes = {
+                @Index(name = "idx_service_branch", columnList = "branch_id"),
+                @Index(name = "idx_service_name", columnList = "service_name")
+        }
 )
 public class ServiceEntity {
 
@@ -27,17 +30,48 @@ public class ServiceEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "service_name", nullable = false)
+    @Column(name = "service_name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "service_color", nullable = false)
-    private String color; // HEX-code - like #FF0000
+    @Column(name = "service_color", nullable = false, length = 7)
+    private String color;
 
-    @ManyToOne
-    @JoinColumn(name = "branch_id")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id", nullable = false)
     private BranchEntity branch;
 
-    @ManyToMany
+    @Builder.Default
+    @OneToMany(
+            mappedBy = "activity",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    private List<OneTimeServiceEntity> oneTimeServices = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(
+            mappedBy = "serviceEntity",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    private List<ScheduleEventEntity> scheduleEvents = new ArrayList<>();
+
+    @Builder.Default
+    @ManyToMany(mappedBy = "activities", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<SubscriptionServiceEntity> subscriptions = new ArrayList<>();
+
+    @Builder.Default
+    @ManyToMany(mappedBy = "services", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<EmployeeEntity> employees = new HashSet<>();
+
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "service_room",
             joinColumns = @JoinColumn(name = "service_id"),
@@ -45,35 +79,21 @@ public class ServiceEntity {
     )
     private Set<RoomEntity> rooms = new HashSet<>();
 
-    @ManyToMany(mappedBy = "activities", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<SubscriptionServiceEntity> subscriptions = new ArrayList<>();
-
-    @OneToMany(
-            mappedBy = "activity",
-            cascade = CascadeType.REMOVE,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
-    )
-    @JsonIgnore
-    private List<OneTimeServiceEntity> oneTimeServices = new ArrayList<>();
-
     @PreRemove
     private void preRemove() {
+        // Delete from SubscriptionServiceEntity.activities
         for (SubscriptionServiceEntity sub : new ArrayList<>(subscriptions)) {
             sub.getActivities().remove(this);
         }
+
+        // Delete from EmployeeEntity.services
+        for (EmployeeEntity employee : new HashSet<>(employees)) {
+            employee.getServices().remove(this);
+        }
+
+        // Delete from RoomEntity.services
+        for (RoomEntity room : new HashSet<>(rooms)) {
+            room.getServices().remove(this);
+        }
     }
-
-    @ManyToMany(mappedBy = "services")
-    Set<EmployeeEntity> employees = new HashSet<>();
-
-    @OneToMany(
-            mappedBy = "serviceEntity",
-            cascade = CascadeType.REMOVE,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
-    )
-    @JsonIgnore
-    private List<ScheduleEventEntity> scheduleEvents = new ArrayList<>();
 }

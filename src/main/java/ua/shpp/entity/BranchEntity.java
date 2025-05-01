@@ -15,37 +15,43 @@ import java.util.Set;
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@ToString(exclude = {"organization", "rooms", "serviceEntities", "eventTypes", "employees", "workingHours"})
 @Builder
-@Table(name = "branches")
+@Table(name = "branches",
+        indexes = {
+                @Index(name = "idx_branch_org", columnList = "organization_id")
+        })
 public class BranchEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 100)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "organization_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
 
     @Builder.Default
     @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoomEntity> rooms = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ServiceEntity> serviceEntities;
+    private List<ServiceEntity> serviceEntities = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "branch", fetch = FetchType.LAZY)
+    private Set<EmployeeEntity> employees = new HashSet<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EventTypeEntity> eventTypes = new ArrayList<>();
 
     @Builder.Default
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "branch_working_hours", joinColumns = @JoinColumn(name = "branch_id"))
     private List<WorkingHour> workingHours = new ArrayList<>();
-
-    @OneToMany(mappedBy = "branch")
-    private Set<EmployeeEntity> employees = new HashSet<>();
-
-    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EventTypeEntity> eventTypes = new ArrayList<>();
-
 }
