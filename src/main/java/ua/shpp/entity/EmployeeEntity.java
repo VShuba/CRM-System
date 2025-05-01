@@ -21,7 +21,7 @@ public class EmployeeEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "branch_id")
+    @JoinColumn(name = "branch_id", nullable = false)
     private BranchEntity branch;
 
     @Column(nullable = false)
