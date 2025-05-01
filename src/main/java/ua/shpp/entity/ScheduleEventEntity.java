@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
 @Table(name = "schedule_event")
 public class ScheduleEventEntity {
     @Id
@@ -29,20 +30,24 @@ public class ScheduleEventEntity {
     //  Налаштувати час провещення івенту
     private LocalDate eventDate;
     //  Обрати часовий інтерва
-    @Column(name = "start_time")
+    @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
 
-    @Column(name = "end_time")
+    @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
     //  Обрати повторення
-    @Column(name = "repeat_event")
+    @Column(name = "repeat_event", nullable = false)
     private Boolean repeatEvent;
     //   Налаштувати максимальну кількість людей для запису
-    @Column(name = "number_of_people")
+    @Column(name = "number_of_people", nullable = false)
     private Byte numberOfPeople;
 
-    @OneToMany(mappedBy = "scheduleEvent")
-    @Column(name = "event_clients")
+    @OneToMany(
+            mappedBy = "scheduleEvent",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<EventClientEntity> eventClients;
 
     // Додано, щоб прив’язати конкретну подію до співробітника, який її проводить
