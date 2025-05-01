@@ -61,7 +61,7 @@ public class EmployeeService {
         log.debug("After mapping: employee entity id: {}, branch: {}, services: {}", employeeEntity.getId(),
                 branch.getId(), employeeEntity.getServices());
 
-        employeeEntity.getBranches().add(branch);
+        employeeEntity.setBranch(branch);
         log.debug("After set branch: employee entity id: {}, branchId: {}, services: {}", employeeEntity.getId(),
                 branch.getId(), employeeEntity.getServices());
         employeeEntity.setServices(new HashSet<>(newServiceEntities));

@@ -42,7 +42,7 @@ public class BranchEntity {
     @CollectionTable(name = "branch_working_hours", joinColumns = @JoinColumn(name = "branch_id"))
     private List<WorkingHour> workingHours = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "branches")
+    @OneToMany(mappedBy = "branch")
     private Set<EmployeeEntity> employees = new HashSet<>();
 
     @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)

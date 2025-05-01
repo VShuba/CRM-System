@@ -13,25 +13,21 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "employee", uniqueConstraints = {
-        @UniqueConstraint(name = "unique_employee_email_organization", columnNames = {"organization_id", "email"})
+        @UniqueConstraint(name = "unique_employee_email_organization", columnNames = {"branch_id", "email"})
 })
 public class EmployeeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "organization_id")
     Organization organization;
 
-    @ManyToMany
-    @JoinTable(
-            name = "employee_branch",
-            joinColumns = @JoinColumn(name = "employee_id"),
-            inverseJoinColumns = @JoinColumn(name = "branch_id")
-    )
-    @Builder.Default
-    private Set<BranchEntity> branches = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "branch_id")
+    private BranchEntity branch;
 
     @Column(nullable = false)
     private String name;
