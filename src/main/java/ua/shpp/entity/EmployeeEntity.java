@@ -15,32 +15,31 @@ import java.util.Set;
 @Table(
         name = "employee",
         uniqueConstraints = {
-                @UniqueConstraint(name = "unique_employee_email_branch", columnNames = {"branch_id", "email"})
+                @UniqueConstraint(name = "uq_employee_branch_id_and_email", columnNames = {"branch_id", "email"})
         },
-        indexes = {
-                @Index(name = "idx_employee_branch", columnList = "branch_id")
-        }
+        indexes = {@Index(name = "idx_employee_branch", columnList = "branch_id")}
 )
 public class EmployeeEntity {
     @Id
+    @Column(columnDefinition = "smallint")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne( fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id", nullable = false, columnDefinition = "smallint")
     private BranchEntity branch;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 70)
     private String name;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 254)
     private String email;
 
-    @Column(length = 30)
+    @Column(length = 15)
     private String phone;
 
     @Lob
-    @Column(nullable = false, columnDefinition = "BLOB")
+    @Column(nullable = false)
     private byte[] avatar;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -49,7 +48,8 @@ public class EmployeeEntity {
             joinColumns = @JoinColumn(name = "employee_id"),
             inverseJoinColumns = @JoinColumn(name = "service_id"),
             uniqueConstraints = {
-                    @UniqueConstraint(columnNames = {"employee_id", "service_id"})
+                    @UniqueConstraint(name = "uq_employee_service_employee_id_and_service_id",
+                            columnNames = {"employee_id", "service_id"})
             },
             indexes = {
                     @Index(name = "idx_employee_service_employee", columnList = "employee_id"),
