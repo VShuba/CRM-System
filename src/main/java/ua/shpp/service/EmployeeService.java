@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ua.shpp.dto.employee.EmployeeRequestDTO;
+import ua.shpp.dto.employee.EmployeeCreateRequestDTO;
 import ua.shpp.dto.employee.EmployeeResponseDTO;
 import ua.shpp.dto.employee.EmployeeServiceCreateDTO;
 import ua.shpp.entity.BranchEntity;
@@ -35,7 +35,7 @@ public class EmployeeService {
     private final int AVATAR_HEIGHT = 75;
     private final int MAX_AVATAR_SIZE_MB = 3;
 
-    public EmployeeResponseDTO createEmployee(MultipartFile avatarImg, EmployeeRequestDTO employeeDTO) {
+    public EmployeeResponseDTO createEmployee(MultipartFile avatarImg, EmployeeCreateRequestDTO employeeDTO) {
         log.debug("Find by id: {} branch", employeeDTO.branchId());
         BranchEntity branch = branchRepository.findById(employeeDTO.branchId())
                 .orElseThrow(() -> new RuntimeException("Branch with id " + employeeDTO.branchId() + " not found"));
@@ -61,7 +61,7 @@ public class EmployeeService {
         log.debug("After mapping: employee entity id: {}, branch: {}, services: {}", employeeEntity.getId(),
                 branch.getId(), employeeEntity.getServices());
 
-        employeeEntity.getBranches().add(branch);
+        employeeEntity.setBranch(branch);
         log.debug("After set branch: employee entity id: {}, branchId: {}, services: {}", employeeEntity.getId(),
                 branch.getId(), employeeEntity.getServices());
         employeeEntity.setServices(new HashSet<>(newServiceEntities));
@@ -76,16 +76,19 @@ public class EmployeeService {
     }
 
     /**
-     * Deletes the relation between an employee and a branch, removes related services for this employee,
-     * and deletes the employee record if no other branch associations exist.
+     * Unbinds an employee from a specific branch by deleting the relationship
+     * between the employee and the branch, and removes the employee's related
+     * service associations for that branch, meaning the employee will no longer
+     * be associated with any services provided at that branch.
      *
-     * @param employeeId the ID of the employee to be modified or deleted
-     * @param branchId the ID of the branch from which the employee will be unlinked
-     * @return true if any records were affected, false otherwise
+     * @param employeeId the ID of the employee to be unlinked from the branch
+     * @param branchId   the ID of the branch to unlink the employee from
+     * @return true if the employee was unbounded from the branch (i.e., if any records were deleted),
+     * false if the employee was not found in the branch (no records were affected)
      */
     @Transactional
-    public boolean deleteEmployee(Long employeeId, Long branchId) {
-        int deletedRecords = employeeRepository.deleteEmployeeAndRelatedRecords(employeeId, branchId);
+    public boolean unbindEmployeeFromBranch(Long employeeId, Long branchId) {
+        int deletedRecords = employeeRepository.unbindEmployeeFromBranch(employeeId, branchId);
         log.info("Records deleted: {}", deletedRecords);
         return deletedRecords > 0;
     }

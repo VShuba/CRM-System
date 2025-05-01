@@ -1,6 +1,10 @@
 package ua.shpp.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ua.shpp.dto.ClientRequestDto;
+import ua.shpp.dto.ClientResponseDto;
 import ua.shpp.dto.EventClientDto;
 import ua.shpp.entity.ClientEntity;
 import ua.shpp.entity.EventClientEntity;
@@ -10,56 +14,113 @@ import ua.shpp.exception.ClientEventStatusChnageException;
 import ua.shpp.exception.ClientNotFoundException;
 import ua.shpp.exception.EventForClientNotFoundException;
 import ua.shpp.exception.EventNotFoundException;
+import ua.shpp.mapper.EventClientMapper;
 import ua.shpp.model.ClientEventStatus;
 import ua.shpp.repository.ClientRepository;
 import ua.shpp.repository.EventClientRepository;
 import ua.shpp.repository.ScheduleEventRepository;
 
 @Service
+@Slf4j
 public class EventClientService {
 
     private final EventClientRepository eventClientRepository;
     private final ClientRepository clientRepository;
     private final ScheduleEventRepository scheduleEventRepository;
+    private final ClientService clientService;
+    private final VisitHistoryService visitHistoryService;
+    private final EventClientMapper eventClientMapper;
 
-    public EventClientService(EventClientRepository eventClientRepository, ClientRepository clientRepository, ScheduleEventRepository scheduleEventRepository) {
+    public EventClientService(EventClientRepository eventClientRepository, ClientRepository clientRepository,
+                              ScheduleEventRepository scheduleEventRepository, ClientService clientService,
+                              VisitHistoryService visitHistoryService, EventClientMapper eventClientMapper) {
         this.eventClientRepository = eventClientRepository;
         this.clientRepository = clientRepository;
         this.scheduleEventRepository = scheduleEventRepository;
+        this.clientService = clientService;
+        this.visitHistoryService = visitHistoryService;
+        this.eventClientMapper = eventClientMapper;
     }
 
-
-    public void addClientToEvent(Long clientId, Long eventId) {
-
+    public EventClientDto addClientToEvent(Long clientId, Long eventId) {
+        log.debug("Attempting to add client {} to event {}", clientId, eventId);
         ClientEntity clientEntity = clientRepository.findById(clientId)
-                .orElseThrow(() -> new ClientNotFoundException(clientId));
+                .orElseThrow(() -> {
+                    log.warn("Client not found with ID: {}", clientId);
+                    return new ClientNotFoundException(clientId);
+                });
         ScheduleEventEntity scheduleEvent = scheduleEventRepository.findById(eventId)
-                .orElseThrow(() -> new EventNotFoundException(eventId));
+                .orElseThrow(() -> {
+                    log.warn("Event not found with ID: {}", eventId);
+                    return new EventNotFoundException(eventId);
+                });
+
         EventClientEntity eventClientEntity = EventClientEntity.builder()
                 .eventUserId(new EventClientId(clientId, eventId))
                 .client(clientEntity)
                 .scheduleEvent(scheduleEvent)
                 .clientEventStatus(ClientEventStatus.ASSIGNED)
+                .oneTimeInfo(null)
+                .subscriptionInfo(null)
                 .build();
 
-        eventClientRepository.save(eventClientEntity);
+        EventClientEntity savedEventClient = eventClientRepository.save(eventClientEntity);
+        log.info("Client {} assigned to event {} with status {}", clientId, eventId,
+                savedEventClient.getClientEventStatus());
+
+        return eventClientMapper.toDto(savedEventClient);
     }
 
     public EventClientDto changeClientStatus(EventClientDto eventClientDto) {
-        EventClientId eventClientId =
-                new EventClientId(eventClientDto.clientId(), eventClientDto.scheduleId());
+        log.debug("Attempting to change status for client event: {}", eventClientDto);
+        EventClientId eventClientId = new EventClientId(eventClientDto.clientId(), eventClientDto.scheduleId());
+
         EventClientEntity eventClientEntity = eventClientRepository.findById(eventClientId)
-                .orElseThrow(() -> new EventForClientNotFoundException(eventClientDto.clientId(), eventClientDto.scheduleId()));
-        if (ClientEventStatus.checkIfStatusChangePossible(eventClientEntity.getClientEventStatus(), eventClientDto.clientEventStatus())) {
-            eventClientEntity.setClientEventStatus(eventClientDto.clientEventStatus());
+                .orElseThrow(() -> {
+                    log.warn("EventClient not found for client {} and event {}", eventClientDto.clientId(),
+                            eventClientDto.scheduleId());
+                    return new EventForClientNotFoundException(eventClientDto.clientId(),
+                            eventClientDto.scheduleId());
+                });
+
+        ClientEventStatus oldStatus = eventClientEntity.getClientEventStatus();
+        ClientEventStatus newStatus = eventClientDto.clientEventStatus();
+
+        if (ClientEventStatus.checkIfStatusChangePossible(oldStatus, newStatus)) {
+            log.info("Changing status for client {} on event {} from {} to {}",
+                    eventClientDto.clientId(), eventClientDto.scheduleId(),
+                    oldStatus, newStatus);
+
+            eventClientEntity.setClientEventStatus(newStatus);
+
             EventClientEntity savedEventClient = eventClientRepository.save(eventClientEntity);
-            return new EventClientDto(
+            log.info("Status changed successfully for client {} on event {} to {}",
                     savedEventClient.getEventUserId().getClientId(),
                     savedEventClient.getEventUserId().getEventId(),
-                    savedEventClient.getClientEventStatus()
-            );
-        } else throw new ClientEventStatusChnageException();
+                    savedEventClient.getClientEventStatus());
+
+            if (savedEventClient.getClientEventStatus() == ClientEventStatus.USED ||
+                    savedEventClient.getClientEventStatus() == ClientEventStatus.SKIPPED) {
+                log.debug("Status is USED or SKIPPED, creating visit history entry.");
+                visitHistoryService.createVisitHistoryEntry(savedEventClient);
+            }
+
+            return eventClientMapper.toDto(savedEventClient);
+        } else {
+            log.warn("Status change not possible for client {} on event {} from {} to {}." +
+                            " Current status order: {}, New status order: {}",
+                    eventClientDto.clientId(), eventClientDto.scheduleId(),
+                    oldStatus, newStatus,
+                    oldStatus.getOrder(), newStatus.getOrder());
+            throw new ClientEventStatusChnageException(String.format("Status change not possible from %s to %s",
+                    oldStatus, newStatus));
+        }
     }
 
-
+    public EventClientDto addClientAndAssignEvent(Long eventId, Long orgId, ClientRequestDto eventClientDto) {
+        log.debug("Attempting to add client and assign to event {}. Org ID: {}", eventId, orgId);
+        ClientResponseDto client = clientService.createClient(orgId, eventClientDto);
+        log.info("Client created with ID: {}", client.id());
+        return addClientToEvent(client.id(), eventId);
+    }
 }

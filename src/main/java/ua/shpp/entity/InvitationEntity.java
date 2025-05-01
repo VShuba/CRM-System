@@ -3,7 +3,7 @@ package ua.shpp.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import ua.shpp.model.InvitationStatus;
-import ua.shpp.model.Role;
+import ua.shpp.model.OrgRole;
 
 import java.time.LocalDateTime;
 
@@ -24,7 +24,7 @@ public class InvitationEntity {
     String recipientEmail;
 
     @Enumerated(EnumType.STRING)
-    Role role;
+    OrgRole role;
 
     LocalDateTime expiresAt;
 

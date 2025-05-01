@@ -10,7 +10,7 @@ import ua.shpp.entity.*;
 import ua.shpp.exception.OrganizationAlreadyExists;
 import ua.shpp.exception.OrganizationNotFound;
 import ua.shpp.mapper.OrganizationEntityToOrganizationDTOMapper;
-import ua.shpp.model.Role;
+import ua.shpp.model.OrgRole;
 import ua.shpp.repository.OrganizationRepository;
 import ua.shpp.repository.UserOrganizationRepository;
 
@@ -48,7 +48,8 @@ public class OrganizationService {
                 .organization(savedOrganization)
                 .user(currentUser)
                 .joinedAt(LocalDate.now())
-                .role(Role.OWNER) // <- даємо OWNER'a тому хто створює організацію
+                .role(OrgRole.ADMIN) // <- даємо OWNER'a тому хто створює організацію
+                                     // UPD: тепер це роль адміна орг, він її створив
                 .build();
 
         userOrganizationRepository.save(userOrganization);

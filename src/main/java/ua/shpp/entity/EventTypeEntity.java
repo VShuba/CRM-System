@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Builder
-@Table(name = "event_types")
+@Table(name = "event_type")
 public class EventTypeEntity {
     @Id
     @Column(name = "id")

@@ -2,7 +2,7 @@ package ua.shpp.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ua.shpp.model.Role;
+import ua.shpp.model.OrgRole;
 
 import java.time.LocalDate;
 
@@ -31,5 +31,6 @@ public class UserOrganization {
     private LocalDate joinedAt; // Додаткове поле
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column(name = "organization_role", nullable = false)
+    private OrgRole role;
 }

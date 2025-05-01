@@ -1,9 +1,9 @@
 package ua.shpp.dto;
 
-import ua.shpp.model.Role;
+import ua.shpp.model.OrgRole;
 
 public record UserOrganizationDTO(
         UserOrganizationIdDTO userOrganizationId,
-        Role role
+        OrgRole role
 ) {
 }

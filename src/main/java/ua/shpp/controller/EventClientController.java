@@ -2,6 +2,7 @@ package ua.shpp.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ua.shpp.dto.ClientRequestDto;
 import ua.shpp.dto.EventClientDto;
 import ua.shpp.service.EventClientService;
 
@@ -24,6 +25,13 @@ public class EventClientController {
     @PutMapping("/")
     public ResponseEntity<EventClientDto> changeClientEventStatus(@RequestBody EventClientDto eventClientDto) {
         return ResponseEntity.ok().body(eventClientService.changeClientStatus(eventClientDto));
+    }
+
+    @PostMapping("/organizations/{orgId}/clients/event/{eventId}")
+    public ResponseEntity<EventClientDto> addClientAndAssignEvent(@PathVariable Long eventId,
+                                                                  @PathVariable Long orgId,
+                                                                  @RequestBody ClientRequestDto eventClientDto) {
+        return ResponseEntity.ok().body(eventClientService.addClientAndAssignEvent(eventId, orgId, eventClientDto));
     }
 
 

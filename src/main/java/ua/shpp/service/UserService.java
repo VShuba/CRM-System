@@ -48,10 +48,20 @@ public class UserService {
      * @return поточний користувач
      */
     public UserEntity getCurrentUser() {
-        String userIDStr = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long userID = Long.parseLong(userIDStr);
+        Long userID = getCurrentUserId();
 
         return repository.findById(userID).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    /**
+     * Retrieves the current user's ID from the security context.
+     *
+     * @return ID of the currently authenticated user
+     * @throws NumberFormatException if the authentication name is not a valid Long
+     */
+    public Long getCurrentUserId() {
+        String userIDStr = SecurityContextHolder.getContext().getAuthentication().getName();
+        return Long.parseLong(userIDStr);
     }
 
     public UserEntity createOAuthUser(UserEntity login) {

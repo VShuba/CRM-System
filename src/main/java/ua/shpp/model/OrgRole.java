@@ -1,7 +1,6 @@
 package ua.shpp.model;
 
-public enum Role {
+public enum OrgRole {
     ADMIN,
-    OWNER,
     MANAGER
 }

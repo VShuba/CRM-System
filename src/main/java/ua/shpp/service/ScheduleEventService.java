@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import ua.shpp.dto.ScheduleEventDto;
 import ua.shpp.exception.EventNotFoundException;
 import ua.shpp.mapper.ScheduleEventMapper;
+import ua.shpp.repository.EmployeeRepository;
+import ua.shpp.repository.RoomRepository;
 import ua.shpp.repository.ScheduleEventRepository;
 import ua.shpp.repository.ServiceRepository;
 
@@ -19,10 +21,16 @@ public class ScheduleEventService {
     private final ScheduleEventRepository scheduleEventRepository;
     private final ScheduleEventMapper scheduleEventMapper;
     private final ServiceRepository serviceRepository;
+    private final EmployeeRepository employeeRepository;
+    private final RoomRepository roomRepository;
 
     public ScheduleEventDto create(ScheduleEventDto scheduleEventDto) {
         log.debug("create() called with DTO: {}", scheduleEventDto);
-        var entity = scheduleEventMapper.toEntity(scheduleEventDto, serviceRepository);
+
+        var entity = scheduleEventMapper.toEntity(scheduleEventDto,
+                serviceRepository,
+                employeeRepository,
+                roomRepository);
         entity.setId(null);
         entity = scheduleEventRepository.save(entity);
         log.info("Created schedule event (id={})", entity.getId());
