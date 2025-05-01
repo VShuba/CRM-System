@@ -12,7 +12,7 @@ import ua.shpp.model.ClientEventStatus;
 @Getter
 @Setter
 @Builder
-@EqualsAndHashCode()
+@EqualsAndHashCode(of = "eventUserId")
 @Table(name = "event_clients")
 public class EventClientEntity {
     @EmbeddedId
@@ -29,6 +29,7 @@ public class EventClientEntity {
     private ScheduleEventEntity scheduleEvent;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 30)
     private ClientEventStatus clientEventStatus;
 
     // Додано, щоб зв’язати відвідування конкретної події з придбаним OneTimeInfoEntity
