@@ -2,9 +2,7 @@ package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import ua.shpp.entity.UserEntity;
 import ua.shpp.model.OrgRole;
 import ua.shpp.repository.UserOrganizationRepository;
 
@@ -24,7 +22,6 @@ public class AuthorizationService {
 //            return false;
 //        }
 
-        UserEntity currentUser = userService.getCurrentUser();
 
         OrgRole requiredRole;
         try {
@@ -34,8 +31,10 @@ public class AuthorizationService {
             return false;
         }
 
+        Long userId = userService.getCurrentUserId();
+
         return userOrganizationRepository.existsByUserIdAndOrganizationIdAndRole(
-                currentUser.getId(),
+                userId,
                 organizationId,
                 requiredRole
         );

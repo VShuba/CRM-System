@@ -59,7 +59,7 @@ public class UserService {
      * @return ID of the currently authenticated user
      * @throws NumberFormatException if the authentication name is not a valid Long
      */
-    private static Long getCurrentUserId() {
+    public Long getCurrentUserId() {
         String userIDStr = SecurityContextHolder.getContext().getAuthentication().getName();
         return Long.parseLong(userIDStr);
     }
