@@ -16,14 +16,9 @@ import java.util.Set;
         @UniqueConstraint(name = "unique_employee_email_organization", columnNames = {"branch_id", "email"})
 })
 public class EmployeeEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "organization_id")
-    Organization organization;
 
     @ManyToOne
     @JoinColumn(name = "branch_id")

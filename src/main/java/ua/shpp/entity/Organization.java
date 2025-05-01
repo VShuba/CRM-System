@@ -36,7 +36,4 @@ public class Organization {
 
     @OneToMany(mappedBy = "organization")
     private List<InvitationEntity> invitationEntities;
-
-    @OneToMany(mappedBy = "organization")
-    private List<EmployeeEntity> employeeEntities;
 }
