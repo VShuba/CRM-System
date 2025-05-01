@@ -12,28 +12,33 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"branchEntities", "userOrganizations"})
-@EqualsAndHashCode(exclude = {"branchEntities", "userOrganizations"}) // needs for exclude ймовірну recursion
+@ToString(exclude = {"branchEntities", "userOrganizations", "invitationEntities"})
+@EqualsAndHashCode(exclude = {"branchEntities", "userOrganizations", "invitationEntities"})
 @Entity
-@Table(name = "organizations")
+@Table(name = "organizations", indexes = {
+        @Index(name = "idx_organization_name", columnList = "name")
+})
 public class Organization {
+
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 
     @Builder.Default
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore // also needs for exclude recursion
+    @JsonIgnore
     private List<BranchEntity> branchEntities = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<UserOrganization> userOrganizations;
+    private List<UserOrganization> userOrganizations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "organization")
-    private List<InvitationEntity> invitationEntities;
+    @Builder.Default
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<InvitationEntity> invitationEntities = new ArrayList<>();
 }
