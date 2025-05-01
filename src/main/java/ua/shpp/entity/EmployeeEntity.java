@@ -26,24 +26,23 @@ public class EmployeeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne( fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id", nullable = false)
     private BranchEntity branch;
 
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(unique = true, nullable = false, length = 100)
+    @Column(nullable = false, length = 100)
     private String email;
 
     @Column(length = 30)
     private String phone;
 
     @Lob
-    @Column(nullable = false, columnDefinition = "BLOB") // PostgreSQL: BLOB → BYTEA !!!
+    @Column(nullable = false, columnDefinition = "BLOB")
     private byte[] avatar;
 
-    @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "employee_service",
@@ -57,5 +56,6 @@ public class EmployeeEntity {
                     @Index(name = "idx_employee_service_service", columnList = "service_id")
             }
     )
+    @Builder.Default
     private Set<ServiceEntity> services = new HashSet<>();
 }
