@@ -21,7 +21,7 @@ public class SubscriptionServiceEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 100)
     private String name;
 
     @ManyToMany
@@ -38,6 +38,7 @@ public class SubscriptionServiceEntity {
     @Column(name = "term_of_validity_in_day", nullable = false)
     private Period termOfValidityInDays = Period.ofDays(35);
 
+    @Column(nullable = false)
     private Long price;
 
     public Period getTermOfValidityInDays() {
