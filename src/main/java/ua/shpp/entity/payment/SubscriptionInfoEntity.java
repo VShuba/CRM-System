@@ -28,7 +28,7 @@ public non-sealed class SubscriptionInfoEntity implements Checkable {
     private SubscriptionServiceEntity subscriptionService;
 
     @Column(nullable = false)
-    private Byte visitsUsed;
+    private Integer visits;
 
     @Column(name = "expiration_date", nullable = false, updatable = false)
     private LocalDate expirationDate;

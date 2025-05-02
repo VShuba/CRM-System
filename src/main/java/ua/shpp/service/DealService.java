@@ -3,6 +3,7 @@ package ua.shpp.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.shpp.dto.*;
 import ua.shpp.entity.payment.CheckEntity;
 import ua.shpp.entity.payment.Checkable;
@@ -14,6 +15,7 @@ import ua.shpp.exception.VisitAlreadyUsedException;
 import ua.shpp.mapper.CheckMapper;
 import ua.shpp.mapper.OneTimeInfoMapper;
 import ua.shpp.mapper.SubscriptionInfoMapper;
+import ua.shpp.model.ClientEventStatus;
 import ua.shpp.model.PaymentMethod;
 import ua.shpp.repository.*;
 
@@ -35,15 +37,17 @@ public class DealService {
     private final SubscriptionInfoMapper subscriptionInfoMapper;
     private final CheckMapper checkMapper;
 
+    private final EventClientService eventClientService;
+
 
     public OneTimeInfoResponseDto createOneTime(OneTimeInfoRequestDto dto, PaymentMethod paymentMethod) {
-        log.info("createOneTime() called with DTO: {}, payment method: {}",  dto, paymentMethod);
+        log.info("createOneTime() called with DTO: {}, payment method: {}", dto, paymentMethod);
         var entity = oneTimeInfoMapper.toEntity(dto,
                 clientRepository,
                 oneTimeOfferRepository,
                 checkRepository);
         entity.setId(null);
-        var check =  createCheck(entity, paymentMethod);
+        var check = createCheck(entity, paymentMethod);
         log.debug("Created check entity for one-time deal {}", check);
         entity.setPaymentCheck(check);
         entity = oneTimeInfoRepository.save(entity);
@@ -59,7 +63,7 @@ public class DealService {
                 subscriptionOfferRepository,
                 checkRepository);
         entity.setId(null);
-        var check =  createCheck(entity, paymentMethod);
+        var check = createCheck(entity, paymentMethod);
         log.debug("Created check entity for subscription deal {}", check);
         entity.setPaymentCheck(check);
         entity = subscriptionInfoRepository.save(entity);
@@ -84,17 +88,39 @@ public class DealService {
         return subscriptionInfoMapper.toDto(entity);
     }
 
-    public OneTimeInfoResponseDto visitOneTimeById(Long id) {
-        log.info("visitOneTimeById() called with id: {}", id);
-        var entity = getOneTimeEntityById(id);
+    public OneTimeInfoResponseDto visitOneTimeById(Long oneTimeId) {
+        log.info("visitOneTimeById() called with id: {}", oneTimeId);
+        var entity = getOneTimeEntityById(oneTimeId);
         log.debug("Fetching one-time deal entity: {}", entity);
         if (Boolean.TRUE.equals(entity.getVisitUsed())) {
-            throw new VisitAlreadyUsedException(String.format("One-time visit id: %d already used", id));
+            throw new VisitAlreadyUsedException(String.format("One-time visit id: %d already used", oneTimeId));
         }
         entity.setVisitUsed(true);
         entity = oneTimeInfoRepository.save(entity);
-        log.info("OneTime with id: {}, visit: {}", id, entity.getVisitUsed());
+        log.info("OneTime with id: {}, visit: {}", oneTimeId, entity.getVisitUsed());
         log.debug("Updated one-time deal entity: {}", entity);
+        return oneTimeInfoMapper.toDto(entity);
+    }
+
+    @Transactional
+    public OneTimeInfoResponseDto visitOneTimeByIdAndScheduleEventId (Long oneTimeId, Long scheduleEventId) {
+        log.info("visitOneTimeByIdAndScheduleEventId() called with one-time id: {}, schedule id: {} ",
+                oneTimeId,scheduleEventId);
+        var entity = getOneTimeEntityById(oneTimeId);
+        log.debug("Fetching one-time deal entity: {}", entity);
+        if (Boolean.TRUE.equals(entity.getVisitUsed())) {
+            throw new VisitAlreadyUsedException(String.format("One-time visit id: %d already used", oneTimeId));
+        }
+        entity.setVisitUsed(true);
+        entity = oneTimeInfoRepository.save(entity);
+        log.info("OneTime with id: {}, visit: {}", oneTimeId, entity.getVisitUsed());
+        log.debug("Updated one-time deal entity: {}", entity);
+
+       eventClientService
+                .changeClientStatus(new EventClientDto(entity.getClient().getId(),
+                scheduleEventId, ClientEventStatus.USED, oneTimeId, null));
+        log.info("Set one-time id: {}, schedule id: {},  status  {}",
+                oneTimeId, scheduleEventId, ClientEventStatus.USED);
         return oneTimeInfoMapper.toDto(entity);
     }
 
@@ -102,14 +128,37 @@ public class DealService {
         log.info("subscriptionVisitById() called with id: {}", id);
         var entity = getSubscriptionEntityById(id);
         log.debug("Fetching subscription deal entity: {}", entity);
-        if (entity.getSubscriptionService().getVisits() <= entity.getVisitsUsed()) {
+        if (entity.getVisits() <= 0) {
             throw new VisitAlreadyUsedException(String.format("Subscription visits id: %d already used", id));
         }
-        Byte visits = entity.getVisitsUsed();
-        entity.setVisitsUsed(++visits);
+        Integer visits = entity.getVisits();
+        entity.setVisits(--visits);
         entity = subscriptionInfoRepository.save(entity);
-        log.info("Subscription with id: {}, visit: {}", id, entity.getVisitsUsed());
+        log.info("Subscription with id: {}, visit: {}", id, entity.getVisits());
         log.debug("Updated subscription deal entity: {}", entity);
+        return subscriptionInfoMapper.toDto(entity);
+    }
+
+    public SubscriptionInfoResponseDto subscriptionVisitByIdAndScheduleEventId(
+            Long subscriptionId, Long scheduleEventId) {
+        log.info("subscriptionVisitByIdAndScheduleEventId() called with subscription id: {}, schedule id: {}",
+                subscriptionId, scheduleEventId);
+        var entity = getSubscriptionEntityById(subscriptionId);
+        log.debug("Fetching subscription deal entity: {}", entity);
+        if (entity.getVisits() <= 0) {
+            throw new VisitAlreadyUsedException(String.format("Subscription visits id: %d already used", subscriptionId));
+        }
+        Integer visits = entity.getVisits();
+        entity.setVisits(--visits);
+        entity = subscriptionInfoRepository.save(entity);
+        log.info("Subscription with id: {}, visit: {}", subscriptionId, entity.getVisits());
+        log.debug("Updated subscription deal entity: {}", entity);
+
+        eventClientService
+                .changeClientStatus(new EventClientDto(entity.getClient().getId(),
+                        scheduleEventId, ClientEventStatus.USED, null, subscriptionId));
+        log.info("Set subscription id: {}, schedule id: {},  status  {}",
+                subscriptionId, scheduleEventId, ClientEventStatus.USED);
         return subscriptionInfoMapper.toDto(entity);
     }
 
@@ -125,6 +174,20 @@ public class DealService {
         return oneTimeInfoRepository.findById(id).orElseThrow(
                 () -> new DealNotFoundException(String.format("One-time visit id: %s, not found", id)));
     }
+
+    public ValidVisitsDealDto validOneTimeVisitById(Long id) {
+        return new ValidVisitsDealDto(id,
+                getOneTimeEntityById(id).getVisitUsed(),
+                1);
+    }
+
+    public ValidVisitsDealDto validSubscriptionById(Long id) {
+        var entity = getSubscriptionEntityById(id);
+        return new ValidVisitsDealDto(id,
+                entity.getVisits() > 0,
+                entity.getVisits());
+    }
+
 
     private SubscriptionInfoEntity getSubscriptionEntityById(Long id) {
         return subscriptionInfoRepository.findById(id).orElseThrow(

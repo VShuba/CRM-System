@@ -52,11 +52,17 @@ public class ScheduleEventEntity {
 
     // Додано, щоб прив’язати конкретну подію до співробітника, який її проводить
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "trainer_id")
-    private EmployeeEntity trainer;
+    @JoinColumn(name = "employee_id")
+    private EmployeeEntity employee;
 
     // Додано, щоб зв’язати конкретну подію з кімнатою, де вона відбувається
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     private RoomEntity room;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_type_id")
+    private EventTypeEntity eventType;
+
+    //todo fix service what was added
 }

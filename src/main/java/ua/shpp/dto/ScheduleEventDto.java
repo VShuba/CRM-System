@@ -23,6 +23,7 @@ public record ScheduleEventDto(Long id,
                                @Schema(description = "Trainer ID", example = "1")
                                Long trainerId,
                                @Schema(description = "Room ID", example = "1")
-                               Long roomId
-) {
+                               Long roomId,
+                               @Schema(description = "Event type ID", example = "1")
+                               Long eventTypeId) {
 }

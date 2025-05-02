@@ -13,7 +13,7 @@ public record SubscriptionInfoResponseDto(
         @Schema(description = "Offer id", example = "1")
         Long subscriptionId,
         @Schema(description = "Subscription visits used", example = "1")
-        byte visitsUsed,
+        Integer visits,
         @Schema(description = "Expiration date",example = "12-04-2025", type = "string", format = "date")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
         LocalDate expirationDate,

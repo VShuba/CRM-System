@@ -52,6 +52,7 @@ public class DealController {
         return ResponseEntity.ok(dto);
     }
 
+    @Deprecated
     @Operation(summary = "Use by one-time deal id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "One-time deal successfully used",
@@ -63,6 +64,21 @@ public class DealController {
     @GetMapping("/use/{id}")
     public ResponseEntity<OneTimeInfoResponseDto> useOneTimeById(@PathVariable Long id) {
         var dto = dealService.visitOneTimeById(id);
+        return ResponseEntity.ok(dto);
+    }
+
+    @Operation(summary = "Use by one-time deal by id and schedule event id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "One-time deal successfully used",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = OneTimeInfoResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "One-time deal id not fount", content = @Content),
+            @ApiResponse(responseCode = "404", description = "One-time visit id already used", content = @Content),
+    })
+    @GetMapping("/use/{oneId}/schedule/{scheduleId}")
+    public ResponseEntity<OneTimeInfoResponseDto> useOneTimeById(@PathVariable("oneId") Long oneTimeId,
+                                                                 @PathVariable("scheduleId") Long scheduleId) {
+        var dto = dealService.visitOneTimeByIdAndScheduleEventId(oneTimeId, scheduleId);
         return ResponseEntity.ok(dto);
     }
 
@@ -96,7 +112,8 @@ public ResponseEntity<SubscriptionInfoResponseDto> create(
         return ResponseEntity.ok(dto);
     }
 
-    @Operation(summary = "Use subscription deal by id")
+    @Deprecated
+    @Operation(summary = "Use subscription deal by id and schedule event id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Subscription deal visit successfully added",
                     content = @Content(mediaType = "application/json",
@@ -107,6 +124,22 @@ public ResponseEntity<SubscriptionInfoResponseDto> create(
     @GetMapping("/visit/{id}")
     public ResponseEntity<SubscriptionInfoResponseDto> visitSubscriptionById(@PathVariable Long id) {
         var dto = dealService.subscriptionVisitById(id);
+        return ResponseEntity.ok(dto);
+    }
+
+    @Operation(summary = "Use subscription deal by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Subscription deal visit successfully added",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = SubscriptionInfoResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "Subscription deal id not fount", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Subscription visit id already used", content = @Content),
+    })
+    @GetMapping("/visit/{id}/schedule/{scheduleId}")
+    public ResponseEntity<SubscriptionInfoResponseDto> visitSubscriptionById(
+            @PathVariable("id") Long id,
+            @PathVariable("scheduleId") Long scheduleId) {
+        var dto = dealService.subscriptionVisitByIdAndScheduleEventId(id,scheduleId);
         return ResponseEntity.ok(dto);
     }
 

@@ -24,7 +24,7 @@ public interface VisitHistoryMapper {
     @Mapping(target = "clientId", source = "client.id")
     @Mapping(target = "serviceColor", source = "scheduleEvent.serviceEntity.color")
     @Mapping(target = "serviceName", source = "scheduleEvent.serviceEntity.name")
-    @Mapping(target = "trainerFullName", source = "scheduleEvent.trainer", qualifiedByName = "trainerToFullName")
+    @Mapping(target = "trainerFullName", source = "scheduleEvent.employee", qualifiedByName = "trainerToFullName")
     @Mapping(target = "date", source = "scheduleEvent.eventDate")
     @Mapping(target = "time", source = "scheduleEvent.startTime")
     @Mapping(target = "roomName", source = "scheduleEvent.room", qualifiedByName = "roomToName")
