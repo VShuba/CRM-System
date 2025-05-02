@@ -209,8 +209,12 @@ public class DealService {
                             .getOneTimeService()
                             .getActivity()
                             .getBranch()
-                            .getName() + " - no branch address") //todo Add Branch address and phone number
-                    .branchPhoneNumber("no branch phone number")
+                            .getAddress())
+                    .branchPhoneNumber(oneTimeInfoEntity
+                            .getOneTimeService()
+                            .getActivity()
+                            .getBranch()
+                            .getPhoneNumber())
                     .customerName(oneTimeInfoEntity.getClient().getName())
                     .customerPhoneNumber(oneTimeInfoEntity.getClient().getPhone())
                     .offerName(oneTimeInfoEntity.getOneTimeService().getActivity().getName())
@@ -230,8 +234,12 @@ public class DealService {
                             .getSubscriptionService()
                             .getActivities().getFirst()
                             .getBranch()
-                            .getName() + " - no branch address") //  no address
-                    .branchPhoneNumber("no branch phone number")
+                            .getAddress()) //  no address
+                    .branchPhoneNumber(subscriptionInfo
+                            .getSubscriptionService()
+                            .getActivities().getFirst()
+                            .getBranch()
+                            .getPhoneNumber())
                     .customerName(subscriptionInfo.getClient().getName())
                     .customerPhoneNumber(subscriptionInfo.getClient().getPhone())
                     .offerName(subscriptionInfo.getSubscriptionService().getName())

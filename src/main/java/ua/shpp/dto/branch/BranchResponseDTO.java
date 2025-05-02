@@ -17,6 +17,12 @@ public record BranchResponseDTO(
         @Schema(description = "Name of branch")
         String name,
 
+        @Schema(description = "Address of branch")
+        String address,
+
+        @Schema(description = "Phone number of branch")
+        String phoneNumber,
+
         @Schema(description = "List of rooms")
         List<RoomResponseDTO> rooms,
 

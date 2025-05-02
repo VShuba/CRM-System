@@ -8,8 +8,8 @@ INSERT INTO organizations (name)
 VALUES ('Test Organization');
 
 -- Create branch (location)
-INSERT INTO branches (name, organization_id)
-VALUES ('Main Branch', 1);
+INSERT INTO branches (name, organization_id, address, phone_number )
+VALUES ('Main Branch', 1, 'Street 1, Building 2', '+380671233344');
 
 -- Create rooms
 INSERT INTO rooms (name, branch_id)

@@ -30,6 +30,13 @@ public class BranchEntity {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(nullable = false, length = 100)
+    private String address;
+
+    @Column(name = "phone_number",nullable = false, length = 100)
+    private String phoneNumber;
+
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
