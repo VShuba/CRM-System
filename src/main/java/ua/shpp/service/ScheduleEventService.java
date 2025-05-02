@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.ScheduleEventDto;
+import ua.shpp.entity.ScheduleEventEntity;
 import ua.shpp.exception.EventNotFoundException;
 import ua.shpp.mapper.ScheduleEventMapper;
 import ua.shpp.repository.EmployeeRepository;
@@ -53,6 +54,19 @@ public class ScheduleEventService {
         log.debug("dates between {} to {} have {} events",
                 startDate, endDate, listEntity.size());
         return listEntity.stream().map(scheduleEventMapper::toDto).toList();
+    }
+
+    public List<ScheduleEventDto> eventFilter(
+                                              Long roomId,
+                                              Long employeeId,
+                                              Long serviceId,
+                                              Long eventTypeId,
+                                              LocalDate startDate,
+                                              LocalDate endDate) {
+        List<ScheduleEventEntity> list =  scheduleEventRepository.findFilteredByAll(roomId,
+                    employeeId, serviceId, eventTypeId, startDate, endDate);
+
+        return list.stream().map(scheduleEventMapper::toDto).toList();
     }
 
     public void deleteById(Long id) {

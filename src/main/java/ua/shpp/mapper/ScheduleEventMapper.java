@@ -22,7 +22,7 @@ public interface ScheduleEventMapper {
     @Mapping(target = "serviceEntity",
             source = "serviceId",
             qualifiedByName = "idToService")
-    @Mapping(target = "trainer", source = "trainerId", qualifiedByName = "idToTrainer")
+    @Mapping(target = "employee", source = "trainerId", qualifiedByName = "idToTrainer")
     @Mapping(target = "room", source = "roomId", qualifiedByName = "idToRoom")
     ScheduleEventEntity toEntity(ScheduleEventDto dto,
                                  @Context ServiceRepository serviceRepository,
@@ -33,7 +33,7 @@ public interface ScheduleEventMapper {
     @Mapping(target = "serviceId",
             source = "serviceEntity",
             qualifiedByName = "serviceToId")
-    @Mapping(target = "trainerId", source = "trainer", qualifiedByName = "trainerToId")
+    @Mapping(target = "trainerId", source = "employee", qualifiedByName = "trainerToId")
     @Mapping(target = "roomId", source = "room", qualifiedByName = "roomToId")
     ScheduleEventDto toDto(ScheduleEventEntity entity);
 

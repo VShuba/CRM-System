@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -44,4 +45,8 @@ public class EmployeeEntity {
     )
     @Builder.Default
     private Set<ServiceEntity> services = new HashSet<>();
+
+    @OneToMany(mappedBy = "employee")
+    @Column(name = "schedule_event_id")
+    private List<ScheduleEventEntity> scheduleEventEntities;
 }

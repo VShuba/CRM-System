@@ -13,6 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.ScheduleEventDto;
+import ua.shpp.dto.ScheduleEventFilterDto;
 import ua.shpp.service.ScheduleEventService;
 
 import java.net.URI;
@@ -92,5 +93,36 @@ public class ScheduleEventController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         scheduleEventService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Filter schedule event by type, roomId, employeeId, serviceId, startDate, endDate" )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Schedule event successfully find",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = ScheduleEventDto.class)))),
+    })
+    @GetMapping("filter/from/{start}/to/{end}")
+    public ResponseEntity<List<ScheduleEventDto>> eventFilter(
+
+            @ModelAttribute ScheduleEventFilterDto dto,
+            @Parameter(
+                    description = "Start date (day-month-year, dd-MM-yyyy)",
+                    example = "22-10-2025"
+            )
+            @PathVariable
+            @DateTimeFormat(pattern = "dd-MM-yyyy")
+            LocalDate start,
+
+            @Parameter(
+                    description = "End date (day-month-year, dd-MM-yyyy)",
+                    example = "29-10-2025"
+            )
+            @PathVariable
+            @DateTimeFormat(pattern = "dd-MM-yyyy")
+            LocalDate end){
+        var list = scheduleEventService
+                .eventFilter(dto.roomId(),dto.employeeId(), dto.serviceId(), dto.eventTypeId(), start, end);
+        return ResponseEntity.ok(list);
     }
 }

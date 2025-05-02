@@ -17,9 +17,7 @@ import ua.shpp.exception.EventTypeNotFoundException;
 import ua.shpp.mapper.EventTypeMapper;
 import ua.shpp.mapper.OneTimeOfferMapper;
 import ua.shpp.mapper.SubscriptionOfferMapper;
-import ua.shpp.repository.BranchRepository;
-import ua.shpp.repository.EventTypeRepository;
-import ua.shpp.repository.ServiceRepository;
+import ua.shpp.repository.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,14 +33,20 @@ public class EventTypeService {
     private final SubscriptionOfferMapper subscriptionOfferMapper;
     private final ServiceRepository serviceRepository;
     private final BranchRepository branchRepository;
+    private final OneTimeOfferRepository oneTimeOfferRepository;
+    private final SubscriptionOfferRepository subscriptionOfferRepository;
 
     public EventTypeResponseDTO create(EventTypeRequestDTO dto) {
         log.info("Creating EventType: {}", dto.name());
 
         validateUniqueEventType(dto.name(), dto.branchId());
 
-        EventTypeEntity entity = eventTypeMapper.toEntity(dto, serviceRepository, branchRepository);
-        addOffersToEventType(dto, entity);
+        EventTypeEntity entity = eventTypeMapper.toEntity(dto,
+                serviceRepository,
+                branchRepository,
+                oneTimeOfferRepository,
+                subscriptionOfferRepository); //todo add to mapper offers
+//        addOffersToEventType(dto, entity); //refactoring
 
         EventTypeEntity saved = eventTypeRepository.save(entity);
         log.info("Created EventType with ID: {}", saved.getId());
@@ -79,7 +83,7 @@ public class EventTypeService {
         validateNameChangeUniqueness(existing, dto);
 
         updateEntityFromDTO(existing, dto);
-        addOffersToEventType(dto, existing);
+//        addOffersToEventType(dto, existing);  //refactoring
 
         EventTypeEntity updated = eventTypeRepository.save(existing);
         log.info("Updated EventType with ID: {}", updated.getId());
@@ -159,28 +163,12 @@ public class EventTypeService {
         entity.getSubscriptions().clear();
     }
 
-    private void addOffersToEventType(EventTypeRequestDTO eventTypeRequestDTO, EventTypeEntity eventTypeEntity) {
-        if (eventTypeRequestDTO.oneTimeVisits() != null) {
-            eventTypeRequestDTO.oneTimeVisits().stream()
-                    .map(oneTimeVisitDTO -> {
-                        var oneTimeVisitEntity = oneTimeOfferMapper
-                                .dtoToEntity(oneTimeVisitDTO, serviceRepository, eventTypeRepository);
-                        oneTimeVisitEntity.setEventType(eventTypeEntity);
-                        return oneTimeVisitEntity;
-                    })
-                    .forEach(eventTypeEntity.getOneTimeVisits()::add);
-        }
-
-        if (eventTypeRequestDTO.subscriptions() != null) {
-            eventTypeRequestDTO.subscriptions().stream()
-                    .map(subscriptionDTO -> {
-                        var subscriptionEntity = subscriptionOfferMapper
-                                .toEntity(subscriptionDTO, serviceRepository, eventTypeRepository);
-                        subscriptionEntity.setEventType(eventTypeEntity);
-                        return subscriptionEntity;
-                    })
-                    .forEach(eventTypeEntity.getSubscriptions()::add);
-        }
-    }
+    //refactoring
+//    private void addOffersToEventType(EventTypeRequestDTO eventTypeRequestDTO, EventTypeEntity eventTypeEntity) {
+//        if (eventTypeRequestDTO.oneTimeVisits() != null) {
+//            var entity = eventTypeMapper.toEntity(eventTypeRequestDTO,
+//                    serviceRepository,branchRepository,oneTimeOfferRepository,subscriptionOfferRepository);
+//        }
+//    } //refactoring
 }
 

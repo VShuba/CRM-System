@@ -43,11 +43,11 @@ public class ServiceEntity {
             joinColumns = @JoinColumn(name = "service_id"),
             inverseJoinColumns = @JoinColumn(name = "room_id")
     )
-    private Set<RoomEntity> rooms = new HashSet<>();
+    private Set<RoomEntity> rooms = new HashSet<>(); // room
 
     @ManyToMany(mappedBy = "activities", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<SubscriptionServiceEntity> subscriptions = new ArrayList<>();
+    private List<SubscriptionServiceEntity> subscriptions = new ArrayList<>();  //TypeEvent
 
     @OneToMany(
             mappedBy = "activity",
@@ -56,7 +56,7 @@ public class ServiceEntity {
             fetch = FetchType.LAZY
     )
     @JsonIgnore
-    private List<OneTimeServiceEntity> oneTimeServices = new ArrayList<>();
+    private List<OneTimeServiceEntity> oneTimeServices = new ArrayList<>(); //TypeEvent
 
     @PreRemove
     private void preRemove() {
@@ -66,7 +66,7 @@ public class ServiceEntity {
     }
 
     @ManyToMany(mappedBy = "services")
-    Set<EmployeeEntity> employees = new HashSet<>();
+    Set<EmployeeEntity> employees = new HashSet<>(); //employees
 
     @OneToMany(
             mappedBy = "serviceEntity",

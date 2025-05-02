@@ -18,10 +18,10 @@ public record EventTypeRequestDTO(
         @NotNull
         Long branchId,
 
-        @Schema(description = "List of one-time services", example = "[]")
-        List<OneTimeOfferDTO> oneTimeVisits,
+        @Schema(description = "List of one-time services Id", example = "[1,2]")
+        List<Long> oneTimeVisits,
 
-        @Schema(description = "List of subscriptions", example = "[]")
-        List<SubscriptionOfferDTO> subscriptions
+        @Schema(description = "List of subscriptions Id", example = "[1,2]")
+        List<Long> subscriptions
 ) {
 }
