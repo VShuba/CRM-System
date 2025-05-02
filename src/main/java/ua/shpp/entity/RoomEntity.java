@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -39,4 +40,9 @@ public class RoomEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "branch_id", nullable = false)
     private BranchEntity branch;
+
+    @OneToMany(mappedBy = "room")
+    @Column(name = "schedule_event_id")
+    private List<ScheduleEventEntity> scheduleEventEntities;
+
 }

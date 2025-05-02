@@ -43,7 +43,11 @@ public class EventTypeEntity {
     @JsonIgnore
     private List<SubscriptionServiceEntity> subscriptions = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToMany(mappedBy = "eventType")
+    @Column(name = "schedule_event_id")
+    private List<ScheduleEventEntity> scheduleEventEntities;
+
+    @ManyToOne
     @JoinColumn(name = "branch_id", nullable = false)
     private BranchEntity branch;
 }
