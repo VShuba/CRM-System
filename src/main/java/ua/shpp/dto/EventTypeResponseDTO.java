@@ -18,10 +18,10 @@ public record EventTypeResponseDTO(
         @Schema(description = "Branch name", example = "Office 1")
         String branchName,
 
-        @Schema(description = "List of one-time services")
-        List<OneTimeOfferDTO> oneTimeVisits,
+        @Schema(description = "List of one-time services id")
+        List<Long> oneTimeVisits,
 
-        @Schema(description = "List of subscriptions")
-        List<SubscriptionOfferDTO> subscriptions
+        @Schema(description = "List of subscriptions id")
+        List<Long> subscriptions
 ) {
 }

@@ -11,6 +11,8 @@ import ua.shpp.repository.OneTimeOfferRepository;
 import ua.shpp.repository.ServiceRepository;
 import ua.shpp.repository.SubscriptionOfferRepository;
 
+import java.time.Duration;
+import java.time.Period;
 import java.util.List;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
@@ -33,7 +35,7 @@ public interface EventTypeMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "oneTimeVisits", source = "oneTimeVisits",
-            qualifiedByName = "time")
+            qualifiedByName = "oneTimeVisitsToId")
     @Mapping(target = "subscriptions", source = "subscriptions",
             qualifiedByName = "subscriptionsToId")
     @Mapping(target = "branchName", source = "branch.name")
@@ -53,8 +55,8 @@ public interface EventTypeMapper {
         return repository.findAllById(listId);
     }
 
-    @Named("time")
-    default List<Long> time(List<OneTimeServiceEntity> listEntity) {
+    @Named("oneTimeVisitsToId")
+    default List<Long> oneTimeVisitsToId(List<OneTimeServiceEntity> listEntity) {
         return listEntity.stream().map(OneTimeServiceEntity::getId).toList();
     }
 
