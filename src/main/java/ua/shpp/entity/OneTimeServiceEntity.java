@@ -29,7 +29,7 @@ public class OneTimeServiceEntity {
     @Column(name = "duration_in_minutes", nullable = false)
     private Duration durationInMinutes;
 
-    @Column(nullable = false)
+    @Column(name = "price", nullable = false)
     private Long price;
 
     public Duration getDurationInMinutes() {

@@ -39,8 +39,8 @@ public class EmployeeService {
         log.debug("Find by id: {} branch", employeeDTO.branchId());
         BranchEntity branch = branchRepository.findById(employeeDTO.branchId())
                 .orElseThrow(() -> new RuntimeException("Branch with id " + employeeDTO.branchId() + " not found"));
-        log.debug("Branch was found with name: {}, employees num: {}, services num: {}",
-                branch.getName(), branch.getEmployees().size(), branch.getServiceEntities().size());
+        log.debug("Branch was found with name: {}, employees: {}, services: {}",
+                branch.getName(), branch.getEmployees(), branch.getServiceEntities());
 
         if (employeeExistsInBranchByEmail(employeeDTO.email(), branch)) {
             throw new RuntimeException("Employee with email " + employeeDTO.email() + " already exists");
@@ -207,6 +207,10 @@ public class EmployeeService {
     }
 
     private static boolean employeeExistsInBranchByEmail(String email, BranchEntity branch) {
+        if (branch.getEmployees() == null) {
+            return false;
+        }
+
         return branch.getEmployees().stream()
                 .anyMatch(e -> e.getEmail().equals(email));
     }

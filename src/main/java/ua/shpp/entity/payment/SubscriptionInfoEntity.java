@@ -33,14 +33,13 @@ public non-sealed class SubscriptionInfoEntity implements Checkable {
     @Column(name = "expiration_date", nullable = false, updatable = false)
     private LocalDate expirationDate;
 
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "check_id", referencedColumnName = "id", nullable = false)
     private CheckEntity paymentCheck;
 
     @PrePersist
-    private void setExpirationDate(){
-        expirationDate =LocalDate.now()
+    private void setExpirationDate() {
+        expirationDate = LocalDate.now()
                 .plusDays(subscriptionService
                         .getTermOfValidityInDays()
                         .getDays());

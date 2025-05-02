@@ -27,17 +27,17 @@ public class UserEntity implements UserDetails {
     @SequenceGenerator(name = "user_id_seq", sequenceName = "user_id_seq", allocationSize = 1)
     private Long id;
 
-    @Column(name = "login", unique = true, nullable = false)
+    @Column(name = "login", unique = true, nullable = false, length = 100)
     private String login;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
 
-    @Column(name = "email", unique = true, nullable = false)
+    @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "global_role", nullable = false)
+    @Column(name = "global_role", nullable = false, length = 20)
     private GlobalRole globalRole;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

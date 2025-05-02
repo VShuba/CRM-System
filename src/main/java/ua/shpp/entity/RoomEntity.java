@@ -10,25 +10,35 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode
-@ToString
+@EqualsAndHashCode(of = "id")
+@ToString(exclude = {"services", "branch"})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "rooms")
+@Table(
+        name = "rooms",
+        indexes = {
+                @Index(name = "idx_room_branch", columnList = "branch_id")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uc_branch_room_name", columnNames = {"branch_id", "name"})
+        }
+)
 public class RoomEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @ManyToMany(mappedBy = "rooms")
+    @Builder.Default
+    @ManyToMany(mappedBy = "rooms", fetch = FetchType.LAZY)
     private Set<ServiceEntity> services = new HashSet<>();
 
-    @ManyToOne
-    @JoinColumn(name = "branch_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "branch_id", nullable = false)
     private BranchEntity branch;
 
     @OneToMany(mappedBy = "room")

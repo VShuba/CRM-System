@@ -13,35 +13,49 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "employee", uniqueConstraints = {
-        @UniqueConstraint(name = "unique_employee_email_organization", columnNames = {"branch_id", "email"})
-})
+@Table(
+        name = "employee",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uq_employee_branch_id_and_email", columnNames = {"branch_id", "email"})
+        },
+        indexes = {@Index(name = "idx_employee_branch", columnList = "branch_id")}
+)
 public class EmployeeEntity {
     @Id
+    @Column(columnDefinition = "smallint")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "branch_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id", nullable = false, columnDefinition = "smallint")
     private BranchEntity branch;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 70)
     private String name;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, length = 254)
     private String email;
 
+    @Column(length = 15)
     private String phone;
 
     @Lob
-    @Column(nullable = false, columnDefinition = "BLOB")
+    @Column(nullable = false)
     private byte[] avatar;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "employee_service",
             joinColumns = @JoinColumn(name = "employee_id"),
-            inverseJoinColumns = @JoinColumn(name = "service_id")
+            inverseJoinColumns = @JoinColumn(name = "service_id"),
+            uniqueConstraints = {
+                    @UniqueConstraint(name = "uq_employee_service_employee_id_and_service_id",
+                            columnNames = {"employee_id", "service_id"})
+            },
+            indexes = {
+                    @Index(name = "idx_employee_service_employee", columnList = "employee_id"),
+                    @Index(name = "idx_employee_service_service", columnList = "service_id")
+            }
     )
     @Builder.Default
     private Set<ServiceEntity> services = new HashSet<>();

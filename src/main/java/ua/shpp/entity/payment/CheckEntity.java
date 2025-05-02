@@ -3,8 +3,6 @@ package ua.shpp.entity.payment;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 import ua.shpp.model.PaymentMethod;
 import ua.shpp.util.CheckNumberGeneratorUtil;
 
@@ -23,26 +21,30 @@ public class CheckEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "check_number", nullable = false, updatable = false)
+    @Column(name = "check_number", nullable = false, updatable = false, length = 20)
     private String checkNumber;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt; // є така аноташка @CreationTimestamp може її?
 
-    @Column(name = "organization_name", nullable = false, updatable = false)
+    @Column(name = "organization_name", nullable = false, updatable = false, length = 100)
     private String organizationName;
-    @Column(name = "branch_address", nullable = false, updatable = false)
+
+    @Column(name = "branch_address", nullable = false, updatable = false, length = 100)
     private String branchAddress;
-    @Column(name = "branch_phone_number", nullable = false, updatable = false)
+
+    @Column(name = "branch_phone_number", nullable = false, updatable = false, length = 20)
     private String branchPhoneNumber;
 
-    @Column(name = "customer_name", nullable = false, updatable = false)
+    @Column(name = "customer_name", nullable = false, updatable = false, length = 120)
     private String customerName;
-    @Column(name = "customer_phone_number", nullable = false, updatable = false)
+
+    @Column(name = "customer_phone_number", nullable = false, updatable = false, length = 20)
     private String customerPhoneNumber;
 
-    @Column(name = "offer_name", nullable = false, updatable = false)
+    @Column(name = "offer_name", nullable = false, updatable = false, length = 100)
     private String offerName;
+
     @Column(name = "price", nullable = false, updatable = false)
     private BigDecimal price;
 
@@ -59,7 +61,7 @@ public class CheckEntity {
     private SubscriptionInfoEntity subscriptionInfo;
 
     @PrePersist
-    private void setCheckNumber(){
+    private void setCheckNumber() {
         checkNumber = CheckNumberGeneratorUtil.generate();
     }
 }
