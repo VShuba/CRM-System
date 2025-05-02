@@ -79,19 +79,6 @@ public class ServiceEntity {
     )
     private Set<RoomEntity> rooms = new HashSet<>(); // room
 
-    @ManyToMany(mappedBy = "activities", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<SubscriptionServiceEntity> subscriptions = new ArrayList<>();  //TypeEvent
-
-    @OneToMany(
-            mappedBy = "activity",
-            cascade = CascadeType.REMOVE,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
-    )
-    @JsonIgnore
-    private List<OneTimeServiceEntity> oneTimeServices = new ArrayList<>(); //TypeEvent
-
     @PreRemove
     private void preRemove() {
         // Delete from SubscriptionServiceEntity.activities
@@ -109,16 +96,4 @@ public class ServiceEntity {
             room.getServices().remove(this);
         }
     }
-
-    @ManyToMany(mappedBy = "services")
-    Set<EmployeeEntity> employees = new HashSet<>(); //employees
-
-    @OneToMany(
-            mappedBy = "serviceEntity",
-            cascade = CascadeType.REMOVE,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
-    )
-    @JsonIgnore
-    private List<ScheduleEventEntity> scheduleEvents = new ArrayList<>();
 }
