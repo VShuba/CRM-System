@@ -1,6 +1,5 @@
 package ua.shpp.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,23 +24,38 @@ public class EventTypeEntity {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @OneToMany(
-            mappedBy = "eventType",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
+    @ManyToMany(
+            cascade = CascadeType.ALL
+            , fetch = FetchType.LAZY
     )
-    @JsonIgnore
+    @JoinTable(
+            name = "event_type_one_time_offers",
+            joinColumns = @JoinColumn(name = "event_type_id"),
+            inverseJoinColumns = @JoinColumn(name = "one_time_offer_id")
+    )
     private List<OneTimeServiceEntity> oneTimeVisits = new ArrayList<>();
 
-    @OneToMany(
-            mappedBy = "eventType",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
+    @ManyToMany(
+            cascade = CascadeType.ALL
+            , fetch = FetchType.LAZY
     )
-    @JsonIgnore
+    @JoinTable(
+            name = "event_type_subscriptions_offers",
+            joinColumns = @JoinColumn(name = "event_type_id"),
+            inverseJoinColumns = @JoinColumn(name = "subscriptions_offer_id")
+    )
     private List<SubscriptionServiceEntity> subscriptions = new ArrayList<>();
+
+    @PreRemove
+    private void preRemove() {
+        for (OneTimeServiceEntity oneTimeService : new ArrayList<>(oneTimeVisits)) {
+            oneTimeService.getEventType().remove(this);
+        }
+
+        for (SubscriptionServiceEntity subscriptionService : new ArrayList<>(subscriptions)) {
+            subscriptionService.getEventType().remove(this);
+        }
+    }
 
     @OneToMany(mappedBy = "eventType")
     @Column(name = "schedule_event_id")

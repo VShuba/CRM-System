@@ -83,10 +83,15 @@ public interface SubscriptionOfferMapper {
         return entityList;
     }
 
-    @Named("eventToId")
-    static Long eventToId(EventTypeEntity entity) {
-        return entity != null ? entity.getId() : null;
-    }
+//    @Named("eventToId")
+//    static Long eventToId(EventTypeEntity entity) {
+//        return entity != null ? entity.getId() : null;
+//    }
+@Named("eventToId")
+static List<Long> eventToId(List<EventTypeEntity> entity) {
+
+        return entity != null ? entity.stream().map(EventTypeEntity::getId).toList() : null;
+}
 
     @Named("idToEvent")
     default EventTypeEntity idToEvent(Long id,

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import ua.shpp.dto.EventTypeRequestDTO;
 import ua.shpp.dto.EventTypeResponseDTO;
 import ua.shpp.entity.EventTypeEntity;
+import ua.shpp.entity.SubscriptionServiceEntity;
 import ua.shpp.exception.BranchNotFoundException;
 import ua.shpp.exception.EventTypeAlreadyExistsException;
 import ua.shpp.exception.EventTypeNotFoundException;
@@ -45,8 +46,7 @@ public class EventTypeService {
                 serviceRepository,
                 branchRepository,
                 oneTimeOfferRepository,
-                subscriptionOfferRepository); //todo add to mapper offers
-//        addOffersToEventType(dto, entity); //refactoring
+                subscriptionOfferRepository);
 
         EventTypeEntity saved = eventTypeRepository.save(entity);
         log.info("Created EventType with ID: {}", saved.getId());
@@ -81,9 +81,9 @@ public class EventTypeService {
                 });
 
         validateNameChangeUniqueness(existing, dto);
-
-        updateEntityFromDTO(existing, dto);
-//        addOffersToEventType(dto, existing);  //refactoring
+        eventTypeMapper.updateFromDto(dto,existing,
+                serviceRepository,branchRepository,oneTimeOfferRepository,subscriptionOfferRepository);
+        log.info("Updated EventType with ID: {}, entity: {}", existing.getId(), existing);
 
         EventTypeEntity updated = eventTypeRepository.save(existing);
         log.info("Updated EventType with ID: {}", updated.getId());
@@ -154,21 +154,5 @@ public class EventTypeService {
                     + " already exists in this branch");
         }
     }
-
-    private void updateEntityFromDTO(EventTypeEntity entity, EventTypeRequestDTO dto) {
-        entity.setName(dto.name());
-        entity.setBranch(branchRepository.findById(dto.branchId())
-                .orElseThrow(() -> new BranchNotFoundException("Branch not found with id: " + dto.branchId())));
-        entity.getOneTimeVisits().clear();
-        entity.getSubscriptions().clear();
-    }
-
-    //refactoring
-//    private void addOffersToEventType(EventTypeRequestDTO eventTypeRequestDTO, EventTypeEntity eventTypeEntity) {
-//        if (eventTypeRequestDTO.oneTimeVisits() != null) {
-//            var entity = eventTypeMapper.toEntity(eventTypeRequestDTO,
-//                    serviceRepository,branchRepository,oneTimeOfferRepository,subscriptionOfferRepository);
-//        }
-//    } //refactoring
 }
 

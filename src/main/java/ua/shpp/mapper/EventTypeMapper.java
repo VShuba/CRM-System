@@ -3,13 +3,11 @@ package ua.shpp.mapper;
 import org.mapstruct.*;
 import ua.shpp.dto.EventTypeRequestDTO;
 import ua.shpp.dto.EventTypeResponseDTO;
+import ua.shpp.dto.OneTimeOfferDTO;
 import ua.shpp.entity.*;
 import ua.shpp.exception.BranchNotFoundException;
 import ua.shpp.exception.ServiceNotFoundException;
-import ua.shpp.repository.BranchRepository;
-import ua.shpp.repository.OneTimeOfferRepository;
-import ua.shpp.repository.ServiceRepository;
-import ua.shpp.repository.SubscriptionOfferRepository;
+import ua.shpp.repository.*;
 
 import java.time.Duration;
 import java.time.Period;
@@ -40,6 +38,20 @@ public interface EventTypeMapper {
             qualifiedByName = "subscriptionsToId")
     @Mapping(target = "branchName", source = "branch.name")
     EventTypeResponseDTO toResponseDTO(EventTypeEntity entity);
+
+    @BeanMapping(nullValuePropertyMappingStrategy =
+            NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "oneTimeVisits", source = "oneTimeVisits",
+            qualifiedByName = "idToOneTimeVisits")
+    @Mapping(target = "subscriptions", source = "subscriptions",
+            qualifiedByName = "idToSubscriptions")
+    @Mapping(target = "branch", expression = "java(resolveBranch(dto.branchId(), branchRepository))")
+    void updateFromDto(EventTypeRequestDTO  dto,
+                       @MappingTarget EventTypeEntity entity,
+                       @Context ServiceRepository serviceRepository,
+                       @Context BranchRepository branchRepository,
+                       @Context OneTimeOfferRepository oneTimeOfferRepository,
+                       @Context SubscriptionOfferRepository subscriptionOfferRepository);
 
     // --- default methods ---
 

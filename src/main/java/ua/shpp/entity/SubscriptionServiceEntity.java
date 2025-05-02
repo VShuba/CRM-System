@@ -41,17 +41,21 @@ public class SubscriptionServiceEntity {
     @Column(nullable = false)
     private Long price;
 
-    public Period getTermOfValidityInDays() {
-        return termOfValidityInDays;
-    }
-
     public void setTermOfValidityInDays(Integer termOfValidityInDays) {
         this.termOfValidityInDays = Period.ofDays(termOfValidityInDays);
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "event_type_id", nullable = false)
-    private EventTypeEntity eventType;
+    @ManyToMany(mappedBy = "subscriptions",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
+    private List<EventTypeEntity> eventType = new ArrayList<>();
+
+    @PreRemove
+    private void preRemove() {
+        for (EventTypeEntity type : new ArrayList<>(eventType)) {
+            type.getSubscriptions().remove(this);
+        }
+    }
 
     @OneToMany(
             mappedBy = "subscriptionService",

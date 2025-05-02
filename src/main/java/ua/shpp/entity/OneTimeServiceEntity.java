@@ -32,17 +32,22 @@ public class OneTimeServiceEntity {
     @Column(name = "price", nullable = false)
     private Long price;
 
-    public Duration getDurationInMinutes() {
-        return durationInMinutes;
-    }
-
     public void setDurationInMinutes(long durationInMinutes) {
         this.durationInMinutes = Duration.ofMinutes(durationInMinutes);
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "event_type_id", nullable = false)
-    private EventTypeEntity eventType;
+    @ManyToMany(
+            mappedBy = "oneTimeVisits",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
+    private List<EventTypeEntity> eventType = new ArrayList<>();
+
+    @PreRemove
+    private void preRemove() {
+        for (EventTypeEntity type : new ArrayList<>(eventType)) {
+            type.getOneTimeVisits().remove(this);
+        }
+    }
 
     @OneToMany(
             mappedBy = "oneTimeService",
