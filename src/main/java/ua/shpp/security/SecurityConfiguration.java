@@ -45,9 +45,15 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())//TODO 11:31 22.04.2025 КОСТИЛЬ треба розібратися як з цим працювати :)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/**").authenticated()
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/auth/**", "/h2-console/*", "/oauth2/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(
+                                "/auth/**",
+                                "/h2-console/*",
+                                "/oauth2/**",
+                                "/swagger-ui/**",
+                                "/swagger-resources/*",
+                                "/v3/api-docs/**",
+                                "/actuator/**"
+                        ).permitAll()
                         .anyRequest().permitAll())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .oauth2Login(oauth -> oauth.successHandler(oAuthSuccessHandle))
