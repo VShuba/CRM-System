@@ -24,9 +24,7 @@ public class ScheduleEventEntity {
     //  Обрати працівника
     //  Обрати тип заходу
     //  Обрати послугу
-    @ManyToOne(fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "service_id", nullable = false)
     private ServiceEntity serviceEntity;
     //  Налаштувати час провещення івенту

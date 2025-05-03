@@ -33,12 +33,12 @@ public class EventClientEntity {
     private ClientEventStatus clientEventStatus;
 
     // Додано, щоб зв’язати відвідування конкретної події з придбаним OneTimeInfoEntity
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "one_time_info_id")
     private OneTimeInfoEntity oneTimeInfo;
 
     // Додано, щоб зв’язати відвідування конкретної події з SubscriptionInfoEntity
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "subscription_info_id")
     private SubscriptionInfoEntity subscriptionInfo;
 }

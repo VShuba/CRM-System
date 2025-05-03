@@ -14,10 +14,10 @@ public record EventClientDto(
         @Schema(description = "Client participation status in the event", example = "ASSIGNED")
         ClientEventStatus clientEventStatus,
 
-        @Schema(description = "Purchased single visit ID (if any)")
+        @Schema(description = "Purchased single visit ID (if any)", example = "1")
         Long oneTimeInfoId,
 
-        @Schema(description = "Purchased subscription ID (if applicable)")
+        @Schema(description = "Purchased subscription ID (if applicable)", example = "1")
         Long subscriptionInfoId
 ) {
 }

@@ -4,6 +4,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.ClientRequestDto;
 import ua.shpp.dto.EventClientDto;
+import ua.shpp.entity.payment.OneTimeInfoEntity;
+import ua.shpp.entity.payment.SubscriptionInfoEntity;
 import ua.shpp.service.EventClientService;
 
 @RestController

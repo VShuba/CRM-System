@@ -2,7 +2,6 @@ package ua.shpp.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ua.shpp.dto.ClientRequestDto;
 import ua.shpp.dto.ClientResponseDto;
 import ua.shpp.dto.EventClientDto;
@@ -16,9 +15,7 @@ import ua.shpp.exception.EventForClientNotFoundException;
 import ua.shpp.exception.EventNotFoundException;
 import ua.shpp.mapper.EventClientMapper;
 import ua.shpp.model.ClientEventStatus;
-import ua.shpp.repository.ClientRepository;
-import ua.shpp.repository.EventClientRepository;
-import ua.shpp.repository.ScheduleEventRepository;
+import ua.shpp.repository.*;
 
 @Service
 @Slf4j
@@ -30,16 +27,22 @@ public class EventClientService {
     private final ClientService clientService;
     private final VisitHistoryService visitHistoryService;
     private final EventClientMapper eventClientMapper;
+    private final OneTimeInfoRepository oneTimeInfoRepository;
+    private final SubscriptionInfoRepository subscriptionInfoRepository;
 
     public EventClientService(EventClientRepository eventClientRepository, ClientRepository clientRepository,
                               ScheduleEventRepository scheduleEventRepository, ClientService clientService,
-                              VisitHistoryService visitHistoryService, EventClientMapper eventClientMapper) {
+                              VisitHistoryService visitHistoryService, EventClientMapper eventClientMapper,
+                              OneTimeInfoRepository oneTimeInfoRepository,
+                              SubscriptionInfoRepository subscriptionInfoRepository) {
         this.eventClientRepository = eventClientRepository;
         this.clientRepository = clientRepository;
         this.scheduleEventRepository = scheduleEventRepository;
         this.clientService = clientService;
         this.visitHistoryService = visitHistoryService;
         this.eventClientMapper = eventClientMapper;
+        this.oneTimeInfoRepository = oneTimeInfoRepository;
+        this.subscriptionInfoRepository = subscriptionInfoRepository;
     }
 
     public EventClientDto addClientToEvent(Long clientId, Long eventId) {
@@ -92,6 +95,14 @@ public class EventClientService {
                     oldStatus, newStatus);
 
             eventClientEntity.setClientEventStatus(newStatus);
+
+            if (eventClientDto.oneTimeInfoId() != null) {
+                eventClientEntity.setOneTimeInfo(oneTimeInfoRepository
+                        .findById(eventClientDto.oneTimeInfoId()).orElseThrow());
+            } else if(eventClientDto.subscriptionInfoId() != null) {
+                eventClientEntity.setSubscriptionInfo(subscriptionInfoRepository
+                        .findById(eventClientDto.subscriptionInfoId()).orElseThrow());
+            }
 
             EventClientEntity savedEventClient = eventClientRepository.save(eventClientEntity);
             log.info("Status changed successfully for client {} on event {} to {}",

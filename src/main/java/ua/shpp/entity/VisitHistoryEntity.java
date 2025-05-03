@@ -22,8 +22,9 @@ public class VisitHistoryEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "client_id", nullable = false)
-    private Long clientId;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "client_id", nullable = false)
+    private ClientEntity client;
 
     @Column(name = "service_color", nullable = false, length = 20)
     private String serviceColor;

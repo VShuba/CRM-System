@@ -8,7 +8,7 @@ INSERT INTO organizations (name)
 VALUES ('Test Organization');
 
 -- Create branch (location)
-INSERT INTO branches (name, organization_id, address, phone_number )
+INSERT INTO branches (name, organization_id, address, phone_number)
 VALUES ('Main Branch', 1, 'Street 1, Building 2', '+380671233344');
 
 -- Create rooms
@@ -23,4 +23,5 @@ VALUES ('Haircut', '#FF5733', 1),
 
 -- Create event_type
 INSERT INTO event_type (name, branch_id)
-VALUES ('Group',1);
+VALUES ('Group', 1);
+

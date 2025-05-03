@@ -10,19 +10,19 @@ import java.time.LocalTime;
 
 @Schema(description = "History of visits")
 public record VisitHistoryDTO(
-        @Schema(description = "Visit history identifier")
+        @Schema(description = "Visit history identifier", example = "1")
         Long id,
 
-        @Schema(description = "Customer ID")
+        @Schema(description = "Customer ID", example = "1")
         Long clientId,
 
-        @Schema(description = "Color is tied to the service")
+        @Schema(description = "Color is tied to the service", example = "#AABBCC")
         String serviceColor,
 
-        @Schema(description = "Name of the service")
+        @Schema(description = "Name of the service", example = "Pool-dance")
         String serviceName,
 
-        @Schema(description = "Full name of the coach")
+        @Schema(description = "Full name of the trainer", example = "Alina Kucheryava")
         String trainerFullName,
 
         @Schema(description = "Date of visit", example = "2025-04-27")
