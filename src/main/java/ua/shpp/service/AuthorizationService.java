@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ua.shpp.model.OrgRole;
 import ua.shpp.repository.BranchRepository;
+import ua.shpp.repository.EmployeeRepository;
 import ua.shpp.repository.ServiceRepository;
 import ua.shpp.repository.UserOrganizationRepository;
 
@@ -16,6 +17,7 @@ public class AuthorizationService {
     private final UserOrganizationRepository userOrganizationRepository;
     private final UserService userService;
     private final BranchRepository branchRepository;
+    private final EmployeeRepository employeeRepository;
     private final ServiceRepository serviceRepository;
 
     public boolean hasRoleInOrg(Long organizationId, String expectedRole) {
@@ -66,4 +68,25 @@ public class AuthorizationService {
         return hasRoleByBranchId(branchId, expectedRole);
     }
 
+    public boolean hasRoleInOrgByBranchId(Long branchId, String expectedRole) {
+        Long organizationId = branchRepository.findOrganizationIdByBranchId(branchId);
+
+        if (organizationId == null) {
+            return false;
+        }
+
+        log.info("OrganizationId: {}", organizationId);
+        return hasRoleInOrg(organizationId, expectedRole);
+    }
+
+    public boolean hasRoleInOrgByEmployeeId(Long employeeId, String expectedRole) {
+        Long branchId = employeeRepository.getBranchIdById(employeeId);
+
+        if (branchId == null) {
+            return false;
+        }
+
+        log.info("BranchId: {}", branchId);
+        return hasRoleInOrgByBranchId(branchId, expectedRole);
+    }
 }
