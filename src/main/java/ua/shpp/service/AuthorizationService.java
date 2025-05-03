@@ -20,6 +20,10 @@ public class AuthorizationService {
     private final EmployeeRepository employeeRepository;
     private final ServiceRepository serviceRepository;
 
+    /**
+     * @deprecated This method is deprecated. Use {@link #hasRoleInOrgByOrgId(Long, OrgRole)}
+     * to check the user's role in the organization, passing role via the enum {@link OrgRole}.
+     */
     @Deprecated
     public boolean hasRoleInOrg(Long organizationId, String expectedRole) {
 
@@ -40,6 +44,10 @@ public class AuthorizationService {
         );
     }
 
+    /**
+     * @deprecated This method is deprecated. Use {@link #hasRoleInOrgByBranchId(Long, OrgRole)}
+     * to check the user's role in the organization with branchId, passing role via the enum {@link OrgRole}.
+     */
     @Deprecated
     public boolean hasRoleByBranchId(Long branchId, String expectedRole) {
         OrgRole requiredRole;
