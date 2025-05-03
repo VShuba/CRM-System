@@ -81,10 +81,6 @@ public class ServiceService {
         repository.delete(service);
     }
 
-    public Page<String> getAllServiceNames(Pageable pageable) {
-        return repository.findAllServiceNames(pageable);
-    }
-
     public Page<ServiceResponseDTO> getAll(Long branchId, Pageable pageable) {
 
         Page<ServiceEntity> allByBranchId = repository.findAllByBranchId(getBranchById(branchId).getId(), pageable);

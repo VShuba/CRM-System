@@ -9,11 +9,12 @@ import ua.shpp.entity.ServiceEntity;
 import java.util.List;
 
 public interface ServiceRepository extends JpaRepository<ServiceEntity, Long> {
-    @Query("SELECT s.name FROM ServiceEntity s")
-    Page<String> findAllServiceNames(Pageable pageable);
 
     @Query(nativeQuery = true, value = "SELECT service_name FROM services WHERE service_name IN (:names) AND branch_id = :branchId")
     List<String> findAllServiceNamesByNamesAndBranch(List<String> names, Long branchId);
 
     Page<ServiceEntity> findAllByBranchId(Long branchId, Pageable pageable);
+
+    @Query("SELECT s.branch.id FROM ServiceEntity s WHERE s.id = :serviceId")
+    Long findBranchIdByServiceId(Long serviceId);
 }

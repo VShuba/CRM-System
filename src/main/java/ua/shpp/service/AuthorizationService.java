@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ua.shpp.model.OrgRole;
+import ua.shpp.repository.BranchRepository;
+import ua.shpp.repository.ServiceRepository;
 import ua.shpp.repository.UserOrganizationRepository;
 
 @Slf4j
@@ -13,15 +15,10 @@ public class AuthorizationService {
 
     private final UserOrganizationRepository userOrganizationRepository;
     private final UserService userService;
+    private final BranchRepository branchRepository;
+    private final ServiceRepository serviceRepository;
 
     public boolean hasRoleInOrg(Long organizationId, String expectedRole) {
-//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//
-//        if (!(principal instanceof UserEntity user)) {
-//            log.warn("Principal is not a UserEntity");
-//            return false;
-//        }
-
 
         OrgRole requiredRole;
         try {
@@ -39,4 +36,34 @@ public class AuthorizationService {
                 requiredRole
         );
     }
+
+    public boolean hasRoleByBranchId(Long branchId, String expectedRole) {
+        OrgRole requiredRole;
+        try {
+            requiredRole = OrgRole.valueOf(expectedRole);
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid role: {}", expectedRole);
+            return false;
+        }
+
+        Long userId = userService.getCurrentUserId();
+
+        // Найди организацию по branchId
+        Long organizationId = branchRepository.findOrganizationIdByBranchId(branchId);
+        if (organizationId == null) {
+            return false;
+        }
+
+        return userOrganizationRepository.existsByUserIdAndOrganizationIdAndRole(userId, organizationId, requiredRole);
+    }
+
+    public boolean hasRoleByServiceId(Long serviceId, String expectedRole) {
+        Long branchId = serviceRepository.findBranchIdByServiceId(serviceId);
+        if (branchId == null) {
+            log.warn("Branch not found for serviceId: {}", serviceId);
+            return false;
+        }
+        return hasRoleByBranchId(branchId, expectedRole);
+    }
+
 }

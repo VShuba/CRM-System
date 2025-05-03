@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.ServiceRequestDTO;
 import ua.shpp.dto.ServiceResponseDTO;
@@ -35,6 +36,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
     })
     @PostMapping
+    @PreAuthorize("@authz.hasRoleByBranchId(#requestDTO.branchId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<ServiceResponseDTO> createService(
             @RequestBody @Valid ServiceRequestDTO requestDTO) {
         return new ResponseEntity<>(serviceService.create(requestDTO), HttpStatus.CREATED);
@@ -48,23 +50,9 @@ public class ServiceController {
             @ApiResponse(responseCode = "404", description = "Service not found", content = @Content)
     })
     @GetMapping("/{id}")
+    @PreAuthorize("@authz.hasRoleByServiceId(#id, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<ServiceResponseDTO> getService(@PathVariable Long id) {
         return new ResponseEntity<>(serviceService.get(id), HttpStatus.OK);
-    }
-
-    @Operation(summary = "Get all service names", description = "Returns a paginated list of service names")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Paginated service names retrieved successfully",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = String.class)))
-    })
-    @GetMapping("/names")
-    public ResponseEntity<Page<String>> getAllServiceNames(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return new ResponseEntity<>(
-                serviceService.getAllServiceNames(PageRequest.of(page, size)),
-                HttpStatus.OK);
     }
 
     @Operation(
@@ -82,6 +70,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content)
     })
     @GetMapping("/branches/{branchId}")
+    @PreAuthorize("@authz.hasRoleByBranchId(#branchId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<Page<ServiceResponseDTO>> getAllServices(
             @PathVariable Long branchId,
             @ParameterObject Pageable pageable) {
@@ -96,7 +85,9 @@ public class ServiceController {
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
             @ApiResponse(responseCode = "404", description = "Service not found", content = @Content)
     })
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
+    @PreAuthorize("@authz.hasRoleByServiceId(#id, 'ADMIN') and @authz.hasRoleByBranchId(#requestDTO.branchId, 'ADMIN')" +
+            " or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<ServiceResponseDTO> updateService(
             @PathVariable Long id,
             @RequestBody @Valid ServiceRequestDTO requestDTO) {
@@ -109,6 +100,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "404", description = "Service not found", content = @Content)
     })
     @DeleteMapping("/{id}")
+    @PreAuthorize("@authz.hasRoleByServiceId(#id, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<Void> deleteService(@PathVariable Long id) {
         serviceService.delete(id);
         return ResponseEntity.noContent().build();
