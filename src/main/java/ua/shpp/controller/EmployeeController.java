@@ -32,9 +32,12 @@ public class EmployeeController {
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new employee with avatar and JSON data")
     public ResponseEntity<EmployeeResponseDTO> addEmployee(@RequestPart(name = "avatar") MultipartFile avatarImg,
-                                                           @Schema(description = "JSON-formatted employee data (EmployeeCreateRequestDTO) as string",
+                                                           @Schema(
+                                                                   description = "JSON-formatted employee data " +
+                                                                           "(EmployeeCreateRequestDTO) as string",
                                                                    requiredMode = Schema.RequiredMode.REQUIRED,
-                                                                   implementation = EmployeeCreateRequestDTO.class)
+                                                                   implementation = EmployeeCreateRequestDTO.class
+                                                           )
                                                            @RequestPart(name = "employee") String employeeDTOStr) {
         try {
             EmployeeCreateRequestDTO employeeCreateRequestDTO = objectMapper.readValue(employeeDTOStr, EmployeeCreateRequestDTO.class);
@@ -50,9 +53,7 @@ public class EmployeeController {
 
     @DeleteMapping("/employee")
     @Operation(summary = "Delete employee from branch")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN') or " +
-            "@authz.hasRoleInOrgByEmployeeId(#requestDTO.employeeId(), 'MANAGER') or " +
-            "@authz.hasRoleInOrgByEmployeeId(#requestDTO.employeeId(), 'ADMIN')")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN') or @authz.hasRoleInOrgByEmployeeId(#requestDTO.employeeId(), OrgRole.MANAGER)")
     public ResponseEntity<Void> deleteEmployeeFromBranch(@RequestBody EmployeeDeleteRequestDTO requestDTO) {
         if (employeeService.deleteEmployee(requestDTO.employeeId())) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
