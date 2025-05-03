@@ -85,6 +85,10 @@ public class AuthorizationService {
         Long userId = userService.getCurrentUserId();
 
         OrgRole currentUserRole = userOrganizationRepository.getUserRoleInOrganization(userId, organizationId);
+        log.info("current user role: {}", currentUserRole);
+        if (currentUserRole == null) {
+            return false;
+        }
 
         return currentUserRole.hasAccessLevelTo(requiredAccessRole);
     }
@@ -101,6 +105,7 @@ public class AuthorizationService {
     }
 
     public boolean hasRoleInOrgByEmployeeId(Long employeeId, OrgRole requiredAccessRole) {
+        log.info("employeeId: {}. requiredAccessRole: {}", employeeId, requiredAccessRole.name());
         Long branchId = employeeRepository.getBranchIdById(employeeId);
 
         if (branchId == null) {
