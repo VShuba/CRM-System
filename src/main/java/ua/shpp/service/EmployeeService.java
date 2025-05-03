@@ -75,20 +75,9 @@ public class EmployeeService {
         return employeeMapper.employeeEntityToEmployeeResponseDTO(employeeEntity, base64Avatar);
     }
 
-    /**
-     * Unbinds an employee from a specific branch by deleting the relationship
-     * between the employee and the branch, and removes the employee's related
-     * service associations for that branch, meaning the employee will no longer
-     * be associated with any services provided at that branch.
-     *
-     * @param employeeId the ID of the employee to be unlinked from the branch
-     * @param branchId   the ID of the branch to unlink the employee from
-     * @return true if the employee was unbounded from the branch (i.e., if any records were deleted),
-     * false if the employee was not found in the branch (no records were affected)
-     */
     @Transactional
-    public boolean unbindEmployeeFromBranch(Long employeeId, Long branchId) {
-        int deletedRecords = employeeRepository.unbindEmployeeFromBranch(employeeId, branchId);
+    public boolean deleteEmployee(Long employeeId) {
+        int deletedRecords = 1;
         log.info("Records deleted: {}", deletedRecords);
         return deletedRecords > 0;
     }

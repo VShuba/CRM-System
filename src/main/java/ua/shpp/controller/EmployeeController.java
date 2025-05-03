@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ua.shpp.dto.employee.EmployeeBranchDeleteRequestDTO;
+import ua.shpp.dto.employee.EmployeeDeleteRequestDTO;
 import ua.shpp.dto.employee.EmployeeCreateRequestDTO;
 import ua.shpp.dto.employee.EmployeeResponseDTO;
 import ua.shpp.exception.InvalidJsonFormatException;
@@ -49,8 +49,8 @@ public class EmployeeController {
 
     @DeleteMapping("/employee")
     @Operation(summary = "Delete employee from branch")
-    public ResponseEntity<Void> deleteEmployeeFromBranch(@RequestBody EmployeeBranchDeleteRequestDTO requestDTO) {
-        if (employeeService.unbindEmployeeFromBranch(requestDTO.employeeId(), requestDTO.branchId())) {
+    public ResponseEntity<Void> deleteEmployeeFromBranch(@RequestBody EmployeeDeleteRequestDTO requestDTO) {
+        if (employeeService.deleteEmployee(requestDTO.employeeId())) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
