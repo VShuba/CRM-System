@@ -41,7 +41,7 @@ public class RoomEntity {
     @JoinColumn(name = "branch_id", nullable = false)
     private BranchEntity branch;
 
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, orphanRemoval = true)
     @Column(name = "schedule_event_id")
     private List<ScheduleEventEntity> scheduleEventEntities;
 

@@ -60,7 +60,7 @@ public class EmployeeEntity {
     @Builder.Default
     private Set<ServiceEntity> services = new HashSet<>();
 
-    @OneToMany(mappedBy = "employee")
+    @OneToMany(mappedBy = "employee",fetch = FetchType.LAZY, orphanRemoval = true)
     @Column(name = "schedule_event_id")
     private List<ScheduleEventEntity> scheduleEventEntities;
 

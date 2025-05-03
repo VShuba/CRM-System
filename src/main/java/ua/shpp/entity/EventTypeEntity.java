@@ -57,7 +57,10 @@ public class EventTypeEntity {
         }
     }
 
-    @OneToMany(mappedBy = "eventType")
+    @OneToMany(mappedBy = "eventType",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @Column(name = "schedule_event_id")
     private List<ScheduleEventEntity> scheduleEventEntities;
 
