@@ -63,4 +63,15 @@ public class EmployeeEntity {
     @OneToMany(mappedBy = "employee")
     @Column(name = "schedule_event_id")
     private List<ScheduleEventEntity> scheduleEventEntities;
+
+    @PreRemove
+    private void preRemove() {
+        for (ScheduleEventEntity scheduleEvent : this.scheduleEventEntities) {
+            scheduleEvent.setEmployee(null);
+        }
+
+        for (ServiceEntity service : this.services) {
+            service.getEmployees().remove(this);
+        }
+    }
 }
