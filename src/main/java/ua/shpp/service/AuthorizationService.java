@@ -20,6 +20,7 @@ public class AuthorizationService {
     private final EmployeeRepository employeeRepository;
     private final ServiceRepository serviceRepository;
 
+    @Deprecated
     public boolean hasRoleInOrg(Long organizationId, String expectedRole) {
 
         OrgRole requiredRole;
@@ -39,6 +40,7 @@ public class AuthorizationService {
         );
     }
 
+    @Deprecated
     public boolean hasRoleByBranchId(Long branchId, String expectedRole) {
         OrgRole requiredRole;
         try {
@@ -68,7 +70,18 @@ public class AuthorizationService {
         return hasRoleByBranchId(branchId, expectedRole);
     }
 
-    public boolean hasRoleInOrgByBranchId(Long branchId, String expectedRole) {
+
+    /*<---------------------------------------------------------------------------------->*/
+
+    private boolean hasRoleInOrgByOrgId(Long organizationId, OrgRole requiredAccessRole) {
+        Long userId = userService.getCurrentUserId();
+
+        OrgRole currentUserRole = userOrganizationRepository.getUserRoleInOrganization(userId, organizationId);
+
+        return currentUserRole.hasAccessLevelTo(requiredAccessRole);
+    }
+
+    public boolean hasRoleInOrgByBranchId(Long branchId, OrgRole requiredAccessRole) {
         Long organizationId = branchRepository.findOrganizationIdByBranchId(branchId);
 
         if (organizationId == null) {
@@ -76,10 +89,10 @@ public class AuthorizationService {
         }
 
         log.info("OrganizationId: {}", organizationId);
-        return hasRoleInOrg(organizationId, expectedRole);
+        return hasRoleInOrgByOrgId(organizationId, requiredAccessRole);
     }
 
-    public boolean hasRoleInOrgByEmployeeId(Long employeeId, String expectedRole) {
+    public boolean hasRoleInOrgByEmployeeId(Long employeeId, OrgRole requiredAccessRole) {
         Long branchId = employeeRepository.getBranchIdById(employeeId);
 
         if (branchId == null) {
@@ -87,6 +100,6 @@ public class AuthorizationService {
         }
 
         log.info("BranchId: {}", branchId);
-        return hasRoleInOrgByBranchId(branchId, expectedRole);
+        return hasRoleInOrgByBranchId(branchId, requiredAccessRole);
     }
 }
