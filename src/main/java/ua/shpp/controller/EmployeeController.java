@@ -53,7 +53,7 @@ public class EmployeeController {
 
     @DeleteMapping("/employee")
     @Operation(summary = "Delete employee from branch")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN') or @authz.hasRoleInOrgByEmployeeId(#requestDTO.employeeId(), OrgRole.MANAGER)")
+    @PreAuthorize("@authz.hasRoleInOrgByEmployeeId(#requestDTO.employeeId(), T(ua.shpp.model.OrgRole).MANAGER)")
     public ResponseEntity<Void> deleteEmployeeFromBranch(@RequestBody EmployeeDeleteRequestDTO requestDTO) {
         if (employeeService.deleteEmployee(requestDTO.employeeId())) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
