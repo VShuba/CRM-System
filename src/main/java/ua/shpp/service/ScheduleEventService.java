@@ -7,10 +7,7 @@ import ua.shpp.dto.ScheduleEventDto;
 import ua.shpp.entity.ScheduleEventEntity;
 import ua.shpp.exception.EventNotFoundException;
 import ua.shpp.mapper.ScheduleEventMapper;
-import ua.shpp.repository.EmployeeRepository;
-import ua.shpp.repository.RoomRepository;
-import ua.shpp.repository.ScheduleEventRepository;
-import ua.shpp.repository.ServiceRepository;
+import ua.shpp.repository.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,6 +21,7 @@ public class ScheduleEventService {
     private final ServiceRepository serviceRepository;
     private final EmployeeRepository employeeRepository;
     private final RoomRepository roomRepository;
+    private final EventTypeRepository eventTypeRepository;
 
     public ScheduleEventDto create(ScheduleEventDto scheduleEventDto) {
         log.debug("create() called with DTO: {}", scheduleEventDto);
@@ -31,7 +29,8 @@ public class ScheduleEventService {
         var entity = scheduleEventMapper.toEntity(scheduleEventDto,
                 serviceRepository,
                 employeeRepository,
-                roomRepository);
+                roomRepository,
+                eventTypeRepository);
         entity.setId(null);
         entity = scheduleEventRepository.save(entity);
         log.info("Created schedule event (id={})", entity.getId());
