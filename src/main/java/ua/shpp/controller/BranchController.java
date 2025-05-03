@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.branch.BranchPatchRequestDTO;
 import ua.shpp.dto.branch.BranchRequestDTO;
@@ -40,6 +41,7 @@ public class BranchController {
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
     })
     @PostMapping
+    @PreAuthorize("hasAuthority('USER') and @authz.hasRoleInOrg(#orgId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<BranchResponseDTO> createBranch(
             @PathVariable Long orgId,
             @RequestBody @Valid BranchRequestDTO requestDTO) {
@@ -58,6 +60,7 @@ public class BranchController {
             @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content)
     })
     @GetMapping("/{branchId}")
+    @PreAuthorize("hasAuthority('USER') and @authz.hasRoleInOrg(#orgId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<BranchResponseDTO> getBranch(
             @PathVariable Long orgId,
             @PathVariable Long branchId) {
@@ -70,6 +73,7 @@ public class BranchController {
             @ApiResponse(responseCode = "404", description = "Branches not found", content = @Content)
     })
     @GetMapping
+    @PreAuthorize("hasAuthority('USER') and @authz.hasRoleInOrg(#orgId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<Page<BranchResponseDTO>> getAllBranch(
             @PathVariable Long orgId,
             @ParameterObject Pageable pageable) {
@@ -86,6 +90,7 @@ public class BranchController {
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
     })
     @PatchMapping("/{branchId}")
+    @PreAuthorize("hasAuthority('USER') and @authz.hasRoleInOrg(#orgId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<BranchResponseDTO> updateBranch(
             @PathVariable Long orgId,
             @PathVariable Long branchId,
@@ -94,6 +99,7 @@ public class BranchController {
     }
 
     @PatchMapping("/{branchId}/working-hours")
+    @PreAuthorize("hasAuthority('USER') and @authz.hasRoleInOrg(#orgId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<BranchResponseDTO> updateWorkingHours(
             @PathVariable Long orgId,
             @PathVariable Long branchId,
@@ -107,6 +113,7 @@ public class BranchController {
             @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content)
     })
     @DeleteMapping("/{branchId}")
+    @PreAuthorize("hasAuthority('USER') and @authz.hasRoleInOrg(#orgId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<Void> deleteBranch(
             @PathVariable Long orgId,
             @PathVariable Long branchId) {

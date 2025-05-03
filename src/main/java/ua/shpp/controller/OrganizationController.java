@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.OrganizationRequestDTO;
 import ua.shpp.dto.OrganizationResponseDTO;
@@ -36,6 +37,7 @@ public class OrganizationController {
                     content = @Content)
     })
     @PostMapping
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<OrganizationResponseDTO> createOrganization(
             @RequestBody @Valid OrganizationRequestDTO requestDTO) {
         return new ResponseEntity<>(organizationService.create(requestDTO), HttpStatus.CREATED);
@@ -49,6 +51,7 @@ public class OrganizationController {
             @ApiResponse(responseCode = "404", description = "Organization not found", content = @Content)
     })
     @GetMapping("/{id}")
+    @PreAuthorize("@authz.hasRoleInOrg(#id, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<OrganizationResponseDTO> getOrganization(@PathVariable Long id) {
         return new ResponseEntity<>(organizationService.get(id), HttpStatus.OK);
     }
@@ -66,6 +69,7 @@ public class OrganizationController {
             )
     })
     @GetMapping
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<Page<OrganizationResponseDTO>> getAllOrganizations(
             @ParameterObject Pageable pageable) {
         return ResponseEntity.ok(organizationService.getAll(pageable));
@@ -82,6 +86,7 @@ public class OrganizationController {
                     content = @Content)
     })
     @PatchMapping("/{id}")
+    @PreAuthorize("@authz.hasRoleInOrg(#id, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<OrganizationResponseDTO> updateOrganization(
             @PathVariable Long id,
             @RequestBody @Valid OrganizationRequestDTO requestDTO) {
@@ -95,8 +100,9 @@ public class OrganizationController {
     })
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@authz.hasRoleInOrg(#id, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<Void> deleteOrganization(@PathVariable Long id) {
-        organizationService.delete(id);
+        organizationService.delete(id); // todo  а може адмін організації видалити свою оргу? Якщо він неадекват?
         return ResponseEntity.noContent().build();
     }
 }
