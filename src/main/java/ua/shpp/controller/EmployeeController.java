@@ -10,10 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ua.shpp.dto.employee.EmployeeDeleteRequestDTO;
 import ua.shpp.dto.employee.EmployeeCreateRequestDTO;
+import ua.shpp.dto.employee.EmployeeDeleteRequestDTO;
 import ua.shpp.dto.employee.EmployeeResponseDTO;
 import ua.shpp.exception.InvalidJsonFormatException;
 import ua.shpp.service.EmployeeService;
@@ -49,6 +50,8 @@ public class EmployeeController {
 
     @DeleteMapping("/employee")
     @Operation(summary = "Delete employee from branch")
+    @PreAuthorize("@authz.hasRoleInOrgByEmployeeId(hasAuthority('SUPER_ADMIN') or #requestDTO.employeeId(), 'MANAGER') " +
+            "or @authz.hasRoleInOrgByEmployeeId(#requestDTO.employeeId(), 'ADMIN')")
     public ResponseEntity<Void> deleteEmployeeFromBranch(@RequestBody EmployeeDeleteRequestDTO requestDTO) {
         if (employeeService.deleteEmployee(requestDTO.employeeId())) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
