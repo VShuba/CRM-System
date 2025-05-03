@@ -1,6 +1,5 @@
 package ua.shpp.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -75,11 +74,13 @@ public class EmployeeService {
         return employeeMapper.employeeEntityToEmployeeResponseDTO(employeeEntity, base64Avatar);
     }
 
-    @Transactional
     public boolean deleteEmployee(Long employeeId) {
-        int deletedRecords = 1;
-        log.info("Records deleted: {}", deletedRecords);
-        return deletedRecords > 0;
+        if (!employeeRepository.existsById(employeeId)) {
+            return false;
+        }
+
+        employeeRepository.deleteById(employeeId);
+        return true;
     }
 
     /**
