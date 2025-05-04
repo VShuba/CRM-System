@@ -14,7 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ua.shpp.dto.employee.EmployeeCreateRequestDTO;
-import ua.shpp.dto.employee.EmployeeDeleteRequestDTO;
 import ua.shpp.dto.employee.EmployeeResponseDTO;
 import ua.shpp.exception.InvalidJsonFormatException;
 import ua.shpp.service.EmployeeService;
@@ -51,14 +50,14 @@ public class EmployeeController {
         }
     }
 
-    @DeleteMapping("/employee")
-    @Operation(summary = "Delete employee from branch")
+    @DeleteMapping("/employee/{id}")
+    @Operation(summary = "Delete employee")
     @PreAuthorize("""
             hasAuthority('SUPER_ADMIN') or
-            @authz.hasRoleInOrgByEmployeeId(#requestDTO.employeeId(), T(ua.shpp.model.OrgRole).MANAGER)
+            @authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).MANAGER)
             """)
-    public ResponseEntity<Void> deleteEmployeeFromBranch(@RequestBody EmployeeDeleteRequestDTO requestDTO) {
-        if (employeeService.deleteEmployee(requestDTO.employeeId())) {
+    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+        if (employeeService.deleteEmployee(id)) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
