@@ -2,7 +2,11 @@ package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import ua.shpp.model.GlobalRole;
 import ua.shpp.model.OrgRole;
 import ua.shpp.repository.BranchRepository;
 import ua.shpp.repository.EmployeeRepository;
@@ -114,5 +118,11 @@ public class AuthorizationService {
 
         log.info("BranchId: {}", branchId);
         return hasRoleInOrgByBranchId(branchId, requiredAccessRole);
+    }
+
+    private boolean isSuperAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null &&
+                authentication.getAuthorities().contains(new SimpleGrantedAuthority(GlobalRole.SUPER_ADMIN.name()));
     }
 }
