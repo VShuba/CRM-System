@@ -24,7 +24,8 @@ public class EventTypeEntity {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @ManyToMany(
+    @OneToMany(
+            orphanRemoval = true,
             cascade = CascadeType.ALL
             , fetch = FetchType.LAZY
     )
@@ -35,7 +36,8 @@ public class EventTypeEntity {
     )
     private List<OneTimeServiceEntity> oneTimeVisits = new ArrayList<>();
 
-    @ManyToMany(
+    @OneToMany(
+            orphanRemoval = true,
             cascade = CascadeType.ALL
             , fetch = FetchType.LAZY
     )
@@ -46,16 +48,6 @@ public class EventTypeEntity {
     )
     private List<SubscriptionServiceEntity> subscriptions = new ArrayList<>();
 
-    @PreRemove
-    private void preRemove() {
-        for (OneTimeServiceEntity oneTimeService : new ArrayList<>(oneTimeVisits)) {
-            oneTimeService.getEventType().remove(this);
-        }
-
-        for (SubscriptionServiceEntity subscriptionService : new ArrayList<>(subscriptions)) {
-            subscriptionService.getEventType().remove(this);
-        }
-    }
 
     @OneToMany(mappedBy = "eventType",
             fetch = FetchType.LAZY,

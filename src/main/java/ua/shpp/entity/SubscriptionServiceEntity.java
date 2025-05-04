@@ -45,17 +45,17 @@ public class SubscriptionServiceEntity {
         this.termOfValidityInDays = Period.ofDays(termOfValidityInDays);
     }
 
-    @ManyToMany(mappedBy = "subscriptions",
+    @ManyToOne(
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL)
-    private List<EventTypeEntity> eventType = new ArrayList<>();
+    private EventTypeEntity eventType;
 
-    @PreRemove
-    private void preRemove() {
-        for (EventTypeEntity type : new ArrayList<>(eventType)) {
-            type.getSubscriptions().remove(this);
-        }
-    }
+//    @PreRemove
+//    private void preRemove() {
+//        for (EventTypeEntity type : new ArrayList<>(eventType)) {
+//            type.getSubscriptions().remove(this);
+//        }
+//    }
 
     @OneToMany(
             mappedBy = "subscriptionService",
