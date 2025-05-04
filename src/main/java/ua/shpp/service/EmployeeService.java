@@ -10,6 +10,7 @@ import ua.shpp.dto.employee.EmployeeServiceCreateDTO;
 import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.EmployeeEntity;
 import ua.shpp.entity.ServiceEntity;
+import ua.shpp.exception.EntityNotFoundException;
 import ua.shpp.mapper.EmployeeMapper;
 import ua.shpp.repository.BranchRepository;
 import ua.shpp.repository.EmployeeRepository;
@@ -71,6 +72,15 @@ public class EmployeeService {
 
         String base64Avatar = ImageUtil.convertImageToBase64(resizedBytesAvatar);
 
+        return employeeMapper.employeeEntityToEmployeeResponseDTO(employeeEntity, base64Avatar);
+    }
+
+    public EmployeeResponseDTO getEmployee(Long id) {
+        log.info("Start getEmployee with id: {}", id);
+        EmployeeEntity employeeEntity = employeeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Employee with id " + id + " not found"));
+        log.info("End getEmployee with id: {}", id);
+        String base64Avatar = ImageUtil.convertImageToBase64(employeeEntity.getAvatar());
         return employeeMapper.employeeEntityToEmployeeResponseDTO(employeeEntity, base64Avatar);
     }
 

@@ -50,6 +50,18 @@ public class EmployeeController {
         }
     }
 
+    @GetMapping("/employee/{id}")
+    @Operation(summary = "Get employee")
+    @PreAuthorize("""
+            hasAuthority('SUPER_ADMIN') or
+            @authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).MANAGER)
+            """)
+    public ResponseEntity<EmployeeResponseDTO> getEmployee(@PathVariable Long id) {
+        EmployeeResponseDTO employeeResponseDTO = employeeService.getEmployee(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(employeeResponseDTO);
+    }
+
     @DeleteMapping("/employee/{id}")
     @Operation(summary = "Delete employee")
     @PreAuthorize("""

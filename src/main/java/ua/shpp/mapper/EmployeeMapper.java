@@ -20,7 +20,6 @@ public interface EmployeeMapper {
 
     @Mapping(target = "base64Avatar", source = "base64Avatar")
     @Mapping(target = "branchId", source = "employeeEntity.branch.id")
-    @Mapping(target = "serviceIds", source = "employeeEntity.services", qualifiedByName = "mapServicesToIds")
     EmployeeResponseDTO employeeEntityToEmployeeResponseDTO(EmployeeEntity employeeEntity, String base64Avatar);
 
     @Named("mapServicesToIds")
