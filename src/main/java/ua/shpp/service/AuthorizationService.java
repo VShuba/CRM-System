@@ -13,6 +13,8 @@ import ua.shpp.repository.EmployeeRepository;
 import ua.shpp.repository.ServiceRepository;
 import ua.shpp.repository.UserOrganizationRepository;
 
+import java.util.function.BooleanSupplier;
+
 @Slf4j
 @Component("authz") // чтобы обращаться как @authz в @PreAuthorize
 @RequiredArgsConstructor
@@ -24,23 +26,38 @@ public class AuthorizationService {
     private final EmployeeRepository employeeRepository;
     private final ServiceRepository serviceRepository;
 
+    private boolean withSuperAdminCheck(BooleanSupplier check) {
+        return isSuperAdmin() || check.getAsBoolean();
+    }
+
+
     /*<---------------------------------------------------------------------------------->*/
     // for ORGANIZATION
     public boolean hasRoleInOrgByOrgId(Long organizationId, OrgRole requiredAccessRole) {
-        Long userId = userService.getCurrentUserId();
-        OrgRole currentUserRole = userOrganizationRepository.getUserRoleInOrganization(userId, organizationId);
-        return currentUserRole != null && currentUserRole.hasAccessLevelTo(requiredAccessRole);
+        return withSuperAdminCheck(() ->
+        {
+            Long userId = userService.getCurrentUserId();
+            OrgRole currentUserRole = userOrganizationRepository.getUserRoleInOrganization(userId, organizationId);
+            return currentUserRole != null && currentUserRole.hasAccessLevelTo(requiredAccessRole);
+        });
     }
+
     // for BRANCH
     public boolean hasRoleInOrgByBranchId(Long branchId, OrgRole requiredAccessRole) {
-        Long organizationId = branchRepository.findOrganizationIdByBranchId(branchId);
-        return organizationId != null && hasRoleInOrgByOrgId(organizationId, requiredAccessRole);
+        return withSuperAdminCheck(() ->
+        {
+            Long organizationId = branchRepository.findOrganizationIdByBranchId(branchId);
+            return organizationId != null && hasRoleInOrgByOrgId(organizationId, requiredAccessRole);
+        });
     }
     /*<---------------------------------------------------------------------------------->*/
 
     public boolean hasRoleByServiceId(Long serviceId, String expectedRole) {
-        Long branchId = serviceRepository.findBranchIdByServiceId(serviceId);
-        return branchId != null && hasRoleInOrgByBranchId(branchId, OrgRole.valueOf(expectedRole));
+        return withSuperAdminCheck(() ->
+        {
+            Long branchId = serviceRepository.findBranchIdByServiceId(serviceId);
+            return branchId != null && hasRoleInOrgByBranchId(branchId, OrgRole.valueOf(expectedRole));
+        });
     }
 
     @Deprecated
