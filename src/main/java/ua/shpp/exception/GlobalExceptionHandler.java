@@ -193,10 +193,15 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Invalid JSON format for EmployeeRequestDTO", request);
     }
 
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    }
+
     // for Event
     @ExceptionHandler(EventNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEventException(EventNotFoundException ex,
-                                                                       HttpServletRequest request) {
+                                                              HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Event not found", request);
     }
 
