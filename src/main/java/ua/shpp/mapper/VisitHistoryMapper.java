@@ -21,6 +21,7 @@ import java.util.List;
 public interface VisitHistoryMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "client", source = "client")
     @Mapping(target = "serviceColor", source = "scheduleEvent.serviceEntity.color")
     @Mapping(target = "serviceName", source = "scheduleEvent.serviceEntity.name")
     @Mapping(target = "trainerFullName", source = "scheduleEvent.employee", qualifiedByName = "trainerToFullName")
@@ -31,6 +32,7 @@ public interface VisitHistoryMapper {
     @Mapping(target = "amountPaid", source = "eventClientEntity", qualifiedByName = "determineAmountPaid")
     VisitHistoryEntity toVisitHistoryEntity(EventClientEntity eventClientEntity);
 
+    @Mapping(target = "clientId", source = "client.id")
     VisitHistoryDTO toDto(VisitHistoryEntity entity);
 
     List<VisitHistoryDTO> toDtoList(List<VisitHistoryEntity> entityList);

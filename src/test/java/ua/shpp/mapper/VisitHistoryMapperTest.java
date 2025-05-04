@@ -1,6 +1,5 @@
 package ua.shpp.mapper;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,6 +10,7 @@ import ua.shpp.entity.*;
 import ua.shpp.entity.payment.CheckEntity;
 import ua.shpp.entity.payment.OneTimeInfoEntity;
 import ua.shpp.entity.payment.SubscriptionInfoEntity;
+import ua.shpp.model.ClientEventStatus;
 import ua.shpp.model.PaymentMethod;
 import ua.shpp.model.PaymentMethodForStory;
 
@@ -21,106 +21,148 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled
 class VisitHistoryMapperTest {
 
     private final VisitHistoryMapper visitHistoryMapper = Mappers.getMapper(VisitHistoryMapper.class);
 
-    @Test
-    void toVisitHistoryEntity_shouldMapFieldsCorrectly() {
-        // given
-        EmployeeEntity trainer = new EmployeeEntity();
-        trainer.setName("Іван Тренер");
-
-        RoomEntity room = new RoomEntity();
-        room.setName("Зал 1");
+    private EventClientEntity createBaseEntity() {
+        EventClientEntity entity = new EventClientEntity();
 
         ServiceEntity service = new ServiceEntity();
-        service.setName("Йога");
-        service.setColor("Зелений");
+        service.setName("Pilates");
+        service.setColor("#FFFFFF");
 
-        ScheduleEventEntity schedule = new ScheduleEventEntity();
-        // todo: schedule.setTrainer(trainer);
-        schedule.setRoom(room);
-        schedule.setServiceEntity(service);
-        schedule.setEventDate(LocalDate.of(2024, 4, 1));
-        schedule.setStartTime(LocalTime.of(10, 0));
+        EmployeeEntity trainer = new EmployeeEntity();
+        trainer.setName("John Doe");
 
-        ClientEntity client = new ClientEntity();
-        client.setId(42L);
+        RoomEntity room = new RoomEntity();
+        room.setName("Main Hall");
 
-        EventClientEntity eventClient = new EventClientEntity();
-        eventClient.setClient(client);
-        eventClient.setScheduleEvent(schedule);
+        ScheduleEventEntity scheduleEvent = new ScheduleEventEntity();
+        scheduleEvent.setServiceEntity(service);
+        scheduleEvent.setEmployee(trainer);
+        scheduleEvent.setRoom(room);
+        scheduleEvent.setEventDate(LocalDate.of(2024, 5, 1));
+        scheduleEvent.setStartTime(LocalTime.of(10, 30));
 
-        SubscriptionInfoEntity subscriptionInfo = new SubscriptionInfoEntity();
-        eventClient.setSubscriptionInfo(subscriptionInfo);
+        entity.setScheduleEvent(scheduleEvent);
+        entity.setClient(new ClientEntity());
+        entity.setClientEventStatus(ClientEventStatus.ASSIGNED);
 
-        // when
+        return entity;
+    }
+
+    @Test
+    void toVisitHistoryEntity_shouldMapFieldsCorrectly() {
+        // Arrange
+        EventClientEntity eventClient = createBaseEntity();
+        eventClient.setSubscriptionInfo(new SubscriptionInfoEntity());
+
+        // Act
         VisitHistoryEntity result = visitHistoryMapper.toVisitHistoryEntity(eventClient);
 
-        // then
+        // Assert
         assertThat(result.getId()).isNull();
-        // todo: assertThat(result.getClientId()).isEqualTo(42L);
-        assertThat(result.getServiceName()).isEqualTo("Йога");
-        assertThat(result.getServiceColor()).isEqualTo("Зелений");
-        assertThat(result.getTrainerFullName()).isEqualTo("Іван Тренер");
-        assertThat(result.getDate()).isEqualTo(LocalDate.of(2024, 4, 1));
-        assertThat(result.getTime()).isEqualTo(LocalTime.of(10, 0));
-        assertThat(result.getRoomName()).isEqualTo("Зал 1");
+        assertThat(result.getServiceName()).isEqualTo("Pilates");
+        assertThat(result.getServiceColor()).isEqualTo("#FFFFFF");
+        assertThat(result.getTrainerFullName()).isEqualTo("John Doe");
+        assertThat(result.getDate()).isEqualTo(LocalDate.of(2024, 5, 1));
+        assertThat(result.getTime()).isEqualTo(LocalTime.of(10, 30));
+        assertThat(result.getRoomName()).isEqualTo("Main Hall");
         assertThat(result.getPaymentMethodForStory()).isEqualTo(PaymentMethodForStory.SUBSCRIPTION);
         assertThat(result.getAmountPaid()).isNull();
     }
 
     @ParameterizedTest
-    @CsvSource({"CARD, 100", "CASH, 100"})
+    @CsvSource({"CARD, 100", "CASH, 150"})
     void toVisitHistoryEntity_withOneTimePayment_shouldMapCorrectly(PaymentMethod method, BigDecimal amount) {
+        EventClientEntity entity = createBaseEntity();
+
         CheckEntity check = new CheckEntity();
         check.setPaymentMethod(method);
         check.setPrice(amount);
 
         OneTimeInfoEntity oneTimeInfo = new OneTimeInfoEntity();
         oneTimeInfo.setPaymentCheck(check);
+        entity.setOneTimeInfo(oneTimeInfo);
 
-        EventClientEntity eventClient = new EventClientEntity();
-        eventClient.setOneTimeInfo(oneTimeInfo);
-        eventClient.setClient(new ClientEntity());
-        eventClient.setScheduleEvent(new ScheduleEventEntity());
-
-        VisitHistoryEntity result = visitHistoryMapper.toVisitHistoryEntity(eventClient);
+        VisitHistoryEntity result = visitHistoryMapper.toVisitHistoryEntity(entity);
 
         assertThat(result.getPaymentMethodForStory()).isEqualTo(PaymentMethodForStory.valueOf(method.name()));
         assertThat(result.getAmountPaid()).isEqualTo(amount);
     }
 
     @Test
-    void toVisitHistoryEntity_withSubscription_shouldMapPaymentMethodAndNullAmount() {
-        // given
-        SubscriptionInfoEntity subscriptionInfo = new SubscriptionInfoEntity();
+    void testToVisitHistoryEntity_Skipped() {
+        EventClientEntity entity = createBaseEntity();
+        entity.setClientEventStatus(ClientEventStatus.SKIPPED);
 
-        EventClientEntity eventClient = new EventClientEntity();
-        eventClient.setSubscriptionInfo(subscriptionInfo);
-        eventClient.setClient(new ClientEntity());
-        eventClient.setScheduleEvent(new ScheduleEventEntity());
+        VisitHistoryEntity result = visitHistoryMapper.toVisitHistoryEntity(entity);
 
-        // when
-        VisitHistoryEntity result = visitHistoryMapper.toVisitHistoryEntity(eventClient);
-
-        // then
-        assertThat(result.getPaymentMethodForStory()).isEqualTo(PaymentMethodForStory.SUBSCRIPTION);
+        assertThat(result.getPaymentMethodForStory()).isEqualTo(PaymentMethodForStory.SKIPPED);
         assertThat(result.getAmountPaid()).isNull();
     }
 
     @Test
+    void testToVisitHistoryEntity_WithUnknownPaymentMethod_ShouldReturnNull() {
+        EventClientEntity entity = createBaseEntity();
+
+        CheckEntity check = new CheckEntity();
+        check.setPaymentMethod(null);
+
+        OneTimeInfoEntity oneTimeInfo = new OneTimeInfoEntity();
+        oneTimeInfo.setPaymentCheck(check);
+        entity.setOneTimeInfo(oneTimeInfo);
+
+        VisitHistoryEntity result = visitHistoryMapper.toVisitHistoryEntity(entity);
+
+        assertThat(result.getPaymentMethodForStory()).isNull();
+        assertThat(result.getAmountPaid()).isNull();
+    }
+
+    @Test
+    void testToVisitHistoryEntity_NoPaymentInfo_ShouldReturnNulls() {
+        EventClientEntity entity = createBaseEntity();
+        entity.setOneTimeInfo(null);
+        entity.setSubscriptionInfo(null);
+
+        VisitHistoryEntity result = visitHistoryMapper.toVisitHistoryEntity(entity);
+
+        assertThat(result.getPaymentMethodForStory()).isNull();
+        assertThat(result.getAmountPaid()).isNull();
+    }
+
+    @Test
+    void testToDto() {
+        VisitHistoryEntity entity = new VisitHistoryEntity();
+        entity.setServiceName("Yoga");
+        entity.setAmountPaid(BigDecimal.TEN);
+
+        VisitHistoryDTO dto = visitHistoryMapper.toDto(entity);
+
+        assertThat(dto.serviceName()).isEqualTo("Yoga");
+        assertThat(dto.amountPaid()).isEqualTo(BigDecimal.TEN);
+    }
+
+    @Test
     void toDtoList_shouldMapListCorrectly() {
+        // Arrange
+        ClientEntity client1 = new ClientEntity();
+        client1.setId(1L);
+
+        ClientEntity client2 = new ClientEntity();
+        client2.setId(2L);
+
         VisitHistoryEntity entity1 = new VisitHistoryEntity();
-        // todo: entity1.setClientId(1L);
+        entity1.setClient(client1);
 
         VisitHistoryEntity entity2 = new VisitHistoryEntity();
-        // todo: entity2.setClientId(2L);
+        entity2.setClient(client2);
 
+        // Act
         List<VisitHistoryDTO> dtoList = visitHistoryMapper.toDtoList(List.of(entity1, entity2));
 
+        // Assert
         assertThat(dtoList).hasSize(2);
         assertThat(dtoList.get(0).clientId()).isEqualTo(1L);
         assertThat(dtoList.get(1).clientId()).isEqualTo(2L);

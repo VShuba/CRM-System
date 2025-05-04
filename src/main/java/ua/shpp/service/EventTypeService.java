@@ -30,8 +30,6 @@ public class EventTypeService {
 
     private final EventTypeRepository eventTypeRepository;
     private final EventTypeMapper eventTypeMapper;
-    private final OneTimeOfferMapper oneTimeOfferMapper;
-    private final SubscriptionOfferMapper subscriptionOfferMapper;
     private final ServiceRepository serviceRepository;
     private final BranchRepository branchRepository;
     private final OneTimeOfferRepository oneTimeOfferRepository;
