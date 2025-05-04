@@ -55,10 +55,7 @@ public class EmployeeController {
 
     @GetMapping("/employee/{id}")
     @Operation(summary = "Get employee")
-    @PreAuthorize("""
-            hasAuthority(T(ua.shpp.model.GlobalRole).SUPER_ADMIN) or
-            @authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).ADMIN)
-            """)
+    @PreAuthorize("@authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).MANAGER)")
     public ResponseEntity<EmployeeResponseDTO> getEmployee(@PathVariable Long id) {
         EmployeeResponseDTO employeeResponseDTO = employeeService.getEmployee(id);
 
@@ -67,10 +64,7 @@ public class EmployeeController {
 
     @DeleteMapping("/employee/{id}")
     @Operation(summary = "Delete employee")
-    @PreAuthorize("""
-            hasAuthority(T(ua.shpp.model.GlobalRole).SUPER_ADMIN) or
-            @authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).ADMIN)
-            """)
+    @PreAuthorize("@authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
         if (employeeService.deleteEmployee(id)) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -81,12 +75,9 @@ public class EmployeeController {
 
     @GetMapping("/employee/{id}/services")
     @Operation(summary = "Get employee services")
-    @PreAuthorize("""
-            hasAuthority(T(ua.shpp.model.GlobalRole).SUPER_ADMIN) or
-            @authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).ADMIN)
-            """)
+    @PreAuthorize("@authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).MANAGER)")
     public ResponseEntity<List<EmployeeServicesResponseDTO>> getEmployeeServices(@PathVariable Long id) {
-         List<EmployeeServicesResponseDTO> employeeServicesResponseDTO = employeeService.getEmployeeServices(id);
+        List<EmployeeServicesResponseDTO> employeeServicesResponseDTO = employeeService.getEmployeeServices(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(employeeServicesResponseDTO);
     }
