@@ -26,10 +26,18 @@ public class AuthorizationService {
     private final EmployeeRepository employeeRepository;
     private final ServiceRepository serviceRepository;
 
+    /**
+     * Hot to use?
+     * ->>>
+     * public boolean yourMethodName(YourParams params) {
+     *     return withSuperAdminCheck(() -> {
+     *         // your implementation
+     *     });
+     * }
+     */
     private boolean withSuperAdminCheck(BooleanSupplier check) {
         return isSuperAdmin() || check.getAsBoolean();
     }
-
 
     /*<---------------------------------------------------------------------------------->*/
     // for ORGANIZATION
