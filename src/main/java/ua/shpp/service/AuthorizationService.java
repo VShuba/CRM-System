@@ -30,9 +30,9 @@ public class AuthorizationService {
      * Hot to use?
      * ->>>
      * public boolean yourMethodName(YourParams params) {
-     *     return withSuperAdminCheck(() -> {
-     *         // your implementation
-     *     });
+     * return withSuperAdminCheck(() -> {
+     * // your implementation
+     * });
      * }
      */
     private boolean withSuperAdminCheck(BooleanSupplier check) {
@@ -68,58 +68,12 @@ public class AuthorizationService {
         });
     }
 
-    @Deprecated
-    public boolean hasRoleInOrg(Long organizationId, String expectedRole) {
-
-        // excpetedRole == currentUser.principal.getRole(SUPER_ADMIN) -> RETURN TRUE
-        OrgRole requiredRole;
-        try {
-            requiredRole = OrgRole.valueOf(expectedRole);
-        } catch (IllegalArgumentException e) {
-            log.warn("Invalid role: {}", expectedRole);
-            return false;
-        }
-
-        Long userId = userService.getCurrentUserId();
-
-        return userOrganizationRepository.existsByUserIdAndOrganizationIdAndRole(
-                userId,
-                organizationId,
-                requiredRole
-        );
-    }
-
-    @Deprecated
-    public boolean hasRoleByBranchId(Long branchId, String expectedRole) {
-        OrgRole requiredRole;
-        try {
-            requiredRole = OrgRole.valueOf(expectedRole);
-        } catch (IllegalArgumentException e) {
-            log.warn("Invalid role: {}", expectedRole);
-            return false;
-        }
-
-        Long userId = userService.getCurrentUserId();
-
-        // Найди организацию по branchId
-        Long organizationId = branchRepository.findOrganizationIdByBranchId(branchId);
-        if (organizationId == null) {
-            return false;
-        }
-
-        return userOrganizationRepository.existsByUserIdAndOrganizationIdAndRole(userId, organizationId, requiredRole);
-    }
-
     public boolean hasRoleInOrgByEmployeeId(Long employeeId, OrgRole requiredAccessRole) {
-        log.info("employeeId: {}. requiredAccessRole: {}", employeeId, requiredAccessRole.name());
-        Long branchId = employeeRepository.getBranchIdById(employeeId);
-
-        if (branchId == null) {
-            return false;
-        }
-
-        log.info("BranchId: {}", branchId);
-        return hasRoleInOrgByBranchId(branchId, requiredAccessRole);
+        return withSuperAdminCheck(() ->
+        {
+            Long branchId = employeeRepository.getBranchIdById(employeeId);
+            return branchId != null && hasRoleInOrgByBranchId(branchId, requiredAccessRole);
+        });
     }
 
     private boolean isSuperAdmin() {

@@ -9,7 +9,6 @@ import ua.shpp.model.OrgRole;
 
 @Repository
 public interface UserOrganizationRepository extends JpaRepository<UserOrganization, UserOrganizationId> {
-    boolean existsByUserIdAndOrganizationIdAndRole(Long userId, Long organizationId, OrgRole role);
 
     @Query(value = """
             SELECT organization_role
