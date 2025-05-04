@@ -41,7 +41,7 @@ public class BranchController {
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
     })
     @PostMapping
-    @PreAuthorize("hasAuthority('USER') and @authz.hasRoleInOrg(#orgId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, 'ADMIN')")
     public ResponseEntity<BranchResponseDTO> createBranch(
             @PathVariable Long orgId,
             @RequestBody @Valid BranchRequestDTO requestDTO) {
@@ -60,7 +60,7 @@ public class BranchController {
             @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content)
     })
     @GetMapping("/{branchId}")
-    @PreAuthorize("hasAuthority('USER') and @authz.hasRoleInOrg(#orgId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, 'ADMIN')")
     public ResponseEntity<BranchResponseDTO> getBranch(
             @PathVariable Long orgId,
             @PathVariable Long branchId) {
@@ -73,7 +73,7 @@ public class BranchController {
             @ApiResponse(responseCode = "404", description = "Branches not found", content = @Content)
     })
     @GetMapping
-    @PreAuthorize("hasAuthority('USER') and @authz.hasRoleInOrg(#orgId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, 'ADMIN')")
     public ResponseEntity<Page<BranchResponseDTO>> getAllBranch(
             @PathVariable Long orgId,
             @ParameterObject Pageable pageable) {
@@ -90,7 +90,7 @@ public class BranchController {
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
     })
     @PatchMapping("/{branchId}")
-    @PreAuthorize("hasAuthority('USER') and @authz.hasRoleInOrg(#orgId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, 'ADMIN')")
     public ResponseEntity<BranchResponseDTO> updateBranch(
             @PathVariable Long orgId,
             @PathVariable Long branchId,
@@ -99,7 +99,7 @@ public class BranchController {
     }
 
     @PatchMapping("/{branchId}/working-hours")
-    @PreAuthorize("hasAuthority('USER') and @authz.hasRoleInOrg(#orgId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, 'ADMIN')")
     public ResponseEntity<BranchResponseDTO> updateWorkingHours(
             @PathVariable Long orgId,
             @PathVariable Long branchId,
@@ -113,7 +113,7 @@ public class BranchController {
             @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content)
     })
     @DeleteMapping("/{branchId}")
-    @PreAuthorize("hasAuthority('USER') and @authz.hasRoleInOrg(#orgId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, 'ADMIN')")
     public ResponseEntity<Void> deleteBranch(
             @PathVariable Long orgId,
             @PathVariable Long branchId) {
