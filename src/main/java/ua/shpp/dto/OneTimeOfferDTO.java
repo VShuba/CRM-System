@@ -12,7 +12,7 @@ public record OneTimeOfferDTO(
         Long id,
         @Schema(description = "Service id", example = "1")
         Long activityId,
-        @Schema(description = "Event type id", example = "[1]")
+        @Schema(description = "Event type id", example = "1")
         Long eventTypeId,
         @Schema(description = "Duration in minutes", example = "60")
         @Size(min = 1, max = 500, message = "Duration must be between 1 and 500 minutes")
