@@ -16,7 +16,7 @@ import ua.shpp.repository.UserOrganizationRepository;
 import java.util.function.BooleanSupplier;
 
 @Slf4j
-@Component("authz") // чтобы обращаться как @authz в @PreAuthorize
+@Component("authz") // @authz в @PreAuthorize
 @RequiredArgsConstructor
 public class AuthorizationService {
 
@@ -40,7 +40,7 @@ public class AuthorizationService {
     }
 
     /*<---------------------------------------------------------------------------------->*/
-    // for ORGANIZATION
+    // ORGANIZATION (FINAL METHOD)
     public boolean hasRoleInOrgByOrgId(Long organizationId, OrgRole requiredAccessRole) {
         return withSuperAdminCheck(() ->
         {
@@ -50,7 +50,7 @@ public class AuthorizationService {
         });
     }
 
-    // for BRANCH
+    // BRANCH
     public boolean hasRoleInOrgByBranchId(Long branchId, OrgRole requiredAccessRole) {
         return withSuperAdminCheck(() ->
         {
@@ -60,11 +60,11 @@ public class AuthorizationService {
     }
     /*<---------------------------------------------------------------------------------->*/
 
-    public boolean hasRoleByServiceId(Long serviceId, String expectedRole) {
+    public boolean hasRoleByServiceId(Long serviceId, OrgRole expectedRole) {
         return withSuperAdminCheck(() ->
         {
             Long branchId = serviceRepository.findBranchIdByServiceId(serviceId);
-            return branchId != null && hasRoleInOrgByBranchId(branchId, OrgRole.valueOf(expectedRole));
+            return branchId != null && hasRoleInOrgByBranchId(branchId, expectedRole);
         });
     }
 

@@ -35,7 +35,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
     })
     @PostMapping
-    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#requestDTO.branchId(), 'ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#requestDTO.branchId(), T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<ServiceResponseDTO> createService(
             @RequestBody @Valid ServiceRequestDTO requestDTO) {
         return new ResponseEntity<>(serviceService.create(requestDTO), HttpStatus.CREATED);
@@ -49,7 +49,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "404", description = "Service not found", content = @Content)
     })
     @GetMapping("/{id}")
-    @PreAuthorize("@authz.hasRoleByServiceId(#id, 'ADMIN')")
+    @PreAuthorize("@authz.hasRoleByServiceId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<ServiceResponseDTO> getService(@PathVariable Long id) {
         return new ResponseEntity<>(serviceService.get(id), HttpStatus.OK);
     }
@@ -69,7 +69,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content)
     })
     @GetMapping("/branches/{branchId}")
-    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#branchId, 'ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#branchId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<Page<ServiceResponseDTO>> getAllServices(
             @PathVariable Long branchId,
             @ParameterObject Pageable pageable) {
@@ -85,8 +85,8 @@ public class ServiceController {
             @ApiResponse(responseCode = "404", description = "Service not found", content = @Content)
     })
     @PutMapping("/{id}")
-    @PreAuthorize("@authz.hasRoleByServiceId(#id, 'ADMIN') and @authz.hasRoleInOrgByBranchId(#requestDTO.branchId, 'ADMIN')" +
-            " or hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@authz.hasRoleByServiceId(#id, T(ua.shpp.model.OrgRole).ADMIN)" +
+            " and @authz.hasRoleInOrgByBranchId(#requestDTO.branchId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<ServiceResponseDTO> updateService(
             @PathVariable Long id,
             @RequestBody @Valid ServiceRequestDTO requestDTO) {
@@ -99,7 +99,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "404", description = "Service not found", content = @Content)
     })
     @DeleteMapping("/{id}")
-    @PreAuthorize("@authz.hasRoleByServiceId(#id, 'ADMIN')")
+    @PreAuthorize("@authz.hasRoleByServiceId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<Void> deleteService(@PathVariable Long id) {
         serviceService.delete(id);
         return ResponseEntity.noContent().build();

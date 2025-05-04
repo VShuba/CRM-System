@@ -50,7 +50,7 @@ public class OrganizationController {
             @ApiResponse(responseCode = "404", description = "Organization not found", content = @Content)
     })
     @GetMapping("/{id}")
-    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#id, 'ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<OrganizationResponseDTO> getOrganization(@PathVariable Long id) {
         return new ResponseEntity<>(organizationService.get(id), HttpStatus.OK);
     }
@@ -85,7 +85,7 @@ public class OrganizationController {
                     content = @Content)
     })
     @PatchMapping("/{id}")
-    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#id, 'ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<OrganizationResponseDTO> updateOrganization(
             @PathVariable Long id,
             @RequestBody @Valid OrganizationRequestDTO requestDTO) {
@@ -99,7 +99,7 @@ public class OrganizationController {
     })
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#id, 'ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<Void> deleteOrganization(@PathVariable Long id) {
         organizationService.delete(id);
         return ResponseEntity.noContent().build();

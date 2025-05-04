@@ -18,7 +18,7 @@ public interface ScheduleEventRepository extends JpaRepository<ScheduleEventEnti
              WHERE (:roomId     IS NULL OR se.room_id      = :roomId)
                AND (:employeeId IS NULL OR se.employee_id  = :employeeId)
                AND (:serviceId  IS NULL OR se.service_id   = :serviceId)
-               AND (:eventTypeId IS NUL OR se.event_type_id = :eventTypeId)
+               AND (:eventTypeId IS NULL OR se.event_type_id = :eventTypeId)
                AND ( (:startDate IS NULL OR se.event_date >= :startDate)
                     AND (:endDate   IS NULL OR se.event_date <= :endDate) )
             """,
