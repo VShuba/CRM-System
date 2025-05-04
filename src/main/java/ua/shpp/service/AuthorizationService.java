@@ -24,13 +24,25 @@ public class AuthorizationService {
     private final EmployeeRepository employeeRepository;
     private final ServiceRepository serviceRepository;
 
-    /**
-     * @deprecated This method is deprecated. Use {@link #hasRoleInOrgByOrgId(Long, OrgRole)}
-     * to check the user's role in the organization, passing role via the enum {@link OrgRole}.
-     */
+    /*<---------------------------------------------------------------------------------->*/
+    // for ORGANIZATION
+    public boolean hasRoleInOrgByOrgId(Long organizationId, OrgRole requiredAccessRole) {
+        Long userId = userService.getCurrentUserId();
+        OrgRole currentUserRole = userOrganizationRepository.getUserRoleInOrganization(userId, organizationId);
+        return currentUserRole != null && currentUserRole.hasAccessLevelTo(requiredAccessRole);
+    }
+    // for BRANCH
+    public boolean hasRoleInOrgByBranchId(Long branchId, OrgRole requiredAccessRole) {
+        Long organizationId = branchRepository.findOrganizationIdByBranchId(branchId);
+        return organizationId != null && hasRoleInOrgByOrgId(organizationId, requiredAccessRole);
+    }
+    /*<---------------------------------------------------------------------------------->*/
+
     @Deprecated
     public boolean hasRoleInOrg(Long organizationId, String expectedRole) {
 
+
+        // excpetedRole == currentUser.principal.getRole(SUPER_ADMIN) -> RETURN TRUE
         OrgRole requiredRole;
         try {
             requiredRole = OrgRole.valueOf(expectedRole);
@@ -48,10 +60,6 @@ public class AuthorizationService {
         );
     }
 
-    /**
-     * @deprecated This method is deprecated. Use {@link #hasRoleInOrgByBranchId(Long, OrgRole)}
-     * to check the user's role in the organization with branchId, passing role via the enum {@link OrgRole}.
-     */
     @Deprecated
     public boolean hasRoleByBranchId(Long branchId, String expectedRole) {
         OrgRole requiredRole;
@@ -80,32 +88,6 @@ public class AuthorizationService {
             return false;
         }
         return hasRoleByBranchId(branchId, expectedRole);
-    }
-
-
-    /*<---------------------------------------------------------------------------------->*/
-
-    private boolean hasRoleInOrgByOrgId(Long organizationId, OrgRole requiredAccessRole) {
-        Long userId = userService.getCurrentUserId();
-
-        OrgRole currentUserRole = userOrganizationRepository.getUserRoleInOrganization(userId, organizationId);
-        log.info("current user role: {}", currentUserRole);
-        if (currentUserRole == null) {
-            return false;
-        }
-
-        return currentUserRole.hasAccessLevelTo(requiredAccessRole);
-    }
-
-    public boolean hasRoleInOrgByBranchId(Long branchId, OrgRole requiredAccessRole) {
-        Long organizationId = branchRepository.findOrganizationIdByBranchId(branchId);
-
-        if (organizationId == null) {
-            return false;
-        }
-
-        log.info("OrganizationId: {}", organizationId);
-        return hasRoleInOrgByOrgId(organizationId, requiredAccessRole);
     }
 
     public boolean hasRoleInOrgByEmployeeId(Long employeeId, OrgRole requiredAccessRole) {

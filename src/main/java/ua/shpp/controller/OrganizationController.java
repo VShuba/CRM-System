@@ -37,7 +37,6 @@ public class OrganizationController {
                     content = @Content)
     })
     @PostMapping
-    @PreAuthorize("hasAuthority('USER') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<OrganizationResponseDTO> createOrganization(
             @RequestBody @Valid OrganizationRequestDTO requestDTO) {
         return new ResponseEntity<>(organizationService.create(requestDTO), HttpStatus.CREATED);
@@ -51,7 +50,7 @@ public class OrganizationController {
             @ApiResponse(responseCode = "404", description = "Organization not found", content = @Content)
     })
     @GetMapping("/{id}")
-    @PreAuthorize("@authz.hasRoleInOrg(#id, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#id, 'ADMIN')")
     public ResponseEntity<OrganizationResponseDTO> getOrganization(@PathVariable Long id) {
         return new ResponseEntity<>(organizationService.get(id), HttpStatus.OK);
     }
@@ -86,7 +85,7 @@ public class OrganizationController {
                     content = @Content)
     })
     @PatchMapping("/{id}")
-    @PreAuthorize("@authz.hasRoleInOrg(#id, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#id, 'ADMIN')")
     public ResponseEntity<OrganizationResponseDTO> updateOrganization(
             @PathVariable Long id,
             @RequestBody @Valid OrganizationRequestDTO requestDTO) {
@@ -100,9 +99,9 @@ public class OrganizationController {
     })
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("@authz.hasRoleInOrg(#id, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#id, 'ADMIN')")
     public ResponseEntity<Void> deleteOrganization(@PathVariable Long id) {
-        organizationService.delete(id); // todo  а може адмін організації видалити свою оргу? Якщо він неадекват?
+        organizationService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
