@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ua.shpp.dto.employee.EmployeeCreateRequestDTO;
 import ua.shpp.dto.employee.EmployeeResponseDTO;
 import ua.shpp.dto.employee.EmployeeServiceCreateDTO;
+import ua.shpp.dto.employee.EmployeeServicesResponseDTO;
 import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.EmployeeEntity;
 import ua.shpp.entity.ServiceEntity;
@@ -91,6 +92,13 @@ public class EmployeeService {
 
         employeeRepository.deleteById(employeeId);
         return true;
+    }
+
+    public List<EmployeeServicesResponseDTO> getEmployeeServices(Long employeeId) {
+        EmployeeEntity employeeEntity = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new EntityNotFoundException("Employee with id " + employeeId + " not found"));
+
+        return null;
     }
 
     /**
