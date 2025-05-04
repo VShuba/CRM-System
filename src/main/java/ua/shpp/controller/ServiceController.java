@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +35,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
     })
     @PostMapping
-    @PreAuthorize("@authz.hasRoleByBranchId(#requestDTO.branchId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#requestDTO.branchId(), 'ADMIN')")
     public ResponseEntity<ServiceResponseDTO> createService(
             @RequestBody @Valid ServiceRequestDTO requestDTO) {
         return new ResponseEntity<>(serviceService.create(requestDTO), HttpStatus.CREATED);
@@ -50,7 +49,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "404", description = "Service not found", content = @Content)
     })
     @GetMapping("/{id}")
-    @PreAuthorize("@authz.hasRoleByServiceId(#id, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@authz.hasRoleByServiceId(#id, 'ADMIN')")
     public ResponseEntity<ServiceResponseDTO> getService(@PathVariable Long id) {
         return new ResponseEntity<>(serviceService.get(id), HttpStatus.OK);
     }
@@ -70,7 +69,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "404", description = "Branch not found", content = @Content)
     })
     @GetMapping("/branches/{branchId}")
-    @PreAuthorize("@authz.hasRoleByBranchId(#branchId, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#branchId, 'ADMIN')")
     public ResponseEntity<Page<ServiceResponseDTO>> getAllServices(
             @PathVariable Long branchId,
             @ParameterObject Pageable pageable) {
@@ -86,7 +85,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "404", description = "Service not found", content = @Content)
     })
     @PutMapping("/{id}")
-    @PreAuthorize("@authz.hasRoleByServiceId(#id, 'ADMIN') and @authz.hasRoleByBranchId(#requestDTO.branchId, 'ADMIN')" +
+    @PreAuthorize("@authz.hasRoleByServiceId(#id, 'ADMIN') and @authz.hasRoleInOrgByBranchId(#requestDTO.branchId, 'ADMIN')" +
             " or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<ServiceResponseDTO> updateService(
             @PathVariable Long id,
@@ -100,7 +99,7 @@ public class ServiceController {
             @ApiResponse(responseCode = "404", description = "Service not found", content = @Content)
     })
     @DeleteMapping("/{id}")
-    @PreAuthorize("@authz.hasRoleByServiceId(#id, 'ADMIN') or hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@authz.hasRoleByServiceId(#id, 'ADMIN')")
     public ResponseEntity<Void> deleteService(@PathVariable Long id) {
         serviceService.delete(id);
         return ResponseEntity.noContent().build();

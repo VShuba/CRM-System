@@ -38,9 +38,13 @@ public class AuthorizationService {
     }
     /*<---------------------------------------------------------------------------------->*/
 
+    public boolean hasRoleByServiceId(Long serviceId, String expectedRole) {
+        Long branchId = serviceRepository.findBranchIdByServiceId(serviceId);
+        return branchId != null && hasRoleInOrgByBranchId(branchId, OrgRole.valueOf(expectedRole));
+    }
+
     @Deprecated
     public boolean hasRoleInOrg(Long organizationId, String expectedRole) {
-
 
         // excpetedRole == currentUser.principal.getRole(SUPER_ADMIN) -> RETURN TRUE
         OrgRole requiredRole;
@@ -79,15 +83,6 @@ public class AuthorizationService {
         }
 
         return userOrganizationRepository.existsByUserIdAndOrganizationIdAndRole(userId, organizationId, requiredRole);
-    }
-
-    public boolean hasRoleByServiceId(Long serviceId, String expectedRole) {
-        Long branchId = serviceRepository.findBranchIdByServiceId(serviceId);
-        if (branchId == null) {
-            log.warn("Branch not found for serviceId: {}", serviceId);
-            return false;
-        }
-        return hasRoleByBranchId(branchId, expectedRole);
     }
 
     public boolean hasRoleInOrgByEmployeeId(Long employeeId, OrgRole requiredAccessRole) {
