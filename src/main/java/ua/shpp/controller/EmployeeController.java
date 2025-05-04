@@ -15,8 +15,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ua.shpp.dto.employee.EmployeeCreateRequestDTO;
 import ua.shpp.dto.employee.EmployeeResponseDTO;
+import ua.shpp.dto.employee.EmployeeServicesResponseDTO;
 import ua.shpp.exception.InvalidJsonFormatException;
 import ua.shpp.service.EmployeeService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -53,8 +56,8 @@ public class EmployeeController {
     @GetMapping("/employee/{id}")
     @Operation(summary = "Get employee")
     @PreAuthorize("""
-            hasAuthority('SUPER_ADMIN') or
-            @authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).MANAGER)
+            hasAuthority(T(ua.shpp.model.GlobalRole).SUPER_ADMIN) or
+            @authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).ADMIN)
             """)
     public ResponseEntity<EmployeeResponseDTO> getEmployee(@PathVariable Long id) {
         EmployeeResponseDTO employeeResponseDTO = employeeService.getEmployee(id);
@@ -65,8 +68,8 @@ public class EmployeeController {
     @DeleteMapping("/employee/{id}")
     @Operation(summary = "Delete employee")
     @PreAuthorize("""
-            hasAuthority('SUPER_ADMIN') or
-            @authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).MANAGER)
+            hasAuthority(T(ua.shpp.model.GlobalRole).SUPER_ADMIN) or
+            @authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).ADMIN)
             """)
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
         if (employeeService.deleteEmployee(id)) {
@@ -74,5 +77,17 @@ public class EmployeeController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
+
+    @GetMapping("/employee/{id}/services")
+    @Operation(summary = "Get employee services")
+    @PreAuthorize("""
+            hasAuthority(T(ua.shpp.model.GlobalRole).SUPER_ADMIN) or
+            @authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).ADMIN)
+            """)
+    public ResponseEntity<List<EmployeeServicesResponseDTO>> getEmployeeServices(@PathVariable Long id) {
+         List<EmployeeServicesResponseDTO> employeeServicesResponseDTO = employeeService.getEmployeeServices(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(employeeServicesResponseDTO);
     }
 }
