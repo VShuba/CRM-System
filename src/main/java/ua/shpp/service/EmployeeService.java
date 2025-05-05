@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ua.shpp.dto.employee.EmployeeRequestDTO;
-import ua.shpp.dto.employee.EmployeeResponseDTO;
-import ua.shpp.dto.employee.EmployeeServiceCreateDTO;
-import ua.shpp.dto.employee.EmployeeServicesResponseDTO;
+import ua.shpp.dto.employee.*;
 import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.EmployeeEntity;
 import ua.shpp.entity.ServiceEntity;
@@ -86,12 +83,36 @@ public class EmployeeService {
         return employeeMapper.employeeEntityToEmployeeResponseDTO(employeeEntity, base64Avatar);
     }
 
-    public EmployeeResponseDTO updateEmployee(Long id, MultipartFile avatarImg, EmployeeRequestDTO employeeRequestDTO) {
+    public EmployeeResponseDTO updateEmployee(Long id, MultipartFile avatarImg, EmployeeUpdateRequestDTO employeeRequestDTO) {
         EmployeeEntity oldEmployeeEntity = employeeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Employee with id " + id + " not found"));
 
+        String base64Avatar;
+        if (avatarImg != null && !avatarImg.isEmpty()) {
+            ImageUtil.checkMaxImgSizeInMB(avatarImg, MAX_AVATAR_SIZE_MB);
+            byte[] resizedBytesAvatar = ImageUtil.resizeImage(avatarImg, AVATAR_WIDTH, AVATAR_HEIGHT);
+            oldEmployeeEntity.setAvatar(resizedBytesAvatar);
+            base64Avatar = ImageUtil.convertImageToBase64(resizedBytesAvatar);
+        } else {
+            byte[] bytesAvatar = oldEmployeeEntity.getAvatar();
+            base64Avatar = ImageUtil.convertImageToBase64(bytesAvatar);
+        }
 
-        return null;
+        if (employeeRequestDTO.name() != null) oldEmployeeEntity.setName(employeeRequestDTO.name());
+        if (employeeRequestDTO.email() != null) oldEmployeeEntity.setEmail(employeeRequestDTO.email());
+        if (employeeRequestDTO.phone() != null) oldEmployeeEntity.setPhone(employeeRequestDTO.phone());
+
+        List<ServiceEntity> existing = findExistingServicesById(employeeRequestDTO.existingServicesIds());
+        Set<ServiceEntity> updatedServices = new HashSet<>(existing);
+
+        List<ServiceEntity> newServiceEntities = saveNewServices(employeeRequestDTO.newServicesDTO(), oldEmployeeEntity.getBranch());
+        updatedServices.addAll(newServiceEntities);
+
+        if (!updatedServices.isEmpty()) {
+            oldEmployeeEntity.setServices(updatedServices);
+        }
+
+        return employeeMapper.employeeEntityToEmployeeResponseDTO(oldEmployeeEntity, base64Avatar);
     }
 
     public boolean deleteEmployee(Long employeeId) {

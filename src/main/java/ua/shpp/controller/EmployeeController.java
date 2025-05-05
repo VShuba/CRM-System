@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ua.shpp.dto.employee.EmployeeRequestDTO;
 import ua.shpp.dto.employee.EmployeeResponseDTO;
 import ua.shpp.dto.employee.EmployeeServicesResponseDTO;
+import ua.shpp.dto.employee.EmployeeUpdateRequestDTO;
 import ua.shpp.exception.InvalidJsonFormatException;
 import ua.shpp.service.EmployeeService;
 
@@ -61,13 +62,13 @@ public class EmployeeController {
                                                                       description = "JSON-formatted employee data " +
                                                                               "(EmployeeRequestDTO) as string",
                                                                       requiredMode = Schema.RequiredMode.REQUIRED,
-                                                                      implementation = EmployeeRequestDTO.class
+                                                                      implementation = EmployeeUpdateRequestDTO.class
                                                               )
                                                               @RequestPart(name = "employee", required = false) String employeeDTOStr) {
         try {
-            EmployeeRequestDTO employeeRequestDTO = objectMapper.readValue(employeeDTOStr, EmployeeRequestDTO.class);
-            log.info("Deserialized string into EmployeeRequestDTO: {}", employeeRequestDTO.toString());
-            EmployeeResponseDTO employeeResponseDTO = employeeService.updateEmployee(id, avatarImg, employeeRequestDTO);
+            EmployeeUpdateRequestDTO employeeUpdateRequestDTO = objectMapper.readValue(employeeDTOStr, EmployeeUpdateRequestDTO.class);
+            log.info("Deserialized string into EmployeeRequestDTO: {}", employeeUpdateRequestDTO.toString());
+            EmployeeResponseDTO employeeResponseDTO = employeeService.updateEmployee(id, avatarImg, employeeUpdateRequestDTO);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(employeeResponseDTO);
         } catch (JsonProcessingException e) {
