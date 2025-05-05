@@ -98,18 +98,20 @@ public class EmployeeService {
             base64Avatar = ImageUtil.convertImageToBase64(bytesAvatar);
         }
 
-        if (employeeRequestDTO.name() != null) oldEmployeeEntity.setName(employeeRequestDTO.name());
-        if (employeeRequestDTO.email() != null) oldEmployeeEntity.setEmail(employeeRequestDTO.email());
-        if (employeeRequestDTO.phone() != null) oldEmployeeEntity.setPhone(employeeRequestDTO.phone());
+        if (employeeRequestDTO != null) {
+            if (employeeRequestDTO.name() != null) oldEmployeeEntity.setName(employeeRequestDTO.name());
+            if (employeeRequestDTO.email() != null) oldEmployeeEntity.setEmail(employeeRequestDTO.email());
+            if (employeeRequestDTO.phone() != null) oldEmployeeEntity.setPhone(employeeRequestDTO.phone());
 
-        List<ServiceEntity> existing = findExistingServicesById(employeeRequestDTO.existingServicesIds());
-        Set<ServiceEntity> updatedServices = new HashSet<>(existing);
+            List<ServiceEntity> existing = findExistingServicesById(employeeRequestDTO.existingServicesIds());
+            Set<ServiceEntity> updatedServices = new HashSet<>(existing);
 
-        List<ServiceEntity> newServiceEntities = saveNewServices(employeeRequestDTO.newServicesDTO(), oldEmployeeEntity.getBranch());
-        updatedServices.addAll(newServiceEntities);
+            List<ServiceEntity> newServiceEntities = saveNewServices(employeeRequestDTO.newServicesDTO(), oldEmployeeEntity.getBranch());
+            updatedServices.addAll(newServiceEntities);
 
-        if (!updatedServices.isEmpty()) {
-            oldEmployeeEntity.setServices(updatedServices);
+            if (!updatedServices.isEmpty()) {
+                oldEmployeeEntity.setServices(updatedServices);
+            }
         }
 
         return employeeMapper.employeeEntityToEmployeeResponseDTO(oldEmployeeEntity, base64Avatar);

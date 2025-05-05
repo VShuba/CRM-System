@@ -66,8 +66,11 @@ public class EmployeeController {
                                                               )
                                                               @RequestPart(name = "employee", required = false) String employeeDTOStr) {
         try {
-            EmployeeUpdateRequestDTO employeeUpdateRequestDTO = objectMapper.readValue(employeeDTOStr, EmployeeUpdateRequestDTO.class);
-            log.info("Deserialized string into EmployeeRequestDTO: {}", employeeUpdateRequestDTO.toString());
+            EmployeeUpdateRequestDTO employeeUpdateRequestDTO = null;
+            if (employeeDTOStr != null) {
+                employeeUpdateRequestDTO = objectMapper.readValue(employeeDTOStr, EmployeeUpdateRequestDTO.class);
+                log.info("Deserialized string into EmployeeRequestDTO: {}", employeeUpdateRequestDTO.toString());
+            }
             EmployeeResponseDTO employeeResponseDTO = employeeService.updateEmployee(id, avatarImg, employeeUpdateRequestDTO);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(employeeResponseDTO);
