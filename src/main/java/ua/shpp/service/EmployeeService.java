@@ -86,7 +86,10 @@ public class EmployeeService {
         return employeeMapper.employeeEntityToEmployeeResponseDTO(employeeEntity, base64Avatar);
     }
 
-    public EmployeeResponseDTO updateEmployee(MultipartFile avatarImg, EmployeeRequestDTO employeeRequestDTO) {
+    public EmployeeResponseDTO updateEmployee(Long id, MultipartFile avatarImg, EmployeeRequestDTO employeeRequestDTO) {
+        EmployeeEntity oldEmployeeEntity = employeeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Employee with id " + id + " not found"));
+
 
         return null;
     }

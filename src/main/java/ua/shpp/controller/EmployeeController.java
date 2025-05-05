@@ -30,7 +30,7 @@ public class EmployeeController {
     private final EmployeeService employeeService;
     private final ObjectMapper objectMapper;
 
-    @PostMapping(path = "/employee",
+    @PostMapping(path = "/employees",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new employee with avatar and JSON data")
     public ResponseEntity<EmployeeResponseDTO> addEmployee(@RequestPart(name = "avatar") MultipartFile avatarImg,
@@ -53,22 +53,21 @@ public class EmployeeController {
         }
     }
 
-    @PutMapping(path = "/employee",
+    @PutMapping(path = "/employees/{id}",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Update employee with avatar and JSON data")
-    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@RequestPart(name = "avatar", required = false) MultipartFile avatarImg,
-                                                           @Schema(
-                                                                   description = "JSON-formatted employee data " +
-                                                                           "(EmployeeRequestDTO) as string",
-                                                                   requiredMode = Schema.RequiredMode.REQUIRED,
-                                                                   implementation = EmployeeRequestDTO.class
-                                                           )
-                                                           @RequestPart(name = "employee", required = false) String employeeDTOStr) {
+    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable Long id, @RequestPart(name = "avatar", required = false) MultipartFile avatarImg,
+                                                              @Schema(
+                                                                      description = "JSON-formatted employee data " +
+                                                                              "(EmployeeRequestDTO) as string",
+                                                                      requiredMode = Schema.RequiredMode.REQUIRED,
+                                                                      implementation = EmployeeRequestDTO.class
+                                                              )
+                                                              @RequestPart(name = "employee", required = false) String employeeDTOStr) {
         try {
             EmployeeRequestDTO employeeRequestDTO = objectMapper.readValue(employeeDTOStr, EmployeeRequestDTO.class);
             log.info("Deserialized string into EmployeeRequestDTO: {}", employeeRequestDTO.toString());
-
-            EmployeeResponseDTO employeeResponseDTO = employeeService.updateEmployee(avatarImg, employeeRequestDTO);
+            EmployeeResponseDTO employeeResponseDTO = employeeService.updateEmployee(id, avatarImg, employeeRequestDTO);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(employeeResponseDTO);
         } catch (JsonProcessingException e) {
