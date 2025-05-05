@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
-import ua.shpp.dto.employee.EmployeeCreateRequestDTO;
+import ua.shpp.dto.employee.EmployeeRequestDTO;
 import ua.shpp.dto.employee.EmployeeServiceCreateDTO;
 import ua.shpp.entity.*;
 import ua.shpp.model.GlobalRole;
@@ -196,7 +196,7 @@ class EmployeeServiceTest {
     }
 
     private EmployeeEntity createEmployee(String name, String email, Long branchId, Set<Long> existingServiceIds, Set<EmployeeServiceCreateDTO> newServices) {
-        EmployeeCreateRequestDTO createEmployeeDTO = EmployeeCreateRequestDTO.builder()
+        EmployeeRequestDTO createEmployeeDTO = EmployeeRequestDTO.builder()
                 .name(name)
                 .email(email)
                 .branchId(branchId)

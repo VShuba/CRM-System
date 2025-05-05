@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ua.shpp.dto.employee.EmployeeCreateRequestDTO;
+import ua.shpp.dto.employee.EmployeeRequestDTO;
 import ua.shpp.dto.employee.EmployeeResponseDTO;
 import ua.shpp.dto.employee.EmployeeServicesResponseDTO;
 import ua.shpp.exception.InvalidJsonFormatException;
@@ -36,16 +36,16 @@ public class EmployeeController {
     public ResponseEntity<EmployeeResponseDTO> addEmployee(@RequestPart(name = "avatar") MultipartFile avatarImg,
                                                            @Schema(
                                                                    description = "JSON-formatted employee data " +
-                                                                           "(EmployeeCreateRequestDTO) as string",
+                                                                           "(EmployeeRequestDTO) as string",
                                                                    requiredMode = Schema.RequiredMode.REQUIRED,
-                                                                   implementation = EmployeeCreateRequestDTO.class
+                                                                   implementation = EmployeeRequestDTO.class
                                                            )
                                                            @RequestPart(name = "employee") String employeeDTOStr) {
         try {
-            EmployeeCreateRequestDTO employeeCreateRequestDTO = objectMapper.readValue(employeeDTOStr, EmployeeCreateRequestDTO.class);
-            log.info("Deserialized string into EmployeeRequestDTO: {}", employeeCreateRequestDTO.toString());
+            EmployeeRequestDTO employeeRequestDTO = objectMapper.readValue(employeeDTOStr, EmployeeRequestDTO.class);
+            log.info("Deserialized string into EmployeeRequestDTO: {}", employeeRequestDTO.toString());
 
-            EmployeeResponseDTO employeeResponseDTO = employeeService.createEmployee(avatarImg, employeeCreateRequestDTO);
+            EmployeeResponseDTO employeeResponseDTO = employeeService.createEmployee(avatarImg, employeeRequestDTO);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(employeeResponseDTO);
         } catch (JsonProcessingException e) {
