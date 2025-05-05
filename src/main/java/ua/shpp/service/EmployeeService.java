@@ -99,7 +99,7 @@ public class EmployeeService {
         EmployeeEntity employeeEntity = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EntityNotFoundException("Employee with id " + employeeId + " not found"));
 
-        return null;
+        return employeeMapper.serviceEntitiesToEmployeeServiceResponseDTO(employeeEntity.getServices());
     }
 
     /**
