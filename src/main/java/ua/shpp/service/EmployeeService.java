@@ -86,6 +86,11 @@ public class EmployeeService {
         return employeeMapper.employeeEntityToEmployeeResponseDTO(employeeEntity, base64Avatar);
     }
 
+    public EmployeeResponseDTO updateEmployee(MultipartFile avatarImg, EmployeeRequestDTO employeeRequestDTO) {
+
+        return null;
+    }
+
     public boolean deleteEmployee(Long employeeId) {
         if (!employeeRepository.existsById(employeeId)) {
             return false;

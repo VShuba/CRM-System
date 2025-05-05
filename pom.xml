@@ -10,7 +10,7 @@
     </parent>
     <groupId>ua</groupId>
     <artifactId>shpp</artifactId>
-    <version>0.0.111</version>
+    <version>0.0.112</version>
     <name>crm-system</name>
     <description>crm-system</description>
     <url/>

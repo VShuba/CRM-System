@@ -53,6 +53,29 @@ public class EmployeeController {
         }
     }
 
+    @PutMapping(path = "/employee",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Update employee with avatar and JSON data")
+    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@RequestPart(name = "avatar", required = false) MultipartFile avatarImg,
+                                                           @Schema(
+                                                                   description = "JSON-formatted employee data " +
+                                                                           "(EmployeeRequestDTO) as string",
+                                                                   requiredMode = Schema.RequiredMode.REQUIRED,
+                                                                   implementation = EmployeeRequestDTO.class
+                                                           )
+                                                           @RequestPart(name = "employee", required = false) String employeeDTOStr) {
+        try {
+            EmployeeRequestDTO employeeRequestDTO = objectMapper.readValue(employeeDTOStr, EmployeeRequestDTO.class);
+            log.info("Deserialized string into EmployeeRequestDTO: {}", employeeRequestDTO.toString());
+
+            EmployeeResponseDTO employeeResponseDTO = employeeService.updateEmployee(avatarImg, employeeRequestDTO);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(employeeResponseDTO);
+        } catch (JsonProcessingException e) {
+            throw new InvalidJsonFormatException("Invalid JSON format for EmployeeRequestDTO", e);
+        }
+    }
+
     @GetMapping("/employee/{id}")
     @Operation(summary = "Get employee")
     @PreAuthorize("@authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).MANAGER)")
