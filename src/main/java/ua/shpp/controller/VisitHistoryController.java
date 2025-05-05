@@ -38,7 +38,7 @@ public class VisitHistoryController {
                     description = "Client not found (if you implement client existence check)", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    @GetMapping("/client/{clientId}")
+    @GetMapping("/clients/{clientId}")
     public ResponseEntity<List<VisitHistoryDTO>> getClientVisitHistory(@PathVariable Long clientId) {
         log.debug("Received request to get visit history for client ID: {}", clientId);
         List<VisitHistoryDTO> history = visitHistoryService.getVisitHistoryByClientId(clientId);

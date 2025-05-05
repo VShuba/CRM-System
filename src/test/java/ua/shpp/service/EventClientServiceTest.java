@@ -18,9 +18,7 @@ import ua.shpp.exception.ClientNotFoundException;
 import ua.shpp.exception.EventForClientNotFoundException;
 import ua.shpp.exception.EventNotFoundException;
 import ua.shpp.model.ClientEventStatus;
-import ua.shpp.repository.ClientRepository;
-import ua.shpp.repository.ScheduleEventRepository;
-import ua.shpp.repository.EventClientRepository;
+import ua.shpp.repository.*;
 import ua.shpp.mapper.EventClientMapper;
 import ua.shpp.entity.ScheduleEventEntity;
 
@@ -52,6 +50,11 @@ class EventClientServiceTest {
 
     @Mock
     private EventClientMapper eventClientMapper;
+
+    @Mock
+    private OneTimeInfoRepository oneTimeInfoRepository;
+    @Mock
+    private SubscriptionInfoRepository subscriptionInfoRepository;
 
     @InjectMocks
     private EventClientService eventClientService;
@@ -507,5 +510,78 @@ class EventClientServiceTest {
         verify(scheduleEventRepository).findById(eventId);
 
         verifyNoInteractions(eventClientRepository, eventClientMapper, visitHistoryService);
+    }
+
+    @Test
+    void testChangeClientStatus_setsOnlyOneTimeInfo_whenSubscriptionInfoIsNull() {
+        // Given
+        Long clientId = 1L;
+        Long eventId = 2L;
+        Long oneTimeInfoId = 300L;
+
+        EventClientDto dto = mock(EventClientDto.class);
+        when(dto.clientId()).thenReturn(clientId);
+        when(dto.scheduleId()).thenReturn(eventId);
+        when(dto.clientEventStatus()).thenReturn(ClientEventStatus.USED);
+        when(dto.oneTimeInfoId()).thenReturn(oneTimeInfoId);
+
+        EventClientId eventClientId = new EventClientId(clientId, eventId);
+        EventClientEntity entity = EventClientEntity.builder()
+                .eventUserId(eventClientId)
+                .clientEventStatus(ClientEventStatus.ASSIGNED)
+                .build();
+
+        OneTimeInfoEntity oneTimeInfo = mock(OneTimeInfoEntity.class);
+
+        when(eventClientRepository.findById(eventClientId)).thenReturn(Optional.of(entity));
+        when(oneTimeInfoRepository.findById(oneTimeInfoId)).thenReturn(Optional.of(oneTimeInfo));
+        when(eventClientRepository.save(any())).thenReturn(entity);
+
+        // When
+        eventClientService.changeClientStatus(dto);
+
+        // Then
+        assertEquals(oneTimeInfo, entity.getOneTimeInfo());
+        assertNull(entity.getSubscriptionInfo());
+        verify(oneTimeInfoRepository).findById(oneTimeInfoId);
+        verify(subscriptionInfoRepository, never()).findById(any());
+        verify(visitHistoryService).createVisitHistoryEntry(entity);
+    }
+
+    @Test
+    void testChangeClientStatus_setsSubscriptionInfo_whenSubscriptionInfoIdIsPresent() {
+        // Given
+        Long clientId = 1L;
+        Long eventId = 2L;
+        Long subscriptionInfoId = 200L;
+
+        EventClientDto dto = mock(EventClientDto.class);
+        when(dto.clientId()).thenReturn(1L);
+        when(dto.scheduleId()).thenReturn(eventId);
+        when(dto.clientEventStatus()).thenReturn(ClientEventStatus.USED);
+        when(dto.oneTimeInfoId()).thenReturn(null);
+        when(dto.subscriptionInfoId()).thenReturn(subscriptionInfoId);
+
+        EventClientId eventClientId = new EventClientId(clientId, eventId);
+        EventClientEntity entity = EventClientEntity.builder()
+                .eventUserId(eventClientId)
+                .clientEventStatus(ClientEventStatus.ASSIGNED)
+                .build();
+
+        SubscriptionInfoEntity subscriptionInfo = mock(SubscriptionInfoEntity.class);
+
+        when(eventClientRepository.findById(eventClientId)).thenReturn(Optional.of(entity));
+        when(subscriptionInfoRepository.findById(subscriptionInfoId)).thenReturn(Optional.of(subscriptionInfo));
+        when(eventClientRepository.save(any())).thenReturn(entity);
+        when(eventClientMapper.toDto(any())).thenReturn(mock(EventClientDto.class));
+
+        // When
+        eventClientService.changeClientStatus(dto);
+
+        // Then
+        assertEquals(subscriptionInfo, entity.getSubscriptionInfo());
+        verify(subscriptionInfoRepository).findById(subscriptionInfoId);
+        verify(oneTimeInfoRepository, never()).findById(any());
+        verify(visitHistoryService).createVisitHistoryEntry(entity);
     }
 }

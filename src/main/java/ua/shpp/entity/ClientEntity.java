@@ -66,14 +66,11 @@ public class ClientEntity {
     @JsonIgnore
     private List<EventClientEntity> userEvents;
 
-    @OneToMany(
-            mappedBy = "client",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<VisitHistoryEntity> visitHistory = new ArrayList<>();
 
-//    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<SubscriptionEntity> subscriptions = new ArrayList<>();
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<SubscriptionHistoryEntity> subscriptionHistoryEntities = new ArrayList<>();
 }

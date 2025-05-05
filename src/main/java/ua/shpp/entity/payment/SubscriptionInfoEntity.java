@@ -44,5 +44,4 @@ public non-sealed class SubscriptionInfoEntity implements Checkable {
                         .getTermOfValidityInDays()
                         .getDays());
     }
-    //todo eventTypeEntity
 }

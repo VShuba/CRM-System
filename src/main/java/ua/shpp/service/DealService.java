@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.shpp.dto.*;
+import ua.shpp.entity.SubscriptionHistoryEntity;
+import ua.shpp.entity.SubscriptionServiceEntity;
 import ua.shpp.entity.payment.CheckEntity;
 import ua.shpp.entity.payment.Checkable;
 import ua.shpp.entity.payment.OneTimeInfoEntity;
@@ -14,6 +16,7 @@ import ua.shpp.exception.DealNotFoundException;
 import ua.shpp.exception.VisitAlreadyUsedException;
 import ua.shpp.mapper.CheckMapper;
 import ua.shpp.mapper.OneTimeInfoMapper;
+import ua.shpp.mapper.SubscriptionHistoryMapper;
 import ua.shpp.mapper.SubscriptionInfoMapper;
 import ua.shpp.model.ClientEventStatus;
 import ua.shpp.model.PaymentMethod;
@@ -32,13 +35,11 @@ public class DealService {
     private final SubscriptionOfferRepository subscriptionOfferRepository;
     private final CheckRepository checkRepository;
     private final ClientRepository clientRepository;
-
     private final OneTimeInfoMapper oneTimeInfoMapper;
     private final SubscriptionInfoMapper subscriptionInfoMapper;
     private final CheckMapper checkMapper;
-
     private final EventClientService eventClientService;
-
+    private final SubscriptionHistoryService subscriptionHistoryService;
 
     public OneTimeInfoResponseDto createOneTime(OneTimeInfoRequestDto dto, PaymentMethod paymentMethod) {
         log.info("createOneTime() called with DTO: {}, payment method: {}", dto, paymentMethod);
@@ -69,6 +70,15 @@ public class DealService {
         entity = subscriptionInfoRepository.save(entity);
         log.info("Created subscription deal (id={})", entity.getId());
         log.debug("Created subscription deal entity: {}", entity);
+        entity = subscriptionInfoRepository.save(entity);
+        log.info("Created subscription deal (id={})", entity.getId());
+        log.debug("Created subscription deal entity: {}", entity);
+
+        // Після покупки підписки автоматично запис в історію підписок
+        subscriptionHistoryService.createSubscriptionHistory(entity);
+        log.debug("Requested creation of subscription history for SubscriptionInfo ID: {}", entity.getId());
+
+        log.debug("Mapping saved SubscriptionInfo back to Response DTO");
         return subscriptionInfoMapper.toDto(entity);
     }
 
@@ -103,9 +113,9 @@ public class DealService {
     }
 
     @Transactional
-    public OneTimeInfoResponseDto visitOneTimeByIdAndScheduleEventId (Long oneTimeId, Long scheduleEventId) {
+    public OneTimeInfoResponseDto visitOneTimeByIdAndScheduleEventId(Long oneTimeId, Long scheduleEventId) {
         log.info("visitOneTimeByIdAndScheduleEventId() called with one-time id: {}, schedule id: {} ",
-                oneTimeId,scheduleEventId);
+                oneTimeId, scheduleEventId);
         var entity = getOneTimeEntityById(oneTimeId);
         log.debug("Fetching one-time deal entity: {}", entity);
         if (Boolean.TRUE.equals(entity.getVisitUsed())) {
@@ -116,14 +126,15 @@ public class DealService {
         log.info("OneTime with id: {}, visit: {}", oneTimeId, entity.getVisitUsed());
         log.debug("Updated one-time deal entity: {}", entity);
 
-       eventClientService
+        eventClientService
                 .changeClientStatus(new EventClientDto(entity.getClient().getId(),
-                scheduleEventId, ClientEventStatus.USED, oneTimeId, null));
+                        scheduleEventId, ClientEventStatus.USED, oneTimeId, null));
         log.info("Set one-time id: {}, schedule id: {},  status  {}",
                 oneTimeId, scheduleEventId, ClientEventStatus.USED);
         return oneTimeInfoMapper.toDto(entity);
     }
 
+    /////
     public SubscriptionInfoResponseDto subscriptionVisitById(Long id) {
         log.info("subscriptionVisitById() called with id: {}", id);
         var entity = getSubscriptionEntityById(id);
@@ -136,6 +147,11 @@ public class DealService {
         entity = subscriptionInfoRepository.save(entity);
         log.info("Subscription with id: {}, visit: {}", id, entity.getVisits());
         log.debug("Updated subscription deal entity: {}", entity);
+
+        // Викликаємо сервіс історії для оновлення visits_left, передаючи оновлену сутність
+        subscriptionHistoryService.updateHistoryVisitsRemaining(entity);
+        log.debug("Requested update of visits_left in history for SubscriptionInfo ID: {}", entity.getId());
+
         return subscriptionInfoMapper.toDto(entity);
     }
 
@@ -187,7 +203,6 @@ public class DealService {
                 entity.getVisits() > 0,
                 entity.getVisits());
     }
-
 
     private SubscriptionInfoEntity getSubscriptionEntityById(Long id) {
         return subscriptionInfoRepository.findById(id).orElseThrow(
@@ -249,6 +264,4 @@ public class DealService {
             default -> throw new IllegalStateException("Unexpected value: " + entity.getClass().getName());
         };
     }
-
-
 }

@@ -82,22 +82,22 @@ public class DealController {
         return ResponseEntity.ok(dto);
     }
 
-@Operation(summary = "Create subscription offer deal")
-@ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Subscription deal successfully created",
-                content = @Content(mediaType = "application/json",
-                        schema = @Schema(implementation = SubscriptionInfoResponseDto.class))),
-        @ApiResponse(responseCode = "404", description = "Client, Service or Event type id not fount", content = @Content),
-})
-@PostMapping("/subscription/{paymentMethod}")
-public ResponseEntity<SubscriptionInfoResponseDto> create(
-        @RequestBody SubscriptionInfoRequestDto dto,
-        @PathVariable("paymentMethod") PaymentMethod paymentMethod) {
-    var service = dealService.createSubscription(dto, paymentMethod);
-    URI location = URI.create("/api/deal/subscription/" + service.id());
+    @Operation(summary = "Create subscription offer deal")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Subscription deal successfully created",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = SubscriptionInfoResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "Client, Service or Event type id not fount", content = @Content),
+    })
+    @PostMapping("/subscription/{paymentMethod}")
+    public ResponseEntity<SubscriptionInfoResponseDto> create(
+            @RequestBody SubscriptionInfoRequestDto dto,
+            @PathVariable("paymentMethod") PaymentMethod paymentMethod) {
+        var service = dealService.createSubscription(dto, paymentMethod);
+        URI location = URI.create("/api/deal/subscription/" + service.id());
 
-    return ResponseEntity.created(location).body(service);
-}
+        return ResponseEntity.created(location).body(service);
+    }
 
     @Operation(summary = "Get subscription deal by id")
     @ApiResponses(value = {
@@ -112,7 +112,6 @@ public ResponseEntity<SubscriptionInfoResponseDto> create(
         return ResponseEntity.ok(dto);
     }
 
-    @Deprecated
     @Operation(summary = "Use subscription deal by id and schedule event id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Subscription deal visit successfully added",
@@ -139,7 +138,7 @@ public ResponseEntity<SubscriptionInfoResponseDto> create(
     public ResponseEntity<SubscriptionInfoResponseDto> visitSubscriptionById(
             @PathVariable("id") Long id,
             @PathVariable("scheduleId") Long scheduleId) {
-        var dto = dealService.subscriptionVisitByIdAndScheduleEventId(id,scheduleId);
+        var dto = dealService.subscriptionVisitByIdAndScheduleEventId(id, scheduleId);
         return ResponseEntity.ok(dto);
     }
 
@@ -155,6 +154,4 @@ public ResponseEntity<SubscriptionInfoResponseDto> create(
         var dto = dealService.getCheckById(id);
         return ResponseEntity.ok(dto);
     }
-
-
 }
