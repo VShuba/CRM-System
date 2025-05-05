@@ -84,37 +84,39 @@ public class EmployeeService {
     }
 
     public EmployeeResponseDTO updateEmployee(Long id, MultipartFile avatarImg, EmployeeUpdateRequestDTO employeeRequestDTO) {
-        EmployeeEntity oldEmployeeEntity = employeeRepository.findById(id)
+        EmployeeEntity employeeEntity = employeeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Employee with id " + id + " not found"));
 
         String base64Avatar;
         if (avatarImg != null && !avatarImg.isEmpty()) {
             ImageUtil.checkMaxImgSizeInMB(avatarImg, MAX_AVATAR_SIZE_MB);
             byte[] resizedBytesAvatar = ImageUtil.resizeImage(avatarImg, AVATAR_WIDTH, AVATAR_HEIGHT);
-            oldEmployeeEntity.setAvatar(resizedBytesAvatar);
+            employeeEntity.setAvatar(resizedBytesAvatar);
             base64Avatar = ImageUtil.convertImageToBase64(resizedBytesAvatar);
         } else {
-            byte[] bytesAvatar = oldEmployeeEntity.getAvatar();
+            byte[] bytesAvatar = employeeEntity.getAvatar();
             base64Avatar = ImageUtil.convertImageToBase64(bytesAvatar);
         }
 
         if (employeeRequestDTO != null) {
-            if (employeeRequestDTO.name() != null) oldEmployeeEntity.setName(employeeRequestDTO.name());
-            if (employeeRequestDTO.email() != null) oldEmployeeEntity.setEmail(employeeRequestDTO.email());
-            if (employeeRequestDTO.phone() != null) oldEmployeeEntity.setPhone(employeeRequestDTO.phone());
+            if (employeeRequestDTO.name() != null) employeeEntity.setName(employeeRequestDTO.name());
+            if (employeeRequestDTO.email() != null) employeeEntity.setEmail(employeeRequestDTO.email());
+            if (employeeRequestDTO.phone() != null) employeeEntity.setPhone(employeeRequestDTO.phone());
 
             List<ServiceEntity> existing = findExistingServicesById(employeeRequestDTO.existingServicesIds());
             Set<ServiceEntity> updatedServices = new HashSet<>(existing);
 
-            List<ServiceEntity> newServiceEntities = saveNewServices(employeeRequestDTO.newServicesDTO(), oldEmployeeEntity.getBranch());
+            List<ServiceEntity> newServiceEntities = saveNewServices(employeeRequestDTO.newServicesDTO(), employeeEntity.getBranch());
             updatedServices.addAll(newServiceEntities);
 
             if (!updatedServices.isEmpty()) {
-                oldEmployeeEntity.setServices(updatedServices);
+                employeeEntity.setServices(updatedServices);
             }
         }
 
-        return employeeMapper.employeeEntityToEmployeeResponseDTO(oldEmployeeEntity, base64Avatar);
+        employeeRepository.save(employeeEntity);
+
+        return employeeMapper.employeeEntityToEmployeeResponseDTO(employeeEntity, base64Avatar);
     }
 
     public boolean deleteEmployee(Long employeeId) {
