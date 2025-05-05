@@ -23,6 +23,8 @@ public interface EmployeeMapper {
     @Mapping(target = "branchId", source = "employeeEntity.branch.id")
     EmployeeResponseDTO employeeEntityToEmployeeResponseDTO(EmployeeEntity employeeEntity, String base64Avatar);
 
+    List<EmployeeServicesResponseDTO> serviceEntitiesToEmployeeServiceResponseDTO(Set<ServiceEntity> services);
+
     @Named("mapServicesToIds")
     default List<Long> mapServiceEntitiesToIds(Set<ServiceEntity> serviceEntities) {
         return serviceEntities.stream()
