@@ -134,7 +134,6 @@ public class DealService {
         return oneTimeInfoMapper.toDto(entity);
     }
 
-    /////
     public SubscriptionInfoResponseDto subscriptionVisitById(Long id) {
         log.info("subscriptionVisitById() called with id: {}", id);
         var entity = getSubscriptionEntityById(id);
@@ -169,6 +168,10 @@ public class DealService {
         entity = subscriptionInfoRepository.save(entity);
         log.info("Subscription with id: {}, visit: {}", subscriptionId, entity.getVisits());
         log.debug("Updated subscription deal entity: {}", entity);
+
+        // Викликаємо сервіс історії для оновлення visits_left, передаючи оновлену сутність
+        subscriptionHistoryService.updateHistoryVisitsRemaining(entity);
+        log.debug("Requested update of visits_left in history for SubscriptionInfo ID: {}", entity.getId());
 
         eventClientService
                 .changeClientStatus(new EventClientDto(entity.getClient().getId(),
