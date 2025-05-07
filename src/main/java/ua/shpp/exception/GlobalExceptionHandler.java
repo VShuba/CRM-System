@@ -34,13 +34,13 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Побудова відповіді про помилку з детальною інформацією.
+     * Constructing an error response with detailed information
      *
-     * @param ex      екземпляр виключення
-     * @param status  HTTP-статус, який буде встановлено у відповіді
-     * @param message повідомлення про помилку
-     * @param request HTTP-запит, що спричинив виключення
-     * @return ResponseEntity з відповіддю про помилку та відповідним HTTP-статусом
+     * @param ex      exception instance
+     * @param status  HTTP status to be set in the response
+     * @param message error message
+     * @param request HTTP request that caused the exception
+     * @return ResponseEntity with error response and corresponding HTTP status
      */
     private ResponseEntity<ErrorResponse> buildErrorResponse(Exception ex, HttpStatus status,
                                                              String message, HttpServletRequest request) {
@@ -232,4 +232,15 @@ public class GlobalExceptionHandler {
                                                               HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Visit already used", request);
     }
+
+    // for Subscription History
+
+    @ExceptionHandler(SubscriptionHistoryCreationException.class)
+    public ResponseEntity<ErrorResponse> handleSubscriptionHistoryCreationException(
+            SubscriptionHistoryCreationException ex, HttpServletRequest request) {
+
+        return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR,
+                "Failed to create subscription history record", request);
+    }
+
 }

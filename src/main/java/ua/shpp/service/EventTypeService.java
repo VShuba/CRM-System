@@ -11,13 +11,9 @@ import org.springframework.stereotype.Service;
 import ua.shpp.dto.EventTypeRequestDTO;
 import ua.shpp.dto.EventTypeResponseDTO;
 import ua.shpp.entity.EventTypeEntity;
-import ua.shpp.entity.SubscriptionServiceEntity;
-import ua.shpp.exception.BranchNotFoundException;
 import ua.shpp.exception.EventTypeAlreadyExistsException;
 import ua.shpp.exception.EventTypeNotFoundException;
 import ua.shpp.mapper.EventTypeMapper;
-import ua.shpp.mapper.OneTimeOfferMapper;
-import ua.shpp.mapper.SubscriptionOfferMapper;
 import ua.shpp.repository.*;
 
 import java.util.ArrayList;
@@ -27,7 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class EventTypeService {
-
     private final EventTypeRepository eventTypeRepository;
     private final EventTypeMapper eventTypeMapper;
     private final ServiceRepository serviceRepository;
@@ -54,12 +49,9 @@ public class EventTypeService {
 
     public EventTypeResponseDTO getById(Long id) {
         log.info("Fetching EventType with ID: {}", id);
-        EventTypeEntity entity = eventTypeRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("EventType not found: {}", id);
-                    return new EventTypeNotFoundException("Event type with id " + id + " not found");
-                });
-        return eventTypeMapper.toResponseDTO(entity);
+        return eventTypeRepository.findById(id)
+                .map(eventTypeMapper::toResponseDTO)
+                .orElseThrow(() -> new EventTypeNotFoundException("Event type with id " + id + " not found"));
     }
 
     public List<EventTypeResponseDTO> getAllByBranch(Long branchId) {
@@ -73,14 +65,11 @@ public class EventTypeService {
         log.info("Updating EventType with ID: {}", id);
 
         EventTypeEntity existing = eventTypeRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("EventType not found: {}", id);
-                    return new EventTypeNotFoundException("Event type with id " + id + " not found");
-                });
+                .orElseThrow(() -> new EventTypeNotFoundException("Event type with id " + id + " not found"));
 
         validateNameChangeUniqueness(existing, dto);
-        eventTypeMapper.updateFromDto(dto,existing,
-                serviceRepository,branchRepository,oneTimeOfferRepository,subscriptionOfferRepository);
+        eventTypeMapper.updateFromDto(dto, existing,
+                serviceRepository, branchRepository, oneTimeOfferRepository, subscriptionOfferRepository);
         log.info("Updated EventType with ID: {}, entity: {}", existing.getId(), existing);
 
         EventTypeEntity updated = eventTypeRepository.save(existing);
@@ -93,7 +82,6 @@ public class EventTypeService {
         log.info("Deleting EventType with ID: {}", id);
 
         if (!eventTypeRepository.existsById(id)) {
-            log.warn("EventType not found: {}", id);
             throw new EventTypeNotFoundException("Event type with id " + id + " not found");
         }
 
@@ -132,7 +120,6 @@ public class EventTypeService {
         return page.map(eventTypeMapper::toResponseDTO);
     }
 
-
     private void validateUniqueEventType(String name, Long branchId) {
         if (eventTypeRepository.existsByNameAndBranchId(name, branchId)) {
             log.warn("Duplicate EventType: '{}' in branch '{}'", name, branchId);
@@ -141,7 +128,7 @@ public class EventTypeService {
         }
     }
 
-    private void validateNameChangeUniqueness(EventTypeEntity existing, EventTypeRequestDTO dto) {
+    public void validateNameChangeUniqueness(EventTypeEntity existing, EventTypeRequestDTO dto) {
         boolean nameChanged = !existing.getName().equals(dto.name());
         boolean branchChanged = !existing.getBranch().getId().equals(dto.branchId());
 

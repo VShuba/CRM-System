@@ -19,27 +19,29 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/subscription-history")
 @RequiredArgsConstructor
-@Tag(name = "Subscription History", description = "API для перегляду історії підписок клієнтів")
+@Tag(name = "Subscription History", description = "API for viewing customer subscription history")
 public class SubscriptionHistoryController {
 
     private final SubscriptionHistoryService subscriptionHistoryService;
 
-    @Operation(summary = "Отримати відфільтровану історію підписок клієнта",
-            description = "Повертає список дійсних або недійсних підписок клієнта з історії за параметром `isValid`.")
+    @Operation(summary = "Get a filtered history of a customer's subscriptions",
+            description = "Returns a list of valid or invalid client subscriptions from history by" +
+                    " the `isValid` parameter")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успішно отримано список підписок",
+            @ApiResponse(responseCode = "200", description = "Subscription list successfully retrieved",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = SubscriptionHistoryDTO[].class))),
-            @ApiResponse(responseCode = "400", description = "Невірний запит (наприклад, відсутній параметр 'isValid')",
+            @ApiResponse(responseCode = "400", description = "Invalid query (e.g. missing 'isValid' parameter)",
                     content = @Content),
-            @ApiResponse(responseCode = "404", description = "Клієнта з вказаним ID не знайдено", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Внутрішня помилка сервера", content = @Content)
+            @ApiResponse(responseCode = "404", description = "No client with the specified ID was found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/clients/{clientId}/filter")
     public ResponseEntity<List<SubscriptionHistoryDTO>> getClientSubscriptionHistory(
-            @Parameter(description = "ID клієнта", required = true, example = "1")
+            @Parameter(description = "Client ID", required = true, example = "1")
             @PathVariable Long clientId,
-            @Parameter(description = "Фільтр за валідністю (true - дійсні, false - недійсні)",
+            @Parameter(description = "Filter by validity (true - valid, false - invalid)",
                     required = true, example = "true")
             @RequestParam Boolean isValid) {
 
@@ -48,18 +50,19 @@ public class SubscriptionHistoryController {
         return ResponseEntity.ok(history);
     }
 
-    @Operation(summary = "Отримати всю історію підписок клієнта",
-            description = "Повертає повний список всіх підписок клієнта з історії (дійсних та недійсних).")
+    @Operation(summary = "Get a client's entire subscription history",
+            description = "Returns a complete list of all client subscriptions from history (valid and invalid)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успішно отримано повний список підписок",
+            @ApiResponse(responseCode = "200", description = "Successfully received full list of subscriptions",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = SubscriptionHistoryDTO[].class))),
-            @ApiResponse(responseCode = "404", description = "Клієнта з вказаним ID не знайдено", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Внутрішня помилка сервера", content = @Content)
+            @ApiResponse(responseCode = "404", description = "No client with the specified ID was found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/clients/{clientId}")
     public ResponseEntity<List<SubscriptionHistoryDTO>> getAllClientSubscriptionHistory(
-            @Parameter(description = "ID клієнта", required = true, example = "1")
+            @Parameter(description = "Client ID", required = true, example = "1")
             @PathVariable Long clientId) {
 
         List<SubscriptionHistoryDTO> history = subscriptionHistoryService.getAllSubscriptionHistoryByClient(clientId);

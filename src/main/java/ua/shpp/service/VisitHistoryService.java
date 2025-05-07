@@ -34,16 +34,13 @@ public class VisitHistoryService {
     public List<VisitHistoryDTO> getVisitHistoryByClientId(Long clientId) {
         log.debug("Fetching visit history for client ID: {}", clientId);
 
-        clientRepository.findById(clientId)
-                .orElseThrow(() -> {
-                    log.warn("Client with ID: {} not found.", clientId);
-                    return new ClientNotFoundException(clientId);
-                });
-        log.debug("Client ID: {} found.", clientId);
+        if (!clientRepository.existsById(clientId)) {
+            throw new ClientNotFoundException(clientId);
+        }
 
         List<VisitHistoryEntity> historyEntities = visitHistoryRepository.findAllByClientId(clientId);
-
         log.info("Found {} history entries for client ID: {}", historyEntities.size(), clientId);
+
         return visitHistoryMapper.toDtoList(historyEntities);
     }
 }

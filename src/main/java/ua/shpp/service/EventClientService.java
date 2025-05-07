@@ -20,7 +20,6 @@ import ua.shpp.repository.*;
 @Service
 @Slf4j
 public class EventClientService {
-
     private final EventClientRepository eventClientRepository;
     private final ClientRepository clientRepository;
     private final ScheduleEventRepository scheduleEventRepository;
@@ -46,17 +45,13 @@ public class EventClientService {
     }
 
     public EventClientDto addClientToEvent(Long clientId, Long eventId) {
-        log.debug("Attempting to add client {} to event {}", clientId, eventId);
+        log.info("Attempting to add client {} to event {}", clientId, eventId);
+
         ClientEntity clientEntity = clientRepository.findById(clientId)
-                .orElseThrow(() -> {
-                    log.warn("Client not found with ID: {}", clientId);
-                    return new ClientNotFoundException(clientId);
-                });
+                .orElseThrow(() -> new ClientNotFoundException(clientId));
+
         ScheduleEventEntity scheduleEvent = scheduleEventRepository.findById(eventId)
-                .orElseThrow(() -> {
-                    log.warn("Event not found with ID: {}", eventId);
-                    return new EventNotFoundException(eventId);
-                });
+                .orElseThrow(() -> new EventNotFoundException(eventId));
 
         EventClientEntity eventClientEntity = EventClientEntity.builder()
                 .eventUserId(new EventClientId(clientId, eventId))
@@ -120,8 +115,7 @@ public class EventClientService {
         } else {
             log.warn("Status change not possible for client {} on event {} from {} to {}." +
                             " Current status order: {}, New status order: {}",
-                    eventClientDto.clientId(), eventClientDto.scheduleId(),
-                    oldStatus, newStatus,
+                    eventClientDto.clientId(), eventClientDto.scheduleId(), oldStatus, newStatus,
                     oldStatus.getOrder(), newStatus.getOrder());
             throw new ClientEventStatusChnageException(String.format("Status change not possible from %s to %s",
                     oldStatus, newStatus));

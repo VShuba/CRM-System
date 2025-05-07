@@ -5,10 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import ua.shpp.dto.EventTypeRequestDTO;
 import ua.shpp.dto.EventTypeResponseDTO;
@@ -17,11 +14,12 @@ import ua.shpp.entity.EventTypeEntity;
 import ua.shpp.exception.EventTypeAlreadyExistsException;
 import ua.shpp.exception.EventTypeNotFoundException;
 import ua.shpp.mapper.EventTypeMapper;
-import ua.shpp.repository.BranchRepository;
-import ua.shpp.repository.EventTypeRepository;
+import ua.shpp.repository.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,109 +33,687 @@ class EventTypeServiceTest {
     @Mock
     private EventTypeMapper eventTypeMapper;
 
+    @Mock
+    private ServiceRepository serviceRepository;
+    @Mock
+    private BranchRepository branchRepository;
+    @Mock
+    private OneTimeOfferRepository oneTimeOfferRepository;
+    @Mock
+    private SubscriptionOfferRepository subscriptionOfferRepository;
+
     @InjectMocks
     private EventTypeService eventTypeService;
 
     @Test
     void create_shouldSaveAndReturnDto() {
+        // Arrange
         EventTypeRequestDTO requestDTO = mock(EventTypeRequestDTO.class);
-        EventTypeEntity entity = mock(EventTypeEntity.class);
+        EventTypeEntity entityToSave = mock(EventTypeEntity.class);
         EventTypeEntity savedEntity = mock(EventTypeEntity.class);
-        EventTypeResponseDTO responseDTO = mock(EventTypeResponseDTO.class);
+        EventTypeResponseDTO expectedResponseDTO = mock(EventTypeResponseDTO.class);
 
         when(requestDTO.name()).thenReturn("Yoga");
         when(requestDTO.branchId()).thenReturn(1L);
         when(eventTypeRepository.existsByNameAndBranchId("Yoga", 1L)).thenReturn(false);
-        when(eventTypeMapper.toEntity(eq(requestDTO), any(), any(), any(), any())).thenReturn(entity);
-        when(eventTypeRepository.save(entity)).thenReturn(savedEntity);
-        when(eventTypeMapper.toResponseDTO(savedEntity)).thenReturn(responseDTO);
+        when(eventTypeMapper.toEntity(eq(requestDTO), any(), any(), any(), any())).thenReturn(entityToSave);
+        when(eventTypeRepository.save(entityToSave)).thenReturn(savedEntity);
+        when(eventTypeMapper.toResponseDTO(savedEntity)).thenReturn(expectedResponseDTO);
 
-        EventTypeResponseDTO result = eventTypeService.create(requestDTO);
+        // Act
+        EventTypeResponseDTO actualResponseDTO = eventTypeService.create(requestDTO);
 
-        assertEquals(responseDTO, result);
+        // Assert
+        assertEquals(expectedResponseDTO, actualResponseDTO);
+        verify(eventTypeRepository).existsByNameAndBranchId("Yoga", 1L);
+        verify(eventTypeMapper).toEntity(eq(requestDTO), any(), any(), any(), any());
+        verify(eventTypeRepository).save(entityToSave);
+        verify(eventTypeMapper).toResponseDTO(savedEntity);
     }
 
     @Test
     void create_shouldThrow_whenDuplicateNameInBranch() {
+        // Arrange
         EventTypeRequestDTO dto = mock(EventTypeRequestDTO.class);
         when(dto.name()).thenReturn("Yoga");
         when(dto.branchId()).thenReturn(1L);
         when(eventTypeRepository.existsByNameAndBranchId("Yoga", 1L)).thenReturn(true);
 
+        // Act & Assert
         assertThrows(EventTypeAlreadyExistsException.class, () -> eventTypeService.create(dto));
+        verify(eventTypeRepository).existsByNameAndBranchId("Yoga", 1L);
+        verify(eventTypeMapper, never()).toEntity(any(), any(), any(), any(), any());
+        verify(eventTypeRepository, never()).save(any());
     }
 
     @Test
     void getById_shouldReturnDto_whenExists() {
-        EventTypeEntity entity = mock(EventTypeEntity.class);
-        EventTypeResponseDTO dto = mock(EventTypeResponseDTO.class);
+        // Arrange
+        Long eventTypeId = 1L;
+        EventTypeEntity foundEntity = mock(EventTypeEntity.class);
+        EventTypeResponseDTO expectedDto = mock(EventTypeResponseDTO.class);
 
-        when(eventTypeRepository.findById(1L)).thenReturn(Optional.of(entity));
-        when(eventTypeMapper.toResponseDTO(entity)).thenReturn(dto);
+        when(eventTypeRepository.findById(eventTypeId)).thenReturn(Optional.of(foundEntity));
+        when(eventTypeMapper.toResponseDTO(foundEntity)).thenReturn(expectedDto);
 
-        EventTypeResponseDTO result = eventTypeService.getById(1L);
+        // Act
+        EventTypeResponseDTO actualDto = eventTypeService.getById(eventTypeId);
 
-        assertEquals(dto, result);
+        // Assert
+        assertEquals(expectedDto, actualDto);
+        verify(eventTypeRepository).findById(eventTypeId);
+        verify(eventTypeMapper).toResponseDTO(foundEntity);
     }
 
     @Test
     void getById_shouldThrow_whenNotFound() {
-        when(eventTypeRepository.findById(1L)).thenReturn(Optional.empty());
+        // Arrange
+        Long eventTypeId = 1L;
+        when(eventTypeRepository.findById(eventTypeId)).thenReturn(Optional.empty());
 
-        assertThrows(EventTypeNotFoundException.class, () -> eventTypeService.getById(1L));
+        // Act & Assert
+        assertThrows(EventTypeNotFoundException.class, () -> eventTypeService.getById(eventTypeId));
+        verify(eventTypeRepository).findById(eventTypeId);
+        verify(eventTypeMapper, never()).toResponseDTO(any());
     }
 
     @Test
-    void getAllByBranch_shouldReturnMappedDtos() {
+    void getAllByBranch_shouldReturnMappedDTOs() {
+        // Arrange
         Long branchId = 1L;
-        EventTypeEntity entity = mock(EventTypeEntity.class);
-        EventTypeResponseDTO dto = mock(EventTypeResponseDTO.class);
+        EventTypeEntity entity1 = mock(EventTypeEntity.class);
+        EventTypeEntity entity2 = mock(EventTypeEntity.class);
+        List<EventTypeEntity> entityList = List.of(entity1, entity2);
 
-        when(eventTypeRepository.findAllByBranchId(branchId)).thenReturn(List.of(entity));
-        when(eventTypeMapper.toResponseDTO(entity)).thenReturn(dto);
+        EventTypeResponseDTO dto1 = mock(EventTypeResponseDTO.class);
+        EventTypeResponseDTO dto2 = mock(EventTypeResponseDTO.class);
+        List<EventTypeResponseDTO> expectedDtoList = List.of(dto1, dto2);
 
-        List<EventTypeResponseDTO> result = eventTypeService.getAllByBranch(branchId);
+        when(eventTypeRepository.findAllByBranchId(branchId)).thenReturn(entityList);
+        when(eventTypeMapper.toResponseDTO(entity1)).thenReturn(dto1);
+        when(eventTypeMapper.toResponseDTO(entity2)).thenReturn(dto2);
 
-        assertEquals(List.of(dto), result);
+        // Act
+        List<EventTypeResponseDTO> actualDtoList = eventTypeService.getAllByBranch(branchId);
+
+        // Assert
+        assertEquals(expectedDtoList, actualDtoList);
+        verify(eventTypeRepository).findAllByBranchId(branchId);
+        verify(eventTypeMapper, times(entityList.size())).toResponseDTO(any(EventTypeEntity.class));
+        verify(eventTypeMapper).toResponseDTO(entity1);
+        verify(eventTypeMapper).toResponseDTO(entity2);
     }
 
     @Test
     void delete_shouldRemove_whenExists() {
-        when(eventTypeRepository.existsById(1L)).thenReturn(true);
+        // Arrange
+        Long eventTypeId = 1L;
+        when(eventTypeRepository.existsById(eventTypeId)).thenReturn(true);
 
-        eventTypeService.delete(1L);
+        // Act
+        eventTypeService.delete(eventTypeId);
 
-        verify(eventTypeRepository).deleteById(1L);
+        // Assert
+        verify(eventTypeRepository).existsById(eventTypeId);
+        verify(eventTypeRepository).deleteById(eventTypeId);
     }
 
     @Test
     void delete_shouldThrow_whenNotExists() {
-        when(eventTypeRepository.existsById(1L)).thenReturn(false);
+        // Arrange
+        Long eventTypeId = 1L;
+        when(eventTypeRepository.existsById(eventTypeId)).thenReturn(false);
 
-        assertThrows(EventTypeNotFoundException.class, () -> eventTypeService.delete(1L));
+        // Act & Assert
+        assertThrows(EventTypeNotFoundException.class, () -> eventTypeService.delete(eventTypeId));
+        verify(eventTypeRepository).existsById(eventTypeId);
+        verify(eventTypeRepository, never()).deleteById(anyLong());
+    }
+
+    // === Helper methods for getFiltered tests ===
+    private Page<EventTypeEntity> createMockEntityPage(List<EventTypeEntity> entities,
+                                                       Pageable pageable, long totalElements) {
+        return new PageImpl<>(entities, pageable, totalElements);
+    }
+
+    private List<EventTypeResponseDTO> setupMockMapperForEntities(List<EventTypeEntity> entities) {
+        List<EventTypeResponseDTO> dtos = new ArrayList<>();
+        for (EventTypeEntity entity : entities) {
+            EventTypeResponseDTO dto = mock(EventTypeResponseDTO.class);
+            when(eventTypeMapper.toResponseDTO(entity)).thenReturn(dto);
+            dtos.add(dto);
+        }
+        return dtos;
+    }
+
+    private void setupRepositoryFindAll(Page<EventTypeEntity> entityPage, Pageable pageable) {
+        when(eventTypeRepository.findAll(any(Specification.class), eq(pageable)))
+                .thenReturn(entityPage);
     }
 
     @Test
-    void getFiltered_shouldReturnMappedPage() {
+    void getFiltered_shouldReturnMappedPage_whenAllFiltersApplied() {
+        // Arrange
+        String name = "yoga";
+        Long branchId = 1L;
+        Long serviceId = 2L;
         Pageable pageable = PageRequest.of(0, 10);
-        EventTypeEntity entity = mock(EventTypeEntity.class);
-        EventTypeResponseDTO dto = mock(EventTypeResponseDTO.class);
-        Page<EventTypeEntity> page = new PageImpl<>(List.of(entity));
 
-        when(eventTypeRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
-        when(eventTypeMapper.toResponseDTO(entity)).thenReturn(dto);
+        List<EventTypeEntity> entityList = IntStream.range(0, 2)
+                .mapToObj(i -> mock(EventTypeEntity.class))
+                .toList();
+        Page<EventTypeEntity> entityPage = createMockEntityPage(entityList, pageable, entityList.size());
+        List<EventTypeResponseDTO> expectedDtoList = setupMockMapperForEntities(entityList);
+        setupRepositoryFindAll(entityPage, pageable);
 
-        Page<EventTypeResponseDTO> result = eventTypeService.getFiltered("yoga", 1L, 2L, pageable);
+        // Act
+        Page<EventTypeResponseDTO> actualResultPage = eventTypeService.getFiltered(name, branchId, serviceId, pageable);
 
-        assertEquals(1, result.getContent().size());
-        assertEquals(dto, result.getContent().get(0));
+        // Assert
+        assertNotNull(actualResultPage);
+        assertEquals(entityList.size(), actualResultPage.getContent().size());
+        assertEquals(expectedDtoList, actualResultPage.getContent());
+        assertEquals(pageable.getPageNumber(), actualResultPage.getNumber());
+        assertEquals(pageable.getPageSize(), actualResultPage.getSize());
+        assertEquals(entityList.size(), actualResultPage.getTotalElements());
+        assertEquals(1, actualResultPage.getTotalPages());
+
+        // Verify
+        verify(eventTypeRepository).findAll(any(Specification.class), eq(pageable));
+        verify(eventTypeMapper, times(entityList.size())).toResponseDTO(any(EventTypeEntity.class));
+    }
+
+    @Test
+    void getFiltered_shouldReturnMappedPage_whenFilteringByName() {
+        // Arrange
+        String name = "event";
+        Pageable pageable = PageRequest.of(0, 10);
+
+        List<EventTypeEntity> entityList = IntStream.range(0, 1)
+                .mapToObj(i -> mock(EventTypeEntity.class))
+                .toList();
+        Page<EventTypeEntity> entityPage = createMockEntityPage(entityList, pageable, entityList.size());
+        List<EventTypeResponseDTO> expectedDtoList = setupMockMapperForEntities(entityList);
+        setupRepositoryFindAll(entityPage, pageable);
+
+        // Act
+        Page<EventTypeResponseDTO> actualResultPage = eventTypeService.getFiltered(name,
+                null, null, pageable);
+
+        // Assert
+        assertNotNull(actualResultPage);
+        assertEquals(entityList.size(), actualResultPage.getContent().size());
+        assertEquals(expectedDtoList, actualResultPage.getContent());
+
+        // Verify interactions
+        verify(eventTypeRepository).findAll(any(Specification.class), eq(pageable));
+        verify(eventTypeMapper, times(entityList.size())).toResponseDTO(any(EventTypeEntity.class));
+    }
+
+    @Test
+    void getFiltered_shouldReturnMappedPage_whenFilteringByBranchId() {
+        // Arrange
+        Long branchId = 5L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        List<EventTypeEntity> entityList = IntStream.range(0, 2)
+                .mapToObj(i -> mock(EventTypeEntity.class))
+                .toList();
+        Page<EventTypeEntity> entityPage = createMockEntityPage(entityList, pageable, entityList.size());
+        List<EventTypeResponseDTO> expectedDtoList = setupMockMapperForEntities(entityList);
+        setupRepositoryFindAll(entityPage, pageable);
+
+        // Act
+        Page<EventTypeResponseDTO> actualResultPage = eventTypeService.getFiltered(null, branchId,
+                null, pageable);
+
+        // Assert
+        assertNotNull(actualResultPage);
+        assertEquals(entityList.size(), actualResultPage.getContent().size());
+        assertEquals(expectedDtoList, actualResultPage.getContent());
+
+        // Verify interactions
+        verify(eventTypeRepository).findAll(any(Specification.class), eq(pageable));
+        verify(eventTypeMapper, times(entityList.size())).toResponseDTO(any(EventTypeEntity.class));
+    }
+
+    @Test
+    void getFiltered_shouldReturnMappedPage_whenFilteringByServiceId() {
+        // Arrange
+        Long serviceId = 7L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        List<EventTypeEntity> entityList = IntStream.range(0, 1)
+                .mapToObj(i -> mock(EventTypeEntity.class))
+                .toList();
+        Page<EventTypeEntity> entityPage = createMockEntityPage(entityList, pageable, entityList.size());
+        List<EventTypeResponseDTO> expectedDtoList = setupMockMapperForEntities(entityList);
+        setupRepositoryFindAll(entityPage, pageable);
+
+        // Act
+        Page<EventTypeResponseDTO> actualResultPage = eventTypeService.getFiltered(null,
+                null, serviceId, pageable);
+
+        // Assert
+        assertNotNull(actualResultPage);
+        assertEquals(entityList.size(), actualResultPage.getContent().size());
+        assertEquals(expectedDtoList, actualResultPage.getContent());
+
+        // Verify interactions
+        verify(eventTypeRepository).findAll(any(Specification.class), eq(pageable));
+        verify(eventTypeMapper, times(entityList.size())).toResponseDTO(any(EventTypeEntity.class));
+    }
+
+    @Test
+    void getFiltered_shouldReturnMappedPage_whenNoFiltersApplied() {
+        // Arrange
+        Pageable pageable = PageRequest.of(1, 20);
+
+        List<EventTypeEntity> entityList = IntStream.range(0, 3)
+                .mapToObj(i -> mock(EventTypeEntity.class))
+                .toList();
+        Page<EventTypeEntity> entityPage = createMockEntityPage(entityList, pageable, entityList.size());
+        List<EventTypeResponseDTO> expectedDtoList = setupMockMapperForEntities(entityList);
+        setupRepositoryFindAll(entityPage, pageable);
+
+        // Act
+        Page<EventTypeResponseDTO> actualResultPage = eventTypeService.getFiltered(null,
+                null, null, pageable);
+
+        // Assert
+        assertNotNull(actualResultPage);
+        assertEquals(entityList.size(), actualResultPage.getContent().size());
+        assertEquals(expectedDtoList, actualResultPage.getContent());
+        assertEquals(pageable.getPageNumber(), actualResultPage.getNumber());
+        assertEquals(pageable.getPageSize(), actualResultPage.getSize());
+
+        // Verify interactions
+        verify(eventTypeRepository).findAll(any(Specification.class), eq(pageable));
+        verify(eventTypeMapper, times(entityList.size())).toResponseDTO(any(EventTypeEntity.class));
+    }
+
+    @Test
+    void getFiltered_shouldReturnEmptyPage_whenRepositoryReturnsEmptyPage() {
+        // Arrange
+        String name = "nonexistent";
+        Long branchId = 99L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<EventTypeEntity> emptyEntityPage = Page.empty(pageable);
+        setupRepositoryFindAll(emptyEntityPage, pageable);
+
+        // Act
+        Page<EventTypeResponseDTO> actualResultPage = eventTypeService.getFiltered(name,
+                branchId, null, pageable);
+
+        // Assert
+        assertNotNull(actualResultPage);
+        assertTrue(actualResultPage.getContent().isEmpty());
+        assertEquals(0, actualResultPage.getTotalElements());
+        assertEquals(0, actualResultPage.getTotalPages());
+        assertEquals(pageable.getPageNumber(), actualResultPage.getNumber());
+        assertEquals(pageable.getPageSize(), actualResultPage.getSize());
+
+        // Verify
+        verify(eventTypeRepository).findAll(any(Specification.class), eq(pageable));
+        verify(eventTypeMapper, never()).toResponseDTO(any(EventTypeEntity.class));
+    }
+
+    @Test
+    void getFiltered_shouldTreatBlankNameAsNull() {
+        // Arrange
+        String name = "";
+        Long branchId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        List<EventTypeEntity> entityList = IntStream.range(0, 1)
+                .mapToObj(i -> mock(EventTypeEntity.class))
+                .toList();
+        Page<EventTypeEntity> entityPage = createMockEntityPage(entityList, pageable, entityList.size());
+        List<EventTypeResponseDTO> expectedDtoList = setupMockMapperForEntities(entityList);
+        setupRepositoryFindAll(entityPage, pageable);
+
+        // Act
+        Page<EventTypeResponseDTO> actualResultPage = eventTypeService.getFiltered(name, branchId,
+                null, pageable);
+
+        // Assert
+        assertNotNull(actualResultPage);
+        assertEquals(entityList.size(), actualResultPage.getContent().size());
+        assertEquals(expectedDtoList, actualResultPage.getContent());
+
+        // Verify
+        verify(eventTypeRepository).findAll(any(Specification.class), eq(pageable));
+        verify(eventTypeMapper, times(entityList.size())).toResponseDTO(any(EventTypeEntity.class));
     }
 
     @Test
     void update_shouldThrow_whenEntityNotFound() {
+        // Arrange
+        Long eventTypeId = 1L;
         EventTypeRequestDTO dto = mock(EventTypeRequestDTO.class);
-        when(eventTypeRepository.findById(1L)).thenReturn(Optional.empty());
+        when(eventTypeRepository.findById(eventTypeId)).thenReturn(Optional.empty());
 
-        assertThrows(EventTypeNotFoundException.class, () -> eventTypeService.update(1L, dto));
+        // Act & Assert
+        assertThrows(EventTypeNotFoundException.class, () -> eventTypeService.update(eventTypeId, dto));
+        verify(eventTypeRepository).findById(eventTypeId);
+        verify(eventTypeMapper, never()).updateFromDto(any(), any(), any(), any(), any(), any());
+        verify(eventTypeRepository, never()).save(any());
+    }
+
+    @Test
+    void validateNameChangeUniqueness_nameChanged_branchChanged_exists_duplicate() {
+        // Arrange
+        String newName = "Yoga Class";
+        Long newBranchId = 2L;
+        String existingName = "Old Yoga Class";
+        Long existingBranchId = 1L;
+
+        BranchEntity existingBranch = mock(BranchEntity.class);
+        when(existingBranch.getId()).thenReturn(existingBranchId);
+
+        EventTypeEntity existingEventType = mock(EventTypeEntity.class);
+        when(existingEventType.getName()).thenReturn(existingName);
+        when(existingEventType.getBranch()).thenReturn(existingBranch);
+
+
+        EventTypeRequestDTO dto = mock(EventTypeRequestDTO.class);
+        when(dto.name()).thenReturn(newName);
+        when(dto.branchId()).thenReturn(newBranchId);
+        when(eventTypeRepository.existsByNameAndBranchId(newName, newBranchId)).thenReturn(true);
+
+        // Act & Assert
+        EventTypeAlreadyExistsException thrown = assertThrows(EventTypeAlreadyExistsException.class, () ->
+                eventTypeService.validateNameChangeUniqueness(existingEventType, dto));
+
+        assertTrue(thrown.getMessage().contains("Event type with name " + newName + " already exists in this branch"));
+        verify(eventTypeRepository).existsByNameAndBranchId(newName, newBranchId);
+    }
+
+    @Test
+    void validateNameChangeUniqueness_nameChanged_branchChanged_noDuplicate() {
+        // Arrange
+        String newName = "Yoga Class";
+        Long newBranchId = 2L;
+        String existingName = "Old Yoga Class";
+        Long existingBranchId = 1L;
+
+        BranchEntity existingBranch = mock(BranchEntity.class);
+        when(existingBranch.getId()).thenReturn(existingBranchId);
+
+        EventTypeEntity existingEventType = mock(EventTypeEntity.class);
+        when(existingEventType.getName()).thenReturn(existingName);
+        when(existingEventType.getBranch()).thenReturn(existingBranch);
+
+        EventTypeRequestDTO dto = mock(EventTypeRequestDTO.class);
+        when(dto.name()).thenReturn(newName);
+        when(dto.branchId()).thenReturn(newBranchId);
+        when(eventTypeRepository.existsByNameAndBranchId(newName, newBranchId)).thenReturn(false);
+
+        // Act
+        assertDoesNotThrow(() -> eventTypeService.validateNameChangeUniqueness(existingEventType, dto));
+
+        // Verify
+        verify(eventTypeRepository).existsByNameAndBranchId(newName, newBranchId);
+    }
+
+    @Test
+    void validateNameChangeUniqueness_nameNotChanged_branchChanged_exists_duplicate() {
+        // Arrange
+        String existingName = "Yoga Class";
+        Long existingBranchId = 1L;
+        Long newBranchId = 2L;
+
+        BranchEntity existingBranch = mock(BranchEntity.class);
+        when(existingBranch.getId()).thenReturn(existingBranchId);
+
+        EventTypeEntity existingEventType = mock(EventTypeEntity.class);
+        when(existingEventType.getName()).thenReturn(existingName);
+        when(existingEventType.getBranch()).thenReturn(existingBranch);
+
+
+        EventTypeRequestDTO dto = mock(EventTypeRequestDTO.class);
+        when(dto.name()).thenReturn(existingName);
+        when(dto.branchId()).thenReturn(newBranchId);
+        when(eventTypeRepository.existsByNameAndBranchId(existingName, newBranchId)).thenReturn(true);
+
+        // Act & Assert
+        EventTypeAlreadyExistsException thrown = assertThrows(EventTypeAlreadyExistsException.class, () ->
+                eventTypeService.validateNameChangeUniqueness(existingEventType, dto));
+
+        assertTrue(thrown.getMessage().contains("Event type with name " + existingName +
+                " already exists in this branch"));
+        verify(eventTypeRepository).existsByNameAndBranchId(existingName, newBranchId);
+    }
+
+    @Test
+    void validateNameChangeUniqueness_nameNotChanged_branchNotChanged_noDuplicate() {
+        // Arrange
+        String existingName = "Yoga Class";
+        Long existingBranchId = 1L;
+
+        BranchEntity existingBranch = mock(BranchEntity.class);
+        when(existingBranch.getId()).thenReturn(existingBranchId);
+
+        EventTypeEntity existingEventType = mock(EventTypeEntity.class);
+        when(existingEventType.getName()).thenReturn(existingName);
+        when(existingEventType.getBranch()).thenReturn(existingBranch);
+
+
+        EventTypeRequestDTO dto = mock(EventTypeRequestDTO.class);
+        when(dto.name()).thenReturn(existingName);
+        when(dto.branchId()).thenReturn(existingBranchId);
+
+        // Act
+        assertDoesNotThrow(() -> eventTypeService.validateNameChangeUniqueness(existingEventType, dto));
+
+        // Verify
+        verify(eventTypeRepository, never()).existsByNameAndBranchId(existingName, existingBranchId);
+    }
+
+
+
+    @Test
+    void update_shouldUpdateAndReturnDto_whenNameAndBranchAreValidAndUnique() {
+        // Arrange
+        Long eventTypeId = 1L;
+        String oldName = "Old Event";
+        Long oldBranchId = 1L;
+        String newName = "New Unique Event";
+        Long newBranchId = 2L;
+
+        EventTypeRequestDTO requestDTO = mock(EventTypeRequestDTO.class);
+        when(requestDTO.name()).thenReturn(newName);
+        when(requestDTO.branchId()).thenReturn(newBranchId);
+
+        BranchEntity existingBranch = mock(BranchEntity.class);
+        when(existingBranch.getId()).thenReturn(oldBranchId);
+
+        EventTypeEntity existingEntity = mock(EventTypeEntity.class);
+        when(existingEntity.getId()).thenReturn(eventTypeId);
+        when(existingEntity.getName()).thenReturn(oldName);
+        when(existingEntity.getBranch()).thenReturn(existingBranch);
+
+        EventTypeEntity savedEntity = mock(EventTypeEntity.class);
+        EventTypeResponseDTO responseDTO = mock(EventTypeResponseDTO.class);
+
+        when(eventTypeRepository.findById(eventTypeId)).thenReturn(Optional.of(existingEntity));
+        when(eventTypeRepository.existsByNameAndBranchId(newName, newBranchId)).thenReturn(false);
+
+        doNothing().when(eventTypeMapper).updateFromDto(
+                requestDTO,
+                existingEntity,
+                serviceRepository,
+                branchRepository,
+                oneTimeOfferRepository,
+                subscriptionOfferRepository
+        );
+
+        when(eventTypeRepository.save(existingEntity)).thenReturn(savedEntity);
+        when(eventTypeMapper.toResponseDTO(savedEntity)).thenReturn(responseDTO);
+
+        // Act
+        EventTypeResponseDTO result = eventTypeService.update(eventTypeId, requestDTO);
+
+        // Assert
+        assertEquals(responseDTO, result);
+        verify(eventTypeRepository).findById(eventTypeId);
+        verify(eventTypeRepository).existsByNameAndBranchId(newName, newBranchId);
+        verify(eventTypeMapper).updateFromDto(requestDTO, existingEntity, serviceRepository, branchRepository,
+                oneTimeOfferRepository, subscriptionOfferRepository);
+        verify(eventTypeRepository).save(existingEntity);
+        verify(eventTypeMapper).toResponseDTO(savedEntity);
+    }
+
+    @Test
+    void update_shouldUpdateAndReturnDto_whenNameAndBranchUnchanged_otherFieldsMayBeUpdatedByMapper() {
+        // Arrange
+        Long eventTypeId = 1L;
+        String currentName = "Current Event";
+        Long currentBranchId = 1L;
+
+        EventTypeRequestDTO requestDTO = mock(EventTypeRequestDTO.class);
+        when(requestDTO.name()).thenReturn(currentName);
+        when(requestDTO.branchId()).thenReturn(currentBranchId);
+
+        BranchEntity currentBranch = mock(BranchEntity.class);
+        when(currentBranch.getId()).thenReturn(currentBranchId);
+
+        EventTypeEntity existingEntity = mock(EventTypeEntity.class);
+        when(existingEntity.getId()).thenReturn(eventTypeId);
+        when(existingEntity.getName()).thenReturn(currentName);
+        when(existingEntity.getBranch()).thenReturn(currentBranch);
+
+        EventTypeEntity savedEntity = mock(EventTypeEntity.class);
+        EventTypeResponseDTO responseDTO = mock(EventTypeResponseDTO.class);
+
+        when(eventTypeRepository.findById(eventTypeId)).thenReturn(Optional.of(existingEntity));
+
+        doNothing().when(eventTypeMapper).updateFromDto(
+                requestDTO,
+                existingEntity,
+                serviceRepository,
+                branchRepository,
+                oneTimeOfferRepository,
+                subscriptionOfferRepository
+        );
+        when(eventTypeRepository.save(existingEntity)).thenReturn(savedEntity);
+        when(eventTypeMapper.toResponseDTO(savedEntity)).thenReturn(responseDTO);
+
+        // Act
+        EventTypeResponseDTO result = eventTypeService.update(eventTypeId, requestDTO);
+
+        // Assert
+        assertEquals(responseDTO, result);
+        verify(eventTypeRepository).findById(eventTypeId);
+        verify(eventTypeRepository, never()).existsByNameAndBranchId(anyString(), anyLong());
+        verify(eventTypeMapper).updateFromDto(requestDTO, existingEntity, serviceRepository, branchRepository,
+                oneTimeOfferRepository, subscriptionOfferRepository);
+        verify(eventTypeRepository).save(existingEntity);
+        verify(eventTypeMapper).toResponseDTO(savedEntity);
+    }
+
+    @Test
+    void update_shouldThrowEventTypeAlreadyExistsException_whenNameChangeCausesDuplicate() {
+        // Arrange
+        Long eventTypeId = 1L;
+        String oldName = "Old Event";
+        Long branchId = 1L;
+        String conflictingNewName = "Existing Event Name";
+
+        EventTypeRequestDTO requestDTO = mock(EventTypeRequestDTO.class);
+        when(requestDTO.name()).thenReturn(conflictingNewName);
+        when(requestDTO.branchId()).thenReturn(branchId);
+
+        BranchEntity currentBranch = mock(BranchEntity.class);
+        when(currentBranch.getId()).thenReturn(branchId);
+
+        EventTypeEntity existingEntity = mock(EventTypeEntity.class);
+        when(existingEntity.getName()).thenReturn(oldName);
+        when(existingEntity.getBranch()).thenReturn(currentBranch);
+
+        when(eventTypeRepository.findById(eventTypeId)).thenReturn(Optional.of(existingEntity));
+        when(eventTypeRepository.existsByNameAndBranchId(conflictingNewName, branchId)).thenReturn(true);
+
+        // Act & Assert
+        EventTypeAlreadyExistsException exception = assertThrows(EventTypeAlreadyExistsException.class, () ->
+                eventTypeService.update(eventTypeId, requestDTO));
+
+        assertTrue(exception.getMessage().contains("Event type with name " + conflictingNewName +
+                " already exists in this branch"));
+        verify(eventTypeRepository).findById(eventTypeId);
+        verify(eventTypeRepository).existsByNameAndBranchId(conflictingNewName, branchId);
+        verify(eventTypeMapper, never()).updateFromDto(any(), any(), any(), any(), any(), any());
+        verify(eventTypeRepository, never()).save(any());
+    }
+
+    @Test
+    void update_shouldThrowEventTypeAlreadyExistsException_whenBranchChangeCausesDuplicate() {
+        // Arrange
+        Long eventTypeId = 1L;
+        String eventName = "Event Name";
+        Long oldBranchId = 1L;
+        Long conflictingNewBranchId = 2L;
+
+        EventTypeRequestDTO requestDTO = mock(EventTypeRequestDTO.class);
+        when(requestDTO.name()).thenReturn(eventName);
+        when(requestDTO.branchId()).thenReturn(conflictingNewBranchId);
+
+        BranchEntity oldBranch = mock(BranchEntity.class);
+        when(oldBranch.getId()).thenReturn(oldBranchId);
+
+        EventTypeEntity existingEntity = mock(EventTypeEntity.class);
+        when(existingEntity.getName()).thenReturn(eventName);
+        when(existingEntity.getBranch()).thenReturn(oldBranch);
+
+        when(eventTypeRepository.findById(eventTypeId)).thenReturn(Optional.of(existingEntity));
+        when(eventTypeRepository.existsByNameAndBranchId(eventName, conflictingNewBranchId)).thenReturn(true);
+
+        // Act & Assert
+        EventTypeAlreadyExistsException exception = assertThrows(EventTypeAlreadyExistsException.class, () ->
+                eventTypeService.update(eventTypeId, requestDTO));
+
+        assertTrue(exception.getMessage().contains("Event type with name " + eventName +
+                " already exists in this branch"));
+        verify(eventTypeRepository).findById(eventTypeId);
+        verify(eventTypeRepository).existsByNameAndBranchId(eventName, conflictingNewBranchId);
+        verify(eventTypeMapper, never()).updateFromDto(any(), any(), any(), any(), any(), any());
+        verify(eventTypeRepository, never()).save(any());
+    }
+
+    @Test
+    void update_shouldThrowEventTypeAlreadyExistsException_whenNameAndBranchChangeCauseDuplicate() {
+        // Arrange
+        Long eventTypeId = 1L;
+        String oldName = "Old Name";
+        Long oldBranchId = 1L;
+        String conflictingNewName = "New Name";
+        Long conflictingNewBranchId = 2L;
+
+        EventTypeRequestDTO requestDTO = mock(EventTypeRequestDTO.class);
+        when(requestDTO.name()).thenReturn(conflictingNewName);
+        when(requestDTO.branchId()).thenReturn(conflictingNewBranchId);
+
+        BranchEntity oldBranch = mock(BranchEntity.class);
+        when(oldBranch.getId()).thenReturn(oldBranchId);
+
+        EventTypeEntity existingEntity = mock(EventTypeEntity.class);
+        when(existingEntity.getName()).thenReturn(oldName);
+        when(existingEntity.getBranch()).thenReturn(oldBranch);
+
+        when(eventTypeRepository.findById(eventTypeId)).thenReturn(Optional.of(existingEntity));
+        when(eventTypeRepository.existsByNameAndBranchId(conflictingNewName,
+                conflictingNewBranchId)).thenReturn(true);
+
+        // Act & Assert
+        EventTypeAlreadyExistsException exception = assertThrows(EventTypeAlreadyExistsException.class, () ->
+                eventTypeService.update(eventTypeId, requestDTO));
+
+        assertTrue(exception.getMessage().contains("Event type with name " + conflictingNewName +
+                " already exists in this branch"));
+        verify(eventTypeRepository).findById(eventTypeId);
+        verify(eventTypeRepository).existsByNameAndBranchId(conflictingNewName, conflictingNewBranchId);
+        verify(eventTypeMapper, never()).updateFromDto(any(), any(), any(), any(), any(), any());
+        verify(eventTypeRepository, never()).save(any());
     }
 }

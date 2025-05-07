@@ -46,15 +46,11 @@ public class ClientService {
         log.info("Updating client with ID: {} for organization ID: {}", clientId, orgId);
 
         ClientEntity client = clientRepository.findById(clientId)
-                .orElseThrow(() -> {
-                    log.error("Client with ID: {} not found", clientId);
-                    return new ClientNotFoundException(clientId);
-                });
+                .orElseThrow(() -> new ClientNotFoundException(clientId));
 
         Organization organization = organizationService.getEntityByIdOrThrow(orgId);
 
         if (!client.getOrganization().getId().equals(orgId)) {
-            log.warn("Client organization mismatch: client {} does not belong to organization {}", clientId, orgId);
             throw new ClientOrganizationMismatchException();
         }
 
@@ -74,13 +70,9 @@ public class ClientService {
         log.info("Fetching client with ID: {} for organization ID: {}", clientId, orgId);
 
         ClientEntity client = clientRepository.findById(clientId)
-                .orElseThrow(() -> {
-                    log.error("Client with ID: {} not found", clientId);
-                    return new ClientNotFoundException(clientId);
-                });
+                .orElseThrow(() -> new ClientNotFoundException(clientId));
 
         if (!client.getOrganization().getId().equals(orgId)) {
-            log.warn("Client organization mismatch: client {} does not belong to organization {}", clientId, orgId);
             throw new ClientOrganizationMismatchException();
         }
 
@@ -98,13 +90,11 @@ public class ClientService {
     }
 
     public List<ClientResponseDto> getClientsByKeyword(String keyword, Long orgId) {
-
         return clientEntityMapper.toDtoList(clientRepository.findByKeyword(keyword, orgId));
     }
 
     public void delete(Long orgId, Long clientId) {
         log.info("Deleting client with ID: {} for organization ID: {}", clientId, orgId);
-
 
         ClientEntity client = clientRepository.findById(clientId)
                 .orElseThrow(() -> {
