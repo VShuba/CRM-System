@@ -16,6 +16,7 @@ import ua.shpp.exception.EventNotFoundException;
 import ua.shpp.mapper.EventClientMapper;
 import ua.shpp.model.ClientEventStatus;
 import ua.shpp.repository.*;
+import ua.shpp.service.history.VisitHistoryService;
 
 @Service
 @Slf4j

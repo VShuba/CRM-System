@@ -16,6 +16,7 @@ import ua.shpp.exception.SubscriptionHistoryCreationException;
 import ua.shpp.mapper.SubscriptionHistoryMapper;
 import ua.shpp.repository.ClientRepository;
 import ua.shpp.repository.SubscriptionHistoryRepository;
+import ua.shpp.service.history.SubscriptionHistoryService;
 
 import java.time.LocalDate;
 import java.util.Collections;

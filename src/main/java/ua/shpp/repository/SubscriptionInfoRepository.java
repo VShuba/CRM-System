@@ -6,4 +6,7 @@ import java.util.Optional;
 
 public interface SubscriptionInfoRepository extends JpaRepository<SubscriptionInfoEntity, Long> {
     Optional<SubscriptionInfoEntity> getByPaymentCheckId(Long id);
+
+    Optional<SubscriptionInfoEntity> findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
+            Long clientId, String name, String eventType);
 }

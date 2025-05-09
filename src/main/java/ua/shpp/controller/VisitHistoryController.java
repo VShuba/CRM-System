@@ -1,7 +1,6 @@
 package ua.shpp.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,8 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ua.shpp.dto.VisitHistoryDTO;
-import ua.shpp.repository.VisitHistoryRepository;
-import ua.shpp.service.VisitHistoryService;
+import ua.shpp.service.history.VisitHistoryService;
 
 import java.util.List;
 
@@ -29,7 +27,8 @@ import java.util.List;
 public class VisitHistoryController {
     private final VisitHistoryService visitHistoryService;
 
-    @Operation(summary = "Get visit history for a client")
+    @Operation(summary = "Get visit history for a client",
+            description = "Retrieves the full list of visit history records associated with the specified client ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved visit history",
                     content = @Content(mediaType = "application/json",

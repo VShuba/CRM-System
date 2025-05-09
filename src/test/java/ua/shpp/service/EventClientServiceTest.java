@@ -30,6 +30,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import org.mockito.InjectMocks;
+import ua.shpp.service.history.VisitHistoryService;
 
 @ExtendWith(MockitoExtension.class)
 class EventClientServiceTest {

@@ -1,4 +1,4 @@
-package ua.shpp.service;
+package ua.shpp.service.history;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +13,7 @@ import ua.shpp.exception.SubscriptionHistoryCreationException;
 import ua.shpp.mapper.SubscriptionHistoryMapper;
 import ua.shpp.repository.ClientRepository;
 import ua.shpp.repository.SubscriptionHistoryRepository;
+import ua.shpp.repository.SubscriptionInfoRepository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,6 +26,7 @@ public class SubscriptionHistoryService {
     private final SubscriptionHistoryRepository subscriptionHistoryRepository;
     private final SubscriptionHistoryMapper subscriptionHistoryMapper;
     private final ClientRepository clientRepository;
+    private final SubscriptionInfoRepository subscriptionInfoRepository;
 
     public void createSubscriptionHistory(SubscriptionInfoEntity subscriptionInfo) {
         log.info("Creating history for SubscriptionInfo ID: {}", subscriptionInfo.getId());
@@ -129,5 +131,37 @@ public class SubscriptionHistoryService {
             throw new IllegalStateException("No history record found to update for SubscriptionInfo ID: " +
                     subscriptionInfo.getId());
         }
+    }
+
+    public void validateActiveSubscriptions() {
+        log.info("Starting daily subscription validation...");
+
+        List<SubscriptionHistoryEntity> histories = subscriptionHistoryRepository.findAll();
+
+        for (SubscriptionHistoryEntity history : histories) {
+            Long clientId = history.getClient().getId();
+            String name = history.getName();
+            String eventType = history.getEventType();
+
+            Optional<SubscriptionInfoEntity> subscriptionInfoOpt = subscriptionInfoRepository
+                            .findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
+                            clientId, name, eventType);
+
+            if (subscriptionInfoOpt.isPresent()) {
+                SubscriptionInfoEntity subscriptionInfo = subscriptionInfoOpt.get();
+                boolean shouldBeValid = subscriptionInfo.getVisits() > 0 &&
+                        subscriptionInfo.getExpirationDate().isAfter(LocalDate.now());
+
+                if (!shouldBeValid && Boolean.TRUE.equals(history.getIsValid())) {
+                    history.setIsValid(false);
+                    subscriptionHistoryRepository.save(history);
+                    log.info("Marked subscription invalid. History ID: {}", history.getId());
+                }
+            } else {
+                log.warn("No matching SubscriptionInfo found for history ID: {}", history.getId());
+            }
+        }
+
+        log.info("Finished subscription validation.");
     }
 }

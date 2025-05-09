@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.SubscriptionHistoryDTO;
-import ua.shpp.service.SubscriptionHistoryService;
+import ua.shpp.service.history.SubscriptionHistoryService;
 
 import java.util.List;
 
