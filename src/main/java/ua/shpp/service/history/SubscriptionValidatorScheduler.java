@@ -12,7 +12,7 @@ public class SubscriptionValidatorScheduler {
     /**
      * Checks subscriptions every day at midnight Kyiv time
      */
-    @Scheduled(cron = "0 0 0 * * *", zone = "Europe/Kyiv")
+    @Scheduled(cron = "1 0 0 * * *", zone = "Europe/Kyiv")
     public void runDailyValidation() {
         subscriptionHistoryService.validateActiveSubscriptions();
     }

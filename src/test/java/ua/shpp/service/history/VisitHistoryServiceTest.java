@@ -1,4 +1,4 @@
-package ua.shpp.service;
+package ua.shpp.service.history;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +14,6 @@ import ua.shpp.mapper.VisitHistoryMapper;
 import ua.shpp.repository.ClientRepository;
 import ua.shpp.repository.VisitHistoryRepository;
 import ua.shpp.model.PaymentMethodForStory;
-import ua.shpp.service.history.VisitHistoryService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

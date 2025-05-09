@@ -1,4 +1,4 @@
-package ua.shpp.service;
+package ua.shpp.service.history;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +16,7 @@ import ua.shpp.exception.SubscriptionHistoryCreationException;
 import ua.shpp.mapper.SubscriptionHistoryMapper;
 import ua.shpp.repository.ClientRepository;
 import ua.shpp.repository.SubscriptionHistoryRepository;
-import ua.shpp.service.history.SubscriptionHistoryService;
+import ua.shpp.repository.SubscriptionInfoRepository;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -41,6 +41,12 @@ class SubscriptionHistoryServiceTest {
 
     @InjectMocks
     private SubscriptionHistoryService subscriptionHistoryService;
+
+    @Mock
+    private SubscriptionInfoRepository subscriptionInfoRepository;
+
+    @Mock
+    private SubscriptionInfoEntity subscriptionInfo;
 
     private ClientEntity createMockClient(Long id) {
         ClientEntity client = mock(ClientEntity.class);
@@ -375,5 +381,139 @@ class SubscriptionHistoryServiceTest {
         verify(clientRepository).findById(clientId);
         verifyNoInteractions(subscriptionHistoryRepository);
         verifyNoInteractions(subscriptionHistoryMapper);
+    }
+
+    @Test
+    void validateActiveSubscriptions_subscriptionInvalidatedSuccessfully() {
+        // Arrange
+        ClientEntity client = createMockClient(1L);
+        EventTypeEntity eventType = createMockEventType("Group");
+        SubscriptionServiceEntity service = createMockSubscriptionService("Yoga Pass", eventType, 10);
+
+        subscriptionInfo = createMockSubscriptionInfo(
+                100L, client, service, 0, LocalDate.now().minusDays(1));
+
+        SubscriptionHistoryEntity history = createMockSubscriptionHistory(
+                client, "Yoga Pass", "Group", 10, 1);
+
+        when(subscriptionHistoryRepository.findAll()).thenReturn(List.of(history));
+        when(subscriptionInfoRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
+                1L, "Yoga Pass", "Group")).thenReturn(Optional.of(subscriptionInfo));
+
+        // Act
+        subscriptionHistoryService.validateActiveSubscriptions();
+
+        // Assert
+        verify(history).setIsValid(false);
+        verify(subscriptionHistoryRepository).save(history);
+    }
+
+    @Test
+    void validateActiveSubscriptions_noMatchingInfo_logsWarning() {
+        // Arrange
+        Long clientId = 1L;
+        String subscriptionName = "Nonexistent";
+        String eventType = "Group";
+
+        ClientEntity mockClient = createMockClient(clientId);
+        SubscriptionHistoryEntity mockHistory = mock(SubscriptionHistoryEntity.class);
+        when(mockHistory.getClient()).thenReturn(mockClient);
+        when(mockHistory.getName()).thenReturn(subscriptionName);
+        when(mockHistory.getEventType()).thenReturn(eventType);
+        when(mockHistory.getId()).thenReturn(99L);
+
+        when(subscriptionHistoryRepository.findAll()).thenReturn(List.of(mockHistory));
+        when(subscriptionInfoRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
+                clientId, subscriptionName, eventType)).thenReturn(Optional.empty());
+
+        // Act
+        subscriptionHistoryService.validateActiveSubscriptions();
+
+        // Assert
+        verify(mockHistory, never()).setIsValid(false);
+        verify(subscriptionHistoryRepository, never()).save(any());
+    }
+
+    @Test
+    void validateActiveSubscriptions_invalidatedDueToExpirationDate() {
+        // Arrange
+        ClientEntity client = createMockClient(1L);
+        EventTypeEntity eventType = createMockEventType("Group");
+        SubscriptionServiceEntity service = createMockSubscriptionService("Yoga Pass", eventType, 10);
+
+        // Візитів > 0, але дата вже в минулому
+        subscriptionInfo = createMockSubscriptionInfo(
+                100L, client, service, 5, LocalDate.now().minusDays(1));
+
+        SubscriptionHistoryEntity history = createMockSubscriptionHistory(
+                client, "Yoga Pass", "Group", 10, 5);
+        lenient().when(history.getIsValid()).thenReturn(true);
+
+        when(subscriptionHistoryRepository.findAll()).thenReturn(List.of(history));
+        when(subscriptionInfoRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
+                1L, "Yoga Pass", "Group")).thenReturn(Optional.of(subscriptionInfo));
+
+        // Act
+        subscriptionHistoryService.validateActiveSubscriptions();
+
+        // Assert
+        verify(history).setIsValid(false);
+        verify(subscriptionHistoryRepository).save(history);
+    }
+
+    @Test
+    void validateActiveSubscriptions_validWhenExpiresToday() {
+        // Arrange
+        ClientEntity client = createMockClient(1L);
+        EventTypeEntity eventType = createMockEventType("Group");
+        SubscriptionServiceEntity service = createMockSubscriptionService("Yoga Pass", eventType, 10);
+
+        // Візитів > 0, дата закінчення = сьогодні
+        subscriptionInfo = createMockSubscriptionInfo(
+                100L, client, service, 3, LocalDate.now());
+
+        SubscriptionHistoryEntity history = createMockSubscriptionHistory(
+                client, "Yoga Pass", "Group", 10, 3);
+        lenient().when(history.getIsValid()).thenReturn(true);
+
+        when(subscriptionHistoryRepository.findAll()).thenReturn(List.of(history));
+        when(subscriptionInfoRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
+                1L, "Yoga Pass", "Group")).thenReturn(Optional.of(subscriptionInfo));
+
+        // Act
+        subscriptionHistoryService.validateActiveSubscriptions();
+
+        // Assert
+        // Нічого не змінюється, бо підписка все ще дійсна
+        verify(history, never()).setIsValid(false);
+        verify(subscriptionHistoryRepository, never()).save(any());
+    }
+
+    @Test
+    void validateActiveSubscriptions_invalidWhenNoVisitsLeftButNotExpired() {
+        // Arrange
+        ClientEntity client = createMockClient(1L);
+        EventTypeEntity eventType = createMockEventType("Group");
+        SubscriptionServiceEntity service = createMockSubscriptionService("Pilates", eventType, 5);
+
+        // Візити = 0, але ще не прострочена
+        subscriptionInfo = createMockSubscriptionInfo(
+                200L, client, service, 0, LocalDate.now().plusDays(5));
+
+        SubscriptionHistoryEntity history = createMockSubscriptionHistory(
+                client, "Pilates", "Group", 5, 1);
+        lenient().when(history.getIsValid()).thenReturn(true);
+
+        when(subscriptionHistoryRepository.findAll()).thenReturn(List.of(history));
+        when(subscriptionInfoRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
+                1L, "Pilates", "Group")).thenReturn(Optional.of(subscriptionInfo));
+
+        // Act
+        subscriptionHistoryService.validateActiveSubscriptions();
+
+        // Assert
+        // Має бути інвалідована
+        verify(history).setIsValid(false);
+        verify(subscriptionHistoryRepository).save(history);
     }
 }

@@ -116,7 +116,7 @@ public class SubscriptionHistoryService {
             historyEntityToUpdate.setVisitsLeft(subscriptionInfo.getVisits());
 
             boolean newIsValid = subscriptionInfo.getVisits() > 0 &&
-                    subscriptionInfo.getExpirationDate().isAfter(LocalDate.now());
+                    !subscriptionInfo.getExpirationDate().isBefore(LocalDate.now());
 
             historyEntityToUpdate.setIsValid(newIsValid);
 
@@ -149,8 +149,9 @@ public class SubscriptionHistoryService {
 
             if (subscriptionInfoOpt.isPresent()) {
                 SubscriptionInfoEntity subscriptionInfo = subscriptionInfoOpt.get();
+
                 boolean shouldBeValid = subscriptionInfo.getVisits() > 0 &&
-                        subscriptionInfo.getExpirationDate().isAfter(LocalDate.now());
+                        !subscriptionInfo.getExpirationDate().isBefore(LocalDate.now());
 
                 if (!shouldBeValid && Boolean.TRUE.equals(history.getIsValid())) {
                     history.setIsValid(false);
