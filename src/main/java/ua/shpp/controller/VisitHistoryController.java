@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,7 @@ public class VisitHistoryController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/clients/{clientId}")
+    @PreAuthorize("@authz.hasRoleInOrgByClientId(#clientId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<List<VisitHistoryDTO>> getClientVisitHistory(@PathVariable Long clientId) {
         log.debug("Received request to get visit history for client ID: {}", clientId);
         List<VisitHistoryDTO> history = visitHistoryService.getVisitHistoryByClientId(clientId);

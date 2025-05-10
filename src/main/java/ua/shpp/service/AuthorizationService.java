@@ -8,10 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import ua.shpp.model.GlobalRole;
 import ua.shpp.model.OrgRole;
-import ua.shpp.repository.BranchRepository;
-import ua.shpp.repository.EmployeeRepository;
-import ua.shpp.repository.ServiceRepository;
-import ua.shpp.repository.UserOrganizationRepository;
+import ua.shpp.repository.*;
 
 import java.util.function.BooleanSupplier;
 
@@ -25,6 +22,7 @@ public class AuthorizationService {
     private final BranchRepository branchRepository;
     private final EmployeeRepository employeeRepository;
     private final ServiceRepository serviceRepository;
+    private final ClientRepository clientRepository;
 
     /**
      * Hot to use?
@@ -73,6 +71,14 @@ public class AuthorizationService {
         {
             Long branchId = employeeRepository.getBranchIdById(employeeId);
             return branchId != null && hasRoleInOrgByBranchId(branchId, requiredAccessRole);
+        });
+    }
+
+    public boolean hasRoleInOrgByClientId(Long clientId, OrgRole expectedRole) {
+        return withSuperAdminCheck(() ->
+        {
+            Long organizationId = clientRepository.findOrganizationIdByClientId(clientId);
+            return organizationId != null && hasRoleInOrgByOrgId(organizationId, expectedRole);
         });
     }
 
