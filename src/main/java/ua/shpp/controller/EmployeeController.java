@@ -56,7 +56,7 @@ public class EmployeeController {
 
     @PutMapping(path = "/employees/{id}",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Update employee with avatar and JSON data")
+    @Operation(summary = "Update employee with avatar and JSON data") // todo where is  PreAuthorize?
     public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable Long id, @RequestPart(name = "avatar", required = false) MultipartFile avatarImg,
                                                               @Schema(
                                                                       description = "JSON-formatted employee data " +
