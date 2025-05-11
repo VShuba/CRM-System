@@ -11,8 +11,8 @@ import ua.shpp.dto.EventClientDto;
 import ua.shpp.entity.ClientEntity;
 import ua.shpp.entity.EventClientEntity;
 import ua.shpp.entity.EventClientId;
-import ua.shpp.entity.payment.OneTimeInfoEntity;
-import ua.shpp.entity.payment.SubscriptionInfoEntity;
+import ua.shpp.entity.payment.OneTimeDealEntity;
+import ua.shpp.entity.payment.SubscriptionDealEntity;
 import ua.shpp.exception.ClientEventStatusChnageException;
 import ua.shpp.exception.ClientNotFoundException;
 import ua.shpp.exception.EventForClientNotFoundException;
@@ -53,16 +53,16 @@ class EventClientServiceTest {
     private EventClientMapper eventClientMapper;
 
     @Mock
-    private OneTimeInfoRepository oneTimeInfoRepository;
+    private OneTimeDealRepository oneTimeDealRepository;
     @Mock
-    private SubscriptionInfoRepository subscriptionInfoRepository;
+    private SubscriptionDealRepository subscriptionDealRepository;
 
     @InjectMocks
     private EventClientService eventClientService;
     private ClientEntity clientEntity;
     private ScheduleEventEntity scheduleEventEntity;
-    private OneTimeInfoEntity oneTimeInfoEntity;
-    private SubscriptionInfoEntity subscriptionInfoEntity;
+    private OneTimeDealEntity oneTimeDealEntity;
+    private SubscriptionDealEntity subscriptionDealEntity;
 
     private EventClientEntity baseEventClientEntity;
     private EventClientDto baseEventClientDto;
@@ -92,8 +92,8 @@ class EventClientServiceTest {
 
         eventClientId = new EventClientId(clientId, eventId);
 
-        oneTimeInfoEntity = OneTimeInfoEntity.builder().id(oneTimeInfoId).client(clientEntity).build();
-        subscriptionInfoEntity = SubscriptionInfoEntity.builder().id(subscriptionInfoId).client(clientEntity).build();
+        oneTimeDealEntity = OneTimeDealEntity.builder().id(oneTimeInfoId).client(clientEntity).build();
+        subscriptionDealEntity = SubscriptionDealEntity.builder().id(subscriptionInfoId).client(clientEntity).build();
 
         baseEventClientEntity = EventClientEntity.builder()
                 .eventUserId(eventClientId)
@@ -247,7 +247,7 @@ class EventClientServiceTest {
         EventClientEntity foundEntity = EventClientEntity.builder()
                 .eventUserId(eventClientId).client(clientEntity).scheduleEvent(scheduleEventEntity)
                 .clientEventStatus(oldStatus)
-                .oneTimeInfo(oneTimeInfoEntity)
+                .oneTimeInfo(oneTimeDealEntity)
                 .subscriptionInfo(null)
                 .build();
 
@@ -285,7 +285,7 @@ class EventClientServiceTest {
                 .eventUserId(eventClientId).client(clientEntity).scheduleEvent(scheduleEventEntity)
                 .clientEventStatus(oldStatus)
                 .oneTimeInfo(null)
-                .subscriptionInfo(subscriptionInfoEntity)
+                .subscriptionInfo(subscriptionDealEntity)
                 .build();
 
         EventClientEntity savedEntity = EventClientEntity.builder()
@@ -532,10 +532,10 @@ class EventClientServiceTest {
                 .clientEventStatus(ClientEventStatus.ASSIGNED)
                 .build();
 
-        OneTimeInfoEntity oneTimeInfo = mock(OneTimeInfoEntity.class);
+        OneTimeDealEntity oneTimeInfo = mock(OneTimeDealEntity.class);
 
         when(eventClientRepository.findById(eventClientId)).thenReturn(Optional.of(entity));
-        when(oneTimeInfoRepository.findById(oneTimeInfoId)).thenReturn(Optional.of(oneTimeInfo));
+        when(oneTimeDealRepository.findById(oneTimeInfoId)).thenReturn(Optional.of(oneTimeInfo));
         when(eventClientRepository.save(any())).thenReturn(entity);
 
         // When
@@ -544,8 +544,8 @@ class EventClientServiceTest {
         // Then
         assertEquals(oneTimeInfo, entity.getOneTimeInfo());
         assertNull(entity.getSubscriptionInfo());
-        verify(oneTimeInfoRepository).findById(oneTimeInfoId);
-        verify(subscriptionInfoRepository, never()).findById(any());
+        verify(oneTimeDealRepository).findById(oneTimeInfoId);
+        verify(subscriptionDealRepository, never()).findById(any());
         verify(visitHistoryService).createVisitHistoryEntry(entity);
     }
 
@@ -569,10 +569,10 @@ class EventClientServiceTest {
                 .clientEventStatus(ClientEventStatus.ASSIGNED)
                 .build();
 
-        SubscriptionInfoEntity subscriptionInfo = mock(SubscriptionInfoEntity.class);
+        SubscriptionDealEntity subscriptionInfo = mock(SubscriptionDealEntity.class);
 
         when(eventClientRepository.findById(eventClientId)).thenReturn(Optional.of(entity));
-        when(subscriptionInfoRepository.findById(subscriptionInfoId)).thenReturn(Optional.of(subscriptionInfo));
+        when(subscriptionDealRepository.findById(subscriptionInfoId)).thenReturn(Optional.of(subscriptionInfo));
         when(eventClientRepository.save(any())).thenReturn(entity);
         when(eventClientMapper.toDto(any())).thenReturn(mock(EventClientDto.class));
 
@@ -581,8 +581,8 @@ class EventClientServiceTest {
 
         // Then
         assertEquals(subscriptionInfo, entity.getSubscriptionInfo());
-        verify(subscriptionInfoRepository).findById(subscriptionInfoId);
-        verify(oneTimeInfoRepository, never()).findById(any());
+        verify(subscriptionDealRepository).findById(subscriptionInfoId);
+        verify(oneTimeDealRepository, never()).findById(any());
         verify(visitHistoryService).createVisitHistoryEntry(entity);
     }
 }

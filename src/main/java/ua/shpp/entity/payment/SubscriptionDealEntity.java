@@ -3,7 +3,7 @@ package ua.shpp.entity.payment;
 import jakarta.persistence.*;
 import lombok.*;
 import ua.shpp.entity.ClientEntity;
-import ua.shpp.entity.SubscriptionServiceEntity;
+import ua.shpp.entity.SubscriptionOfferEntity;
 
 import java.time.LocalDate;
 
@@ -13,8 +13,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "subscription_info")
-public non-sealed class SubscriptionInfoEntity implements Checkable {
+@Table(name = "subscription_deal")
+public non-sealed class SubscriptionDealEntity implements Checkable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,7 +25,7 @@ public non-sealed class SubscriptionInfoEntity implements Checkable {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "subscriptionService_id", nullable = false)
-    private SubscriptionServiceEntity subscriptionService;
+    private SubscriptionOfferEntity subscriptionService;
 
     @Column(nullable = false)
     private Integer visits;

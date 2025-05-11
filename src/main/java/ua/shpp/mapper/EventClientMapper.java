@@ -9,15 +9,15 @@ import ua.shpp.entity.ClientEntity;
 import ua.shpp.entity.EventClientEntity;
 import ua.shpp.entity.EventClientId;
 import ua.shpp.entity.ScheduleEventEntity;
-import ua.shpp.entity.payment.OneTimeInfoEntity;
-import ua.shpp.entity.payment.SubscriptionInfoEntity;
+import ua.shpp.entity.payment.OneTimeDealEntity;
+import ua.shpp.entity.payment.SubscriptionDealEntity;
 import ua.shpp.exception.ClientNotFoundException;
 import ua.shpp.exception.DealNotFoundException;
 import ua.shpp.exception.EventNotFoundException;
 import ua.shpp.repository.ClientRepository;
-import ua.shpp.repository.OneTimeInfoRepository;
+import ua.shpp.repository.OneTimeDealRepository;
 import ua.shpp.repository.ScheduleEventRepository;
-import ua.shpp.repository.SubscriptionInfoRepository;
+import ua.shpp.repository.SubscriptionDealRepository;
 
 @Mapper(componentModel = "spring")
 public interface EventClientMapper {
@@ -42,8 +42,8 @@ public interface EventClientMapper {
 @Mapping(target = "client", source = "clientId",
         qualifiedByName = "idToClient")
     EventClientEntity toEntity(EventClientDto dto,
-                               @Context SubscriptionInfoRepository subscriptionInfoRepository,
-                               @Context OneTimeInfoRepository oneTimeInfoRepository,
+                               @Context SubscriptionDealRepository subscriptionDealRepository,
+                               @Context OneTimeDealRepository oneTimeDealRepository,
                                @Context ScheduleEventRepository scheduleEventRepository,
                                @Context ClientRepository clientRepository
                                );
@@ -54,16 +54,16 @@ public interface EventClientMapper {
     }
 
     @Named("idToSubscription")
-    default SubscriptionInfoEntity toEmbeddedId(Long id,
-                                                @Context SubscriptionInfoRepository repository) {
+    default SubscriptionDealEntity toEmbeddedId(Long id,
+                                                @Context SubscriptionDealRepository repository) {
         return repository.findById(id).orElseThrow(
                 () -> new DealNotFoundException(String.format(" Subscription id: %s, not found", id))
         );
     }
 
     @Named("idToOneTimeInfo")
-    default OneTimeInfoEntity idToOneTimeInfo(Long id,
-                                              @Context OneTimeInfoRepository repository) {
+    default OneTimeDealEntity idToOneTimeInfo(Long id,
+                                              @Context OneTimeDealRepository repository) {
         return repository.findById(id).orElseThrow(
                 () -> new DealNotFoundException(String.format(" One-time visit id: %s, not found", id))
         );

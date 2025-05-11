@@ -54,11 +54,11 @@ public class CheckEntity {
 
     @OneToOne(mappedBy = "paymentCheck", fetch = FetchType.LAZY)
     @JsonIgnore
-    private OneTimeInfoEntity oneTimeInfo;
+    private OneTimeDealEntity oneTimeInfo;
 
     @OneToOne(mappedBy = "paymentCheck", fetch = FetchType.LAZY)
     @JsonIgnore
-    private SubscriptionInfoEntity subscriptionInfo;
+    private SubscriptionDealEntity subscriptionInfo;
 
     @PrePersist
     private void setCheckNumber() {

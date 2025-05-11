@@ -3,10 +3,9 @@ package ua.shpp.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ua.shpp.dto.SubscriptionOfferCreateDTO;
 import ua.shpp.dto.SubscriptionOfferDTO;
 import ua.shpp.exception.OfferNotFoundException;
 import ua.shpp.mapper.SubscriptionOfferMapper;
@@ -24,11 +23,10 @@ public class SubscriptionOfferService {
     private final ServiceRepository serviceRepository;
     private final EventTypeRepository eventTypeRepository;
 
-    public SubscriptionOfferDTO create(SubscriptionOfferDTO dto) {
+    public SubscriptionOfferDTO create(SubscriptionOfferCreateDTO dto) {
         log.debug("create() called with DTO: {}", dto);
         var entity = subscriptionOfferMapper
                 .toEntity(dto, serviceRepository, eventTypeRepository);
-        entity.setId(null);
         entity = subscriptionOfferRepository.save(entity);
         log.info("Created subscription offer (id={})", entity.getId());
         log.debug("Created subscription entity: {}", entity);
@@ -45,10 +43,12 @@ public class SubscriptionOfferService {
         return subscriptionOfferMapper.toDto(entity);
     }
 
-    public Page<SubscriptionOfferDTO> getAllByEventTypeId(Long eventTypeId,Pageable pageRequest){
-        return subscriptionOfferRepository
-                .findAllByEventTypeId(eventTypeId, pageRequest)
-                .map(subscriptionOfferMapper::toDto);
+    public Page<SubscriptionOfferDTO> getAllByEventTypeId(Long eventTypeId, Pageable pageRequest) {
+        log.info("getAllByEventTypeId() called with id: {}", eventTypeId);
+        var allOffers = subscriptionOfferRepository
+                .findAllByEventTypeId(eventTypeId, pageRequest);
+        log.debug("Fetching all subscription offer entity: {}", allOffers);
+        return allOffers.map(subscriptionOfferMapper::toDto);
     }
 
     public SubscriptionOfferDTO update(SubscriptionOfferDTO updateDto) {
@@ -59,7 +59,7 @@ public class SubscriptionOfferService {
         subscriptionOfferMapper.updateFromDto(updateDto, entity, serviceRepository, eventTypeRepository);
         subscriptionOfferRepository.save(entity);
         log.info("Updated subscription offer (id={})", entity.getId());
-        log.info("Updated subscription offer entity: {}", entity);
+        log.debug("Updated subscription offer entity: {}", entity);
         return subscriptionOfferMapper.toDto(entity);
     }
 

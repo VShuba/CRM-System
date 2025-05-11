@@ -4,8 +4,8 @@ import org.mapstruct.*;
 import ua.shpp.dto.SubscriptionHistoryDTO;
 import ua.shpp.entity.ClientEntity;
 import ua.shpp.entity.SubscriptionHistoryEntity;
-import ua.shpp.entity.SubscriptionServiceEntity;
-import ua.shpp.entity.payment.SubscriptionInfoEntity;
+import ua.shpp.entity.SubscriptionOfferEntity;
+import ua.shpp.entity.payment.SubscriptionDealEntity;
 import ua.shpp.exception.ClientNotFoundException;
 import ua.shpp.repository.ClientRepository;
 
@@ -21,8 +21,8 @@ public interface SubscriptionHistoryMapper {
     @Mapping(target = "totalVisits", source = "subscriptionService.visits")
     @Mapping(target = "visitsLeft", source = "subscriptionInfo.visits")
     @Mapping(target = "isValid", expression = "java(isStillValid(subscriptionInfo))")
-    SubscriptionHistoryEntity toHistory(SubscriptionInfoEntity subscriptionInfo,
-                                        SubscriptionServiceEntity subscriptionService);
+    SubscriptionHistoryEntity toHistory(SubscriptionDealEntity subscriptionInfo,
+                                        SubscriptionOfferEntity subscriptionService);
 
     @Mapping(target = "clientId", source = "client.id")
     SubscriptionHistoryDTO toDto(SubscriptionHistoryEntity entity);
@@ -30,7 +30,7 @@ public interface SubscriptionHistoryMapper {
     @Mapping(target = "client", source = "clientId", qualifiedByName = "idToClient")
     SubscriptionHistoryEntity toEntity(SubscriptionHistoryDTO dto, @Context ClientRepository clientRepository);
 
-    default boolean isStillValid(SubscriptionInfoEntity subscriptionInfo) {
+    default boolean isStillValid(SubscriptionDealEntity subscriptionInfo) {
         return subscriptionInfo.getVisits() > 0 &&
                 subscriptionInfo.getExpirationDate().isAfter(LocalDate.now());
     }

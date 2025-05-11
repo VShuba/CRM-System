@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ua.shpp.dto.OneTimeOfferCreateDTO;
 import ua.shpp.dto.OneTimeOfferDTO;
 import ua.shpp.exception.OfferNotFoundException;
 import ua.shpp.mapper.OneTimeOfferMapper;
@@ -22,11 +23,10 @@ public class OneTimeOfferService {
     private final ServiceRepository serviceRepository;
     private final EventTypeRepository eventTypeRepository;
 
-    public OneTimeOfferDTO create(OneTimeOfferDTO oneTimeOfferDTO) {
+    public OneTimeOfferDTO create(OneTimeOfferCreateDTO oneTimeOfferDTO) {
         log.debug("create() called with DTO: {}", oneTimeOfferDTO);
         var entity = oneTimeOfferMapper
                 .dtoToEntity(oneTimeOfferDTO, serviceRepository, eventTypeRepository);
-        entity.setId(null);
         entity = oneTimeOfferRepository.save(entity);
         log.info("Created one-time offer (id={})", entity.getId());
         log.debug("create() one-time offer Entity: {}", entity);
@@ -44,9 +44,11 @@ public class OneTimeOfferService {
     }
 
     public Page<OneTimeOfferDTO> getAllByEventTypeId(Long eventTypeId, Pageable pageRequest){
-        return oneTimeOfferRepository
-                .findAllByEventTypeId(eventTypeId, pageRequest)
-                .map(oneTimeOfferMapper::entityToDto);
+        log.info("getAllByEventTypeId() called with id: {}", eventTypeId);
+        var allOffers = oneTimeOfferRepository
+                .findAllByEventTypeId(eventTypeId, pageRequest);
+        log.debug("Fetching all one-time offer entity: {}", allOffers);
+        return allOffers.map(oneTimeOfferMapper::entityToDto);
     }
 
     public OneTimeOfferDTO update(OneTimeOfferDTO updateDto) {

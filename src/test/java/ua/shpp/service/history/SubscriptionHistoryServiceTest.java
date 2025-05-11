@@ -9,14 +9,14 @@ import ua.shpp.dto.SubscriptionHistoryDTO;
 import ua.shpp.entity.ClientEntity;
 import ua.shpp.entity.EventTypeEntity;
 import ua.shpp.entity.SubscriptionHistoryEntity;
-import ua.shpp.entity.SubscriptionServiceEntity;
-import ua.shpp.entity.payment.SubscriptionInfoEntity;
+import ua.shpp.entity.SubscriptionOfferEntity;
+import ua.shpp.entity.payment.SubscriptionDealEntity;
 import ua.shpp.exception.ClientNotFoundException;
 import ua.shpp.exception.SubscriptionHistoryCreationException;
 import ua.shpp.mapper.SubscriptionHistoryMapper;
 import ua.shpp.repository.ClientRepository;
 import ua.shpp.repository.SubscriptionHistoryRepository;
-import ua.shpp.repository.SubscriptionInfoRepository;
+import ua.shpp.repository.SubscriptionDealRepository;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -43,10 +43,10 @@ class SubscriptionHistoryServiceTest {
     private SubscriptionHistoryService subscriptionHistoryService;
 
     @Mock
-    private SubscriptionInfoRepository subscriptionInfoRepository;
+    private SubscriptionDealRepository subscriptionDealRepository;
 
     @Mock
-    private SubscriptionInfoEntity subscriptionInfo;
+    private SubscriptionDealEntity subscriptionInfo;
 
     private ClientEntity createMockClient(Long id) {
         ClientEntity client = mock(ClientEntity.class);
@@ -60,19 +60,19 @@ class SubscriptionHistoryServiceTest {
         return eventType;
     }
 
-    private SubscriptionServiceEntity createMockSubscriptionService(String name, EventTypeEntity eventType,
-                                                                    Integer totalVisits) {
-        SubscriptionServiceEntity service = mock(SubscriptionServiceEntity.class);
+    private SubscriptionOfferEntity createMockSubscriptionService(String name, EventTypeEntity eventType,
+                                                                  Integer totalVisits) {
+        SubscriptionOfferEntity service = mock(SubscriptionOfferEntity.class);
         lenient().when(service.getName()).thenReturn(name);
         lenient().when(service.getEventType()).thenReturn(eventType);
         lenient().when(service.getVisits()).thenReturn(totalVisits);
         return service;
     }
 
-    private SubscriptionInfoEntity createMockSubscriptionInfo(Long id, ClientEntity client,
-                                                              SubscriptionServiceEntity service,
+    private SubscriptionDealEntity createMockSubscriptionInfo(Long id, ClientEntity client,
+                                                              SubscriptionOfferEntity service,
                                                               Integer visits, LocalDate expirationDate) {
-        SubscriptionInfoEntity info = mock(SubscriptionInfoEntity.class);
+        SubscriptionDealEntity info = mock(SubscriptionDealEntity.class);
         lenient().when(info.getId()).thenReturn(id);
         lenient().when(info.getClient()).thenReturn(client);
         lenient().when(info.getSubscriptionService()).thenReturn(service);
@@ -100,9 +100,9 @@ class SubscriptionHistoryServiceTest {
         // Arrange
         ClientEntity mockClient = createMockClient(1L);
         EventTypeEntity mockEventType = createMockEventType("Group");
-        SubscriptionServiceEntity mockService = createMockSubscriptionService("Yoga Pass",
+        SubscriptionOfferEntity mockService = createMockSubscriptionService("Yoga Pass",
                 mockEventType, 10);
-        SubscriptionInfoEntity mockSubscriptionInfo = createMockSubscriptionInfo(100L, mockClient,
+        SubscriptionDealEntity mockSubscriptionInfo = createMockSubscriptionInfo(100L, mockClient,
                 mockService, 10, LocalDate.now().plusDays(30));
         SubscriptionHistoryEntity mockHistoryEntity = createMockSubscriptionHistory(mockClient,
                 "Yoga Pass", "Group", 10, 10);
@@ -123,7 +123,7 @@ class SubscriptionHistoryServiceTest {
     @Test
     void createSubscriptionHistory_serviceIsNull_throwsIllegalStateException() {
         // Arrange
-        SubscriptionInfoEntity mockSubscriptionInfo = mock(SubscriptionInfoEntity.class);
+        SubscriptionDealEntity mockSubscriptionInfo = mock(SubscriptionDealEntity.class);
         when(mockSubscriptionInfo.getSubscriptionService()).thenReturn(null);
         when(mockSubscriptionInfo.getId()).thenReturn(100L);
 
@@ -143,9 +143,9 @@ class SubscriptionHistoryServiceTest {
         // Arrange
         ClientEntity mockClient = createMockClient(1L);
         EventTypeEntity mockEventType = createMockEventType("Group");
-        SubscriptionServiceEntity mockService = createMockSubscriptionService("Yoga Pass",
+        SubscriptionOfferEntity mockService = createMockSubscriptionService("Yoga Pass",
                 mockEventType, 10);
-        SubscriptionInfoEntity mockSubscriptionInfo = createMockSubscriptionInfo(100L, mockClient,
+        SubscriptionDealEntity mockSubscriptionInfo = createMockSubscriptionInfo(100L, mockClient,
                 mockService, 10, LocalDate.now().plusDays(30));
         SubscriptionHistoryEntity mockHistoryEntity = createMockSubscriptionHistory(mockClient,
                 "Yoga Pass", "Group", 10, 10);
@@ -218,9 +218,9 @@ class SubscriptionHistoryServiceTest {
         Long clientId = 1L;
         ClientEntity mockClient = createMockClient(clientId);
         EventTypeEntity mockEventType = createMockEventType("Group");
-        SubscriptionServiceEntity mockService = createMockSubscriptionService("Yoga Pass",
+        SubscriptionOfferEntity mockService = createMockSubscriptionService("Yoga Pass",
                 mockEventType, 10);
-        SubscriptionInfoEntity mockSubscriptionInfo = createMockSubscriptionInfo(subscriptionInfoId,
+        SubscriptionDealEntity mockSubscriptionInfo = createMockSubscriptionInfo(subscriptionInfoId,
                 mockClient, mockService, 5, LocalDate.now().plusDays(10));
 
         SubscriptionHistoryEntity mockHistoryToUpdate = createMockSubscriptionHistory(mockClient,
@@ -260,9 +260,9 @@ class SubscriptionHistoryServiceTest {
         Long clientId = 1L;
         ClientEntity mockClient = createMockClient(clientId);
         EventTypeEntity mockEventType = createMockEventType("Individual");
-        SubscriptionServiceEntity mockService = createMockSubscriptionService("Training",
+        SubscriptionOfferEntity mockService = createMockSubscriptionService("Training",
                 mockEventType, 5);
-        SubscriptionInfoEntity mockSubscriptionInfo = createMockSubscriptionInfo(subscriptionInfoId,
+        SubscriptionDealEntity mockSubscriptionInfo = createMockSubscriptionInfo(subscriptionInfoId,
                 mockClient, mockService, 0, LocalDate.now().plusDays(10));
 
         SubscriptionHistoryEntity mockHistoryToUpdate = createMockSubscriptionHistory(mockClient,
@@ -294,9 +294,9 @@ class SubscriptionHistoryServiceTest {
         Long clientId = 1L;
         ClientEntity mockClient = createMockClient(clientId);
         EventTypeEntity mockEventType = createMockEventType("Group");
-        SubscriptionServiceEntity mockService = createMockSubscriptionService("Crossfit",
+        SubscriptionOfferEntity mockService = createMockSubscriptionService("Crossfit",
                 mockEventType, 8);
-        SubscriptionInfoEntity mockSubscriptionInfo = createMockSubscriptionInfo(subscriptionInfoId,
+        SubscriptionDealEntity mockSubscriptionInfo = createMockSubscriptionInfo(subscriptionInfoId,
                 mockClient, mockService, 3, LocalDate.now().minusDays(1));
 
         SubscriptionHistoryEntity mockHistoryToUpdate = createMockSubscriptionHistory(mockClient,
@@ -328,9 +328,9 @@ class SubscriptionHistoryServiceTest {
         Long clientId = 1L;
         ClientEntity mockClient = createMockClient(clientId);
         EventTypeEntity mockEventType = createMockEventType("Group");
-        SubscriptionServiceEntity mockService = createMockSubscriptionService("Yoga Pass",
+        SubscriptionOfferEntity mockService = createMockSubscriptionService("Yoga Pass",
                 mockEventType, 10);
-        SubscriptionInfoEntity mockSubscriptionInfo = createMockSubscriptionInfo(subscriptionInfoId,
+        SubscriptionDealEntity mockSubscriptionInfo = createMockSubscriptionInfo(subscriptionInfoId,
                 mockClient, mockService, 5, LocalDate.now().plusDays(10));
 
         when(subscriptionHistoryRepository.findByClientIdAndNameAndEventTypeAndIsValid(
@@ -388,7 +388,7 @@ class SubscriptionHistoryServiceTest {
         // Arrange
         ClientEntity client = createMockClient(1L);
         EventTypeEntity eventType = createMockEventType("Group");
-        SubscriptionServiceEntity service = createMockSubscriptionService("Yoga Pass", eventType, 10);
+        SubscriptionOfferEntity service = createMockSubscriptionService("Yoga Pass", eventType, 10);
 
         subscriptionInfo = createMockSubscriptionInfo(
                 100L, client, service, 0, LocalDate.now().minusDays(1));
@@ -397,7 +397,7 @@ class SubscriptionHistoryServiceTest {
                 client, "Yoga Pass", "Group", 10, 1);
 
         when(subscriptionHistoryRepository.findAll()).thenReturn(List.of(history));
-        when(subscriptionInfoRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
+        when(subscriptionDealRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
                 1L, "Yoga Pass", "Group")).thenReturn(Optional.of(subscriptionInfo));
 
         // Act
@@ -423,7 +423,7 @@ class SubscriptionHistoryServiceTest {
         when(mockHistory.getId()).thenReturn(99L);
 
         when(subscriptionHistoryRepository.findAll()).thenReturn(List.of(mockHistory));
-        when(subscriptionInfoRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
+        when(subscriptionDealRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
                 clientId, subscriptionName, eventType)).thenReturn(Optional.empty());
 
         // Act
@@ -439,7 +439,7 @@ class SubscriptionHistoryServiceTest {
         // Arrange
         ClientEntity client = createMockClient(1L);
         EventTypeEntity eventType = createMockEventType("Group");
-        SubscriptionServiceEntity service = createMockSubscriptionService("Yoga Pass", eventType, 10);
+        SubscriptionOfferEntity service = createMockSubscriptionService("Yoga Pass", eventType, 10);
 
         // Візитів > 0, але дата вже в минулому
         subscriptionInfo = createMockSubscriptionInfo(
@@ -450,7 +450,7 @@ class SubscriptionHistoryServiceTest {
         lenient().when(history.getIsValid()).thenReturn(true);
 
         when(subscriptionHistoryRepository.findAll()).thenReturn(List.of(history));
-        when(subscriptionInfoRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
+        when(subscriptionDealRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
                 1L, "Yoga Pass", "Group")).thenReturn(Optional.of(subscriptionInfo));
 
         // Act
@@ -466,7 +466,7 @@ class SubscriptionHistoryServiceTest {
         // Arrange
         ClientEntity client = createMockClient(1L);
         EventTypeEntity eventType = createMockEventType("Group");
-        SubscriptionServiceEntity service = createMockSubscriptionService("Yoga Pass", eventType, 10);
+        SubscriptionOfferEntity service = createMockSubscriptionService("Yoga Pass", eventType, 10);
 
         // Візитів > 0, дата закінчення = сьогодні
         subscriptionInfo = createMockSubscriptionInfo(
@@ -477,7 +477,7 @@ class SubscriptionHistoryServiceTest {
         lenient().when(history.getIsValid()).thenReturn(true);
 
         when(subscriptionHistoryRepository.findAll()).thenReturn(List.of(history));
-        when(subscriptionInfoRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
+        when(subscriptionDealRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
                 1L, "Yoga Pass", "Group")).thenReturn(Optional.of(subscriptionInfo));
 
         // Act
@@ -494,7 +494,7 @@ class SubscriptionHistoryServiceTest {
         // Arrange
         ClientEntity client = createMockClient(1L);
         EventTypeEntity eventType = createMockEventType("Group");
-        SubscriptionServiceEntity service = createMockSubscriptionService("Pilates", eventType, 5);
+        SubscriptionOfferEntity service = createMockSubscriptionService("Pilates", eventType, 5);
 
         // Візити = 0, але ще не прострочена
         subscriptionInfo = createMockSubscriptionInfo(
@@ -505,7 +505,7 @@ class SubscriptionHistoryServiceTest {
         lenient().when(history.getIsValid()).thenReturn(true);
 
         when(subscriptionHistoryRepository.findAll()).thenReturn(List.of(history));
-        when(subscriptionInfoRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
+        when(subscriptionDealRepository.findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
                 1L, "Pilates", "Group")).thenReturn(Optional.of(subscriptionInfo));
 
         // Act

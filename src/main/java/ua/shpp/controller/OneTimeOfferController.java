@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ua.shpp.dto.OneTimeOfferCreateDTO;
 import ua.shpp.dto.OneTimeOfferDTO;
 import ua.shpp.service.OneTimeOfferService;
 
@@ -36,7 +37,7 @@ public class OneTimeOfferController {
     })
     @PostMapping
     public ResponseEntity<OneTimeOfferDTO> create(
-            @RequestBody OneTimeOfferDTO oneTimeOfferDTO) {
+            @RequestBody OneTimeOfferCreateDTO oneTimeOfferDTO) {
         var service = oneTimeOfferService.create(oneTimeOfferDTO);
         URI location = URI.create("/api/offer/one-time/" + service.id());
 

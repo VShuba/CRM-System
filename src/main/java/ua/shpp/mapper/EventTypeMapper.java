@@ -3,14 +3,11 @@ package ua.shpp.mapper;
 import org.mapstruct.*;
 import ua.shpp.dto.EventTypeRequestDTO;
 import ua.shpp.dto.EventTypeResponseDTO;
-import ua.shpp.dto.OneTimeOfferDTO;
 import ua.shpp.entity.*;
 import ua.shpp.exception.BranchNotFoundException;
 import ua.shpp.exception.ServiceNotFoundException;
 import ua.shpp.repository.*;
 
-import java.time.Duration;
-import java.time.Period;
 import java.util.List;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
@@ -56,25 +53,25 @@ public interface EventTypeMapper {
     // --- default methods ---
 
     @Named("idToOneTimeVisits")
-    default List<OneTimeServiceEntity> idToOneTimeVisits(List<Long> listId,
-                                                         @Context OneTimeOfferRepository repository) {
+    default List<OneTimeOfferEntity> idToOneTimeVisits(List<Long> listId,
+                                                       @Context OneTimeOfferRepository repository) {
         return repository.findAllById(listId);
     }
 
     @Named("idToSubscriptions")
-    default List<SubscriptionServiceEntity> idToSubscriptions(List<Long> listId,
-                                                              @Context SubscriptionOfferRepository repository) {
+    default List<SubscriptionOfferEntity> idToSubscriptions(List<Long> listId,
+                                                            @Context SubscriptionOfferRepository repository) {
         return repository.findAllById(listId);
     }
 
     @Named("oneTimeVisitsToId")
-    default List<Long> oneTimeVisitsToId(List<OneTimeServiceEntity> listEntity) {
-        return listEntity.stream().map(OneTimeServiceEntity::getId).toList();
+    default List<Long> oneTimeVisitsToId(List<OneTimeOfferEntity> listEntity) {
+        return listEntity.stream().map(OneTimeOfferEntity::getId).toList();
     }
 
     @Named("subscriptionsToId")
-    static List<Long> subscriptionsToId(List<SubscriptionServiceEntity> listEntity) {
-        return listEntity.stream().map(SubscriptionServiceEntity::getId).toList();
+    static List<Long> subscriptionsToId(List<SubscriptionOfferEntity> listEntity) {
+        return listEntity.stream().map(SubscriptionOfferEntity::getId).toList();
     }
 
 

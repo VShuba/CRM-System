@@ -5,9 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 @Schema(description = "Request to one-time offer")
-public record OneTimeOfferDTO(
-        @Schema(description = "Service id", example = "1")
-        Long id,
+public record OneTimeOfferCreateDTO(
         @Schema(description = "Service id", example = "1")
         Long activityId,
         @Schema(description = "Event type id", example = "1")

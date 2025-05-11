@@ -3,7 +3,7 @@ package ua.shpp.entity.payment;
 import jakarta.persistence.*;
 import lombok.*;
 import ua.shpp.entity.ClientEntity;
-import ua.shpp.entity.OneTimeServiceEntity;
+import ua.shpp.entity.OneTimeOfferEntity;
 
 @Entity
 @Builder
@@ -11,8 +11,8 @@ import ua.shpp.entity.OneTimeServiceEntity;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "one_time_info")
-public non-sealed class OneTimeInfoEntity implements Checkable {
+@Table(name = "one_time_deal")
+public non-sealed class OneTimeDealEntity implements Checkable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,7 +23,7 @@ public non-sealed class OneTimeInfoEntity implements Checkable {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "oneTimeService_id", nullable = false)
-    private OneTimeServiceEntity oneTimeService;
+    private OneTimeOfferEntity oneTimeService;
 
     @Column(nullable = false)
     private Boolean visitUsed;

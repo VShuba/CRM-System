@@ -8,8 +8,8 @@ import org.mapstruct.factory.Mappers;
 import ua.shpp.dto.VisitHistoryDTO;
 import ua.shpp.entity.*;
 import ua.shpp.entity.payment.CheckEntity;
-import ua.shpp.entity.payment.OneTimeInfoEntity;
-import ua.shpp.entity.payment.SubscriptionInfoEntity;
+import ua.shpp.entity.payment.OneTimeDealEntity;
+import ua.shpp.entity.payment.SubscriptionDealEntity;
 import ua.shpp.model.ClientEventStatus;
 import ua.shpp.model.PaymentMethod;
 import ua.shpp.model.PaymentMethodForStory;
@@ -56,7 +56,7 @@ class VisitHistoryMapperTest {
     void toVisitHistoryEntity_shouldMapFieldsCorrectly() {
         // Arrange
         EventClientEntity eventClient = createBaseEntity();
-        eventClient.setSubscriptionInfo(new SubscriptionInfoEntity());
+        eventClient.setSubscriptionInfo(new SubscriptionDealEntity());
 
         // Act
         VisitHistoryEntity result = visitHistoryMapper.toVisitHistoryEntity(eventClient);
@@ -82,7 +82,7 @@ class VisitHistoryMapperTest {
         check.setPaymentMethod(method);
         check.setPrice(amount);
 
-        OneTimeInfoEntity oneTimeInfo = new OneTimeInfoEntity();
+        OneTimeDealEntity oneTimeInfo = new OneTimeDealEntity();
         oneTimeInfo.setPaymentCheck(check);
         entity.setOneTimeInfo(oneTimeInfo);
 
@@ -110,7 +110,7 @@ class VisitHistoryMapperTest {
         CheckEntity check = new CheckEntity();
         check.setPaymentMethod(null);
 
-        OneTimeInfoEntity oneTimeInfo = new OneTimeInfoEntity();
+        OneTimeDealEntity oneTimeInfo = new OneTimeDealEntity();
         oneTimeInfo.setPaymentCheck(check);
         entity.setOneTimeInfo(oneTimeInfo);
 

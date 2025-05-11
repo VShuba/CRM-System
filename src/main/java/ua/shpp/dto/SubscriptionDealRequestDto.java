@@ -2,9 +2,7 @@ package ua.shpp.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public record SubscriptionInfoRequestDto(
-        @Schema(description = "Deal info id", example = "1")
-        Long id,
+public record SubscriptionDealRequestDto(
         @Schema(description = "Client id", example = "1")
         Long clientId,
         @Schema(description = "Offer id", example = "1")

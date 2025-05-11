@@ -1,10 +1,11 @@
 package ua.shpp.mapper;
 
 import org.mapstruct.*;
+import ua.shpp.dto.SubscriptionOfferCreateDTO;
 import ua.shpp.dto.SubscriptionOfferDTO;
 import ua.shpp.entity.EventTypeEntity;
 import ua.shpp.entity.ServiceEntity;
-import ua.shpp.entity.SubscriptionServiceEntity;
+import ua.shpp.entity.SubscriptionOfferEntity;
 import ua.shpp.exception.EventTypeNotFoundException;
 import ua.shpp.exception.ServiceNotFoundException;
 import ua.shpp.repository.EventTypeRepository;
@@ -25,7 +26,7 @@ public interface SubscriptionOfferMapper {
     @Mapping(target = "eventTypeId",
             source = "eventType",
             qualifiedByName = "eventToId")
-    SubscriptionOfferDTO toDto(SubscriptionServiceEntity entity);
+    SubscriptionOfferDTO toDto(SubscriptionOfferEntity entity);
 
     @Mapping(target = "termOfValidityInDays", qualifiedByName = "intToPeriod")
     @Mapping(target = "activities", source = "activitiesId",
@@ -33,9 +34,20 @@ public interface SubscriptionOfferMapper {
     @Mapping(target = "eventType",
             source = "eventTypeId",
             qualifiedByName = "idToEvent")
-    SubscriptionServiceEntity toEntity(SubscriptionOfferDTO dto,
-                                       @Context ServiceRepository serviceRepository,
-                                       @Context EventTypeRepository eventTypeRepository);
+    SubscriptionOfferEntity toEntity(SubscriptionOfferCreateDTO dto,
+                                     @Context ServiceRepository serviceRepository,
+                                     @Context EventTypeRepository eventTypeRepository);
+
+
+    @Mapping(target = "termOfValidityInDays", qualifiedByName = "intToPeriod")
+    @Mapping(target = "activities", source = "activitiesId",
+            qualifiedByName = "idToActivity")
+    @Mapping(target = "eventType",
+            source = "eventTypeId",
+            qualifiedByName = "idToEvent")
+    SubscriptionOfferEntity toEntity(SubscriptionOfferDTO dto,
+                                     @Context ServiceRepository serviceRepository,
+                                     @Context EventTypeRepository eventTypeRepository);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "activities", source = "activitiesId",
@@ -44,7 +56,7 @@ public interface SubscriptionOfferMapper {
             source = "eventTypeId",
             qualifiedByName = "idToEvent")
     void updateFromDto(SubscriptionOfferDTO dto,
-                       @MappingTarget SubscriptionServiceEntity entity,
+                       @MappingTarget SubscriptionOfferEntity entity,
                        @Context ServiceRepository serviceRepository,
                        @Context EventTypeRepository eventTypeRepository);
 

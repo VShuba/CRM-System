@@ -26,12 +26,12 @@ public class DealController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "One-time deal successfully created",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = OneTimeInfoResponseDto.class))),
+                            schema = @Schema(implementation = OneTimeDealResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Client, Service or Event type id not fount", content = @Content),
     })
     @PostMapping("/one-time/{paymentMethod}")
-    public ResponseEntity<OneTimeInfoResponseDto> create(
-            @RequestBody OneTimeInfoRequestDto dto,
+    public ResponseEntity<OneTimeDealResponseDto> create(
+            @RequestBody OneTimeDealRequestDto dto,
             @PathVariable("paymentMethod") PaymentMethod paymentMethod) {
         var service = dealService.createOneTime(dto, paymentMethod);
         URI location = URI.create("/api/deal/one-time/" + service.id());
@@ -43,11 +43,11 @@ public class DealController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "One-time deal successfully find",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = OneTimeInfoResponseDto.class))),
+                            schema = @Schema(implementation = OneTimeDealResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "One-time deal id not fount", content = @Content),
     })
     @GetMapping("/one-time/{id}")
-    public ResponseEntity<OneTimeInfoResponseDto> getOneTimeById(@PathVariable Long id) {
+    public ResponseEntity<OneTimeDealResponseDto> getOneTimeById(@PathVariable Long id) {
         var dto = dealService.getOneTimeById(id);
         return ResponseEntity.ok(dto);
     }
@@ -57,12 +57,12 @@ public class DealController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "One-time deal successfully used",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = OneTimeInfoResponseDto.class))),
+                            schema = @Schema(implementation = OneTimeDealResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "One-time deal id not fount", content = @Content),
             @ApiResponse(responseCode = "404", description = "One-time visit id already used", content = @Content),
     })
     @GetMapping("/use/{id}")
-    public ResponseEntity<OneTimeInfoResponseDto> useOneTimeById(@PathVariable Long id) {
+    public ResponseEntity<OneTimeDealResponseDto> useOneTimeById(@PathVariable Long id) {
         var dto = dealService.visitOneTimeById(id);
         return ResponseEntity.ok(dto);
     }
@@ -71,12 +71,12 @@ public class DealController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "One-time deal successfully used",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = OneTimeInfoResponseDto.class))),
+                            schema = @Schema(implementation = OneTimeDealResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "One-time deal id not fount", content = @Content),
             @ApiResponse(responseCode = "404", description = "One-time visit id already used", content = @Content),
     })
     @GetMapping("/use/{oneId}/schedule/{scheduleId}")
-    public ResponseEntity<OneTimeInfoResponseDto> useOneTimeById(@PathVariable("oneId") Long oneTimeId,
+    public ResponseEntity<OneTimeDealResponseDto> useOneTimeById(@PathVariable("oneId") Long oneTimeId,
                                                                  @PathVariable("scheduleId") Long scheduleId) {
         var dto = dealService.visitOneTimeByIdAndScheduleEventId(oneTimeId, scheduleId);
         return ResponseEntity.ok(dto);
@@ -86,12 +86,12 @@ public class DealController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Subscription deal successfully created",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = SubscriptionInfoResponseDto.class))),
+                            schema = @Schema(implementation = SubscriptionDealResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Client, Service or Event type id not fount", content = @Content),
     })
     @PostMapping("/subscription/{paymentMethod}")
-    public ResponseEntity<SubscriptionInfoResponseDto> create(
-            @RequestBody SubscriptionInfoRequestDto dto,
+    public ResponseEntity<SubscriptionDealResponseDto> create(
+            @RequestBody SubscriptionDealRequestDto dto,
             @PathVariable("paymentMethod") PaymentMethod paymentMethod) {
         var service = dealService.createSubscription(dto, paymentMethod);
         URI location = URI.create("/api/deal/subscription/" + service.id());
@@ -103,11 +103,11 @@ public class DealController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Subscription deal successfully find",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = SubscriptionInfoResponseDto.class))),
+                            schema = @Schema(implementation = SubscriptionDealResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Subscription deal id not fount", content = @Content),
     })
     @GetMapping("/subscription/{id}")
-    public ResponseEntity<SubscriptionInfoResponseDto> getSubscriptionById(@PathVariable Long id) {
+    public ResponseEntity<SubscriptionDealResponseDto> getSubscriptionById(@PathVariable Long id) {
         var dto = dealService.getSubscriptionById(id);
         return ResponseEntity.ok(dto);
     }
@@ -116,12 +116,12 @@ public class DealController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Subscription deal visit successfully added",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = SubscriptionInfoResponseDto.class))),
+                            schema = @Schema(implementation = SubscriptionDealResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Subscription deal id not fount", content = @Content),
             @ApiResponse(responseCode = "404", description = "Subscription visit id already used", content = @Content),
     })
     @GetMapping("/visit/{id}")
-    public ResponseEntity<SubscriptionInfoResponseDto> visitSubscriptionById(@PathVariable Long id) {
+    public ResponseEntity<SubscriptionDealResponseDto> visitSubscriptionById(@PathVariable Long id) {
         var dto = dealService.subscriptionVisitById(id);
         return ResponseEntity.ok(dto);
     }
@@ -130,12 +130,12 @@ public class DealController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Subscription deal visit successfully added",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = SubscriptionInfoResponseDto.class))),
+                            schema = @Schema(implementation = SubscriptionDealResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Subscription deal id not fount", content = @Content),
             @ApiResponse(responseCode = "404", description = "Subscription visit id already used", content = @Content),
     })
     @GetMapping("/visit/{id}/schedule/{scheduleId}")
-    public ResponseEntity<SubscriptionInfoResponseDto> visitSubscriptionById(
+    public ResponseEntity<SubscriptionDealResponseDto> visitSubscriptionById(
             @PathVariable("id") Long id,
             @PathVariable("scheduleId") Long scheduleId) {
         var dto = dealService.subscriptionVisitByIdAndScheduleEventId(id, scheduleId);

@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 
-public record SubscriptionInfoResponseDto(
+public record SubscriptionDealResponseDto(
         @Schema(description = "Deal info id", example = "1")
         Long id,
         @Schema(description = "Client id", example = "1")

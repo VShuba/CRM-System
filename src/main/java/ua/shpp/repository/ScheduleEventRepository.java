@@ -15,12 +15,12 @@ public interface ScheduleEventRepository extends JpaRepository<ScheduleEventEnti
     @Query(value = """
             SELECT se.*
               FROM schedule_event se
-             WHERE (:roomId     IS NULL OR se.room_id      = :roomId)
-               AND (:employeeId IS NULL OR se.employee_id  = :employeeId)
-               AND (:serviceId  IS NULL OR se.service_id   = :serviceId)
+             WHERE (:roomId      IS NULL OR se.room_id       = :roomId)
+               AND (:employeeId  IS NULL OR se.employee_id   = :employeeId)
                AND (:eventTypeId IS NULL OR se.event_type_id = :eventTypeId)
-               AND ( (:startDate IS NULL OR se.event_date >= :startDate)
-                    AND (:endDate   IS NULL OR se.event_date <= :endDate) )
+               AND (:serviceId   IS NULL OR se.service_id    = :serviceId)
+               AND (:startDate   IS NULL OR se.event_date    >= :startDate)
+               AND (:endDate     IS NULL OR se.event_date    <= :endDate)
             """,
             nativeQuery = true)
     List<ScheduleEventEntity> findFilteredByAll(

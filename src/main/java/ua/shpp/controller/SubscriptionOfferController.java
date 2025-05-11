@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.OneTimeOfferDTO;
+import ua.shpp.dto.SubscriptionOfferCreateDTO;
 import ua.shpp.dto.SubscriptionOfferDTO;
 import ua.shpp.service.SubscriptionOfferService;
 
@@ -36,7 +37,7 @@ public class SubscriptionOfferController {
     })
     @PostMapping
     public ResponseEntity<SubscriptionOfferDTO> create(
-            @RequestBody SubscriptionOfferDTO subscriptionOfferDTO) {
+            @RequestBody SubscriptionOfferCreateDTO subscriptionOfferDTO) {
         var offer = subscriptionOfferService.create(subscriptionOfferDTO);
         URI location = URI.create("/api/offer/subscription/" + offer.id());
 

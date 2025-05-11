@@ -2,14 +2,11 @@ package ua.shpp.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import ua.shpp.entity.EventClientId;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
-@Schema(description = "Request & response to schedule event")
-public record ScheduleEventDto(
-        Long id,
+@Schema(description = "Request to create schedule event")
+public record ScheduleEventCreateDto(
         @Schema(description = "Service ID", example = "1")
         Long serviceId,
         @Schema(example = "12-04-2025", type = "string", format = "date")
