@@ -5,10 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
-@Schema(description = "Request & response to subscription offer")
-public record SubscriptionOfferDTO(
-        @Schema(description = " Offer id", example = "1")
-        Long id,
+@Schema(description = "Request to create subscription offer")
+public record SubscriptionOfferCreateDTO(
         @Schema(description = "Offer name", example = "Complex 1")
         String name,
         @Schema(description = "Event type id", example = "1")

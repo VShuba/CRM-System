@@ -6,14 +6,14 @@ import org.springframework.stereotype.Service;
 import ua.shpp.dto.SubscriptionHistoryDTO;
 import ua.shpp.entity.ClientEntity;
 import ua.shpp.entity.SubscriptionHistoryEntity;
-import ua.shpp.entity.SubscriptionServiceEntity;
-import ua.shpp.entity.payment.SubscriptionInfoEntity;
+import ua.shpp.entity.SubscriptionOfferEntity;
+import ua.shpp.entity.payment.SubscriptionDealEntity;
 import ua.shpp.exception.ClientNotFoundException;
 import ua.shpp.exception.SubscriptionHistoryCreationException;
 import ua.shpp.mapper.SubscriptionHistoryMapper;
 import ua.shpp.repository.ClientRepository;
 import ua.shpp.repository.SubscriptionHistoryRepository;
-import ua.shpp.repository.SubscriptionInfoRepository;
+import ua.shpp.repository.SubscriptionDealRepository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,11 +26,11 @@ public class SubscriptionHistoryService {
     private final SubscriptionHistoryRepository subscriptionHistoryRepository;
     private final SubscriptionHistoryMapper subscriptionHistoryMapper;
     private final ClientRepository clientRepository;
-    private final SubscriptionInfoRepository subscriptionInfoRepository;
+    private final SubscriptionDealRepository subscriptionDealRepository;
 
-    public void createSubscriptionHistory(SubscriptionInfoEntity subscriptionInfo) {
+    public void createSubscriptionHistory(SubscriptionDealEntity subscriptionInfo) {
         log.info("Creating history for SubscriptionInfo ID: {}", subscriptionInfo.getId());
-        SubscriptionServiceEntity subscriptionService = subscriptionInfo.getSubscriptionService();
+        SubscriptionOfferEntity subscriptionService = subscriptionInfo.getSubscriptionService();
 
         if (subscriptionService == null) {
             log.error("SubscriptionService is null for SubscriptionInfo ID: {}", subscriptionInfo.getId());
@@ -96,10 +96,10 @@ public class SubscriptionHistoryService {
         return historyDTOs;
     }
 
-    public void updateHistoryVisitsRemaining(SubscriptionInfoEntity subscriptionInfo) {
+    public void updateHistoryVisitsRemaining(SubscriptionDealEntity subscriptionInfo) {
         log.info("Updating visits_left for SubscriptionInfo ID: {}", subscriptionInfo.getId());
 
-        SubscriptionServiceEntity subscriptionService = subscriptionInfo.getSubscriptionService();
+        SubscriptionOfferEntity subscriptionService = subscriptionInfo.getSubscriptionService();
         ClientEntity client = subscriptionInfo.getClient();
 
         Long clientId = client.getId();
@@ -143,12 +143,12 @@ public class SubscriptionHistoryService {
             String name = history.getName();
             String eventType = history.getEventType();
 
-            Optional<SubscriptionInfoEntity> subscriptionInfoOpt = subscriptionInfoRepository
+            Optional<SubscriptionDealEntity> subscriptionInfoOpt = subscriptionDealRepository
                             .findByClientIdAndSubscriptionService_NameAndSubscriptionService_EventType_Name(
                             clientId, name, eventType);
 
             if (subscriptionInfoOpt.isPresent()) {
-                SubscriptionInfoEntity subscriptionInfo = subscriptionInfoOpt.get();
+                SubscriptionDealEntity subscriptionInfo = subscriptionInfoOpt.get();
 
                 boolean shouldBeValid = subscriptionInfo.getVisits() > 0 &&
                         !subscriptionInfo.getExpirationDate().isBefore(LocalDate.now());

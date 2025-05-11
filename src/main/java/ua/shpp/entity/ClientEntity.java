@@ -3,8 +3,8 @@ package ua.shpp.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import ua.shpp.entity.payment.OneTimeInfoEntity;
-import ua.shpp.entity.payment.SubscriptionInfoEntity;
+import ua.shpp.entity.payment.OneTimeDealEntity;
+import ua.shpp.entity.payment.SubscriptionDealEntity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class ClientEntity {
             fetch = FetchType.LAZY
     )
     @JsonIgnore
-    private List<OneTimeInfoEntity> oneTimeInfo = new ArrayList<>();
+    private List<OneTimeDealEntity> oneTimeInfo = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "client",
@@ -55,7 +55,7 @@ public class ClientEntity {
             fetch = FetchType.LAZY
     )
     @JsonIgnore
-    private List<SubscriptionInfoEntity> subscriptionInfo = new ArrayList<>();
+    private List<SubscriptionDealEntity> subscriptionInfo = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "client",

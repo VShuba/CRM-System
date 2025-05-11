@@ -34,7 +34,7 @@ public class EventTypeEntity {
             joinColumns = @JoinColumn(name = "event_type_id"),
             inverseJoinColumns = @JoinColumn(name = "one_time_offer_id")
     )
-    private List<OneTimeServiceEntity> oneTimeVisits = new ArrayList<>();
+    private List<OneTimeOfferEntity> oneTimeVisits = new ArrayList<>();
 
     @OneToMany(
             orphanRemoval = true,
@@ -46,7 +46,7 @@ public class EventTypeEntity {
             joinColumns = @JoinColumn(name = "event_type_id"),
             inverseJoinColumns = @JoinColumn(name = "subscriptions_offer_id")
     )
-    private List<SubscriptionServiceEntity> subscriptions = new ArrayList<>();
+    private List<SubscriptionOfferEntity> subscriptions = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "eventType",

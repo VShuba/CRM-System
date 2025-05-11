@@ -4,8 +4,8 @@ package ua.shpp.mapper;
 import org.mapstruct.*;
 import ua.shpp.dto.CheckDto;
 import ua.shpp.entity.payment.CheckEntity;
-import ua.shpp.repository.OneTimeInfoRepository;
-import ua.shpp.repository.SubscriptionInfoRepository;
+import ua.shpp.repository.OneTimeDealRepository;
+import ua.shpp.repository.SubscriptionDealRepository;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
@@ -16,13 +16,13 @@ public interface CheckMapper {
 
     @Mapping(target = "oneTimeInfo", ignore = true)
     @Mapping(target = "subscriptionInfo", ignore = true)
-    CheckEntity toEntity(CheckDto dto, @Context OneTimeInfoRepository oneTimeInfoRepository, @Context SubscriptionInfoRepository subscriptionInfoRepository);
+    CheckEntity toEntity(CheckDto dto, @Context OneTimeDealRepository oneTimeDealRepository, @Context SubscriptionDealRepository subscriptionDealRepository);
 
     @AfterMapping
     default void setBranch(CheckDto dto,@MappingTarget CheckEntity entity,
-                           @Context OneTimeInfoRepository oneTimeInfoRepository,
-                           @Context SubscriptionInfoRepository subscriptionInfoRepository) {
-        entity.setOneTimeInfo(oneTimeInfoRepository.getByPaymentCheckId(dto.id()).orElse(null));
-        entity.setSubscriptionInfo(subscriptionInfoRepository.getByPaymentCheckId(dto.id()).orElse(null));
+                           @Context OneTimeDealRepository oneTimeDealRepository,
+                           @Context SubscriptionDealRepository subscriptionDealRepository) {
+        entity.setOneTimeInfo(oneTimeDealRepository.getByPaymentCheckId(dto.id()).orElse(null));
+        entity.setSubscriptionInfo(subscriptionDealRepository.getByPaymentCheckId(dto.id()).orElse(null));
     }
 }

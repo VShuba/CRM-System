@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ua.shpp.dto.ScheduleEventCreateDto;
 import ua.shpp.dto.ScheduleEventDto;
 import ua.shpp.dto.ScheduleEventFilterDto;
 import ua.shpp.service.ScheduleEventService;
@@ -35,7 +36,7 @@ public class ScheduleEventController {
             @ApiResponse(responseCode = "404", description = "Service id not fount", content = @Content),
     })
     @PostMapping
-    public ResponseEntity<ScheduleEventDto> create(@RequestBody ScheduleEventDto scheduleEventDto) {
+    public ResponseEntity<ScheduleEventDto> create(@RequestBody ScheduleEventCreateDto scheduleEventDto) {
         var event = scheduleEventService.create(scheduleEventDto);
         URI location = URI.create("/api/schedule/event/" + event.id());
 

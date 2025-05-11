@@ -1,9 +1,10 @@
 package ua.shpp.mapper;
 
 import org.mapstruct.*;
+import ua.shpp.dto.OneTimeOfferCreateDTO;
 import ua.shpp.dto.OneTimeOfferDTO;
 import ua.shpp.entity.EventTypeEntity;
-import ua.shpp.entity.OneTimeServiceEntity;
+import ua.shpp.entity.OneTimeOfferEntity;
 import ua.shpp.entity.ServiceEntity;
 import ua.shpp.exception.EventTypeNotFoundException;
 import ua.shpp.exception.ServiceNotFoundException;
@@ -11,7 +12,6 @@ import ua.shpp.repository.EventTypeRepository;
 import ua.shpp.repository.ServiceRepository;
 
 import java.time.Duration;
-import java.util.List;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
@@ -25,7 +25,7 @@ public interface OneTimeOfferMapper {
             qualifiedByName = "activityToId")
     @Mapping(target = "eventTypeId", source = "eventType",
             qualifiedByName = "eventToId")
-    OneTimeOfferDTO entityToDto(OneTimeServiceEntity entity);
+    OneTimeOfferDTO entityToDto(OneTimeOfferEntity entity);
 
     @Mapping(target = "durationInMinutes", source = "durationInMinutes",
             qualifiedByName = "longToDuration")
@@ -33,9 +33,19 @@ public interface OneTimeOfferMapper {
             qualifiedByName = "idToActivity")
     @Mapping(target = "eventType", source = "eventTypeId",
             qualifiedByName = "idToEvent")
-    OneTimeServiceEntity dtoToEntity(OneTimeOfferDTO dto,
-                                     @Context ServiceRepository serviceRepository,
-                                     @Context EventTypeRepository eventTypeRepository);
+    OneTimeOfferEntity dtoToEntity(OneTimeOfferDTO dto,
+                                   @Context ServiceRepository serviceRepository,
+                                   @Context EventTypeRepository eventTypeRepository);
+
+    @Mapping(target = "durationInMinutes", source = "durationInMinutes",
+            qualifiedByName = "longToDuration")
+    @Mapping(target = "activity", source = "activityId",
+            qualifiedByName = "idToActivity")
+    @Mapping(target = "eventType", source = "eventTypeId",
+            qualifiedByName = "idToEvent")
+    OneTimeOfferEntity dtoToEntity(OneTimeOfferCreateDTO dto,
+                                   @Context ServiceRepository serviceRepository,
+                                   @Context EventTypeRepository eventTypeRepository);
 
     @BeanMapping(nullValuePropertyMappingStrategy =
             NullValuePropertyMappingStrategy.IGNORE)
@@ -44,7 +54,7 @@ public interface OneTimeOfferMapper {
     @Mapping(target = "eventType", source = "eventTypeId",
             qualifiedByName = "idToEvent")
     void updateFromDto(OneTimeOfferDTO dto,
-                       @MappingTarget OneTimeServiceEntity entity,
+                       @MappingTarget OneTimeOfferEntity entity,
                        @Context ServiceRepository serviceRepository,
                        @Context EventTypeRepository eventTypeRepository);
 

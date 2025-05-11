@@ -4,7 +4,7 @@ package ua.shpp.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import ua.shpp.entity.payment.OneTimeInfoEntity;
+import ua.shpp.entity.payment.OneTimeDealEntity;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "one_time_services")
-public class OneTimeServiceEntity {
+public class OneTimeOfferEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -49,5 +49,5 @@ public class OneTimeServiceEntity {
             fetch = FetchType.LAZY
     )
     @JsonIgnore
-    private List<OneTimeInfoEntity> oneTimeInfo = new ArrayList<>();
+    private List<OneTimeDealEntity> oneTimeDeal = new ArrayList<>();
 }

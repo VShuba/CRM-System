@@ -3,7 +3,7 @@ package ua.shpp.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import ua.shpp.entity.payment.SubscriptionInfoEntity;
+import ua.shpp.entity.payment.SubscriptionDealEntity;
 
 import java.time.Period;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "subscription_services")
-public class SubscriptionServiceEntity {
+public class SubscriptionOfferEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -50,12 +50,6 @@ public class SubscriptionServiceEntity {
             cascade = CascadeType.ALL)
     private EventTypeEntity eventType;
 
-//    @PreRemove
-//    private void preRemove() {
-//        for (EventTypeEntity type : new ArrayList<>(eventType)) {
-//            type.getSubscriptions().remove(this);
-//        }
-//    }
 
     @OneToMany(
             mappedBy = "subscriptionService",
@@ -63,6 +57,5 @@ public class SubscriptionServiceEntity {
             orphanRemoval = true,
             fetch = FetchType.LAZY
     )
-    @JsonIgnore
-    private List<SubscriptionInfoEntity> subscriptionTimeInfo = new ArrayList<>();
+    private List<SubscriptionDealEntity> subscriptionDeal = new ArrayList<>();
 }

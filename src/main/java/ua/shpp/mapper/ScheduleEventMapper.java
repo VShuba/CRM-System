@@ -4,6 +4,7 @@ import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import ua.shpp.dto.ScheduleEventCreateDto;
 import ua.shpp.dto.ScheduleEventDto;
 import ua.shpp.entity.*;
 import ua.shpp.exception.EventNotFoundException;
@@ -25,6 +26,19 @@ public interface ScheduleEventMapper {
     @Mapping(target = "room", source = "roomId", qualifiedByName = "idToRoom")
     @Mapping(target = "eventType", source = "eventTypeId", qualifiedByName = "idToEventType")
     ScheduleEventEntity toEntity(ScheduleEventDto dto,
+                                 @Context ServiceRepository serviceRepository,
+                                 @Context EmployeeRepository employeeRepository,
+                                 @Context RoomRepository roomRepository,
+                                 @Context EventTypeRepository eventTypeRepository
+    );
+
+    @Mapping(target = "serviceEntity",
+            source = "serviceId",
+            qualifiedByName = "idToService")
+    @Mapping(target = "employee", source = "trainerId", qualifiedByName = "idToTrainer")
+    @Mapping(target = "room", source = "roomId", qualifiedByName = "idToRoom")
+    @Mapping(target = "eventType", source = "eventTypeId", qualifiedByName = "idToEventType")
+    ScheduleEventEntity toEntity(ScheduleEventCreateDto dto,
                                  @Context ServiceRepository serviceRepository,
                                  @Context EmployeeRepository employeeRepository,
                                  @Context RoomRepository roomRepository,

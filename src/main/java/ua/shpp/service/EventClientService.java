@@ -27,22 +27,22 @@ public class EventClientService {
     private final ClientService clientService;
     private final VisitHistoryService visitHistoryService;
     private final EventClientMapper eventClientMapper;
-    private final OneTimeInfoRepository oneTimeInfoRepository;
-    private final SubscriptionInfoRepository subscriptionInfoRepository;
+    private final OneTimeDealRepository oneTimeDealRepository;
+    private final SubscriptionDealRepository subscriptionDealRepository;
 
     public EventClientService(EventClientRepository eventClientRepository, ClientRepository clientRepository,
                               ScheduleEventRepository scheduleEventRepository, ClientService clientService,
                               VisitHistoryService visitHistoryService, EventClientMapper eventClientMapper,
-                              OneTimeInfoRepository oneTimeInfoRepository,
-                              SubscriptionInfoRepository subscriptionInfoRepository) {
+                              OneTimeDealRepository oneTimeDealRepository,
+                              SubscriptionDealRepository subscriptionDealRepository) {
         this.eventClientRepository = eventClientRepository;
         this.clientRepository = clientRepository;
         this.scheduleEventRepository = scheduleEventRepository;
         this.clientService = clientService;
         this.visitHistoryService = visitHistoryService;
         this.eventClientMapper = eventClientMapper;
-        this.oneTimeInfoRepository = oneTimeInfoRepository;
-        this.subscriptionInfoRepository = subscriptionInfoRepository;
+        this.oneTimeDealRepository = oneTimeDealRepository;
+        this.subscriptionDealRepository = subscriptionDealRepository;
     }
 
     public EventClientDto addClientToEvent(Long clientId, Long eventId) {
@@ -93,10 +93,10 @@ public class EventClientService {
             eventClientEntity.setClientEventStatus(newStatus);
 
             if (eventClientDto.oneTimeInfoId() != null) {
-                eventClientEntity.setOneTimeInfo(oneTimeInfoRepository
+                eventClientEntity.setOneTimeInfo(oneTimeDealRepository
                         .findById(eventClientDto.oneTimeInfoId()).orElseThrow());
             } else if(eventClientDto.subscriptionInfoId() != null) {
-                eventClientEntity.setSubscriptionInfo(subscriptionInfoRepository
+                eventClientEntity.setSubscriptionInfo(subscriptionDealRepository
                         .findById(eventClientDto.subscriptionInfoId()).orElseThrow());
             }
 

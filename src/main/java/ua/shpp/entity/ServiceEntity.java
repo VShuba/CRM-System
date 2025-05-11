@@ -48,7 +48,7 @@ public class ServiceEntity {
             fetch = FetchType.LAZY
     )
     @JsonIgnore
-    private List<OneTimeServiceEntity> oneTimeServices = new ArrayList<>();
+    private List<OneTimeOfferEntity> oneTimeServices = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(
@@ -63,7 +63,7 @@ public class ServiceEntity {
     @Builder.Default
     @ManyToMany(mappedBy = "activities", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<SubscriptionServiceEntity> subscriptions = new ArrayList<>();
+    private List<SubscriptionOfferEntity> subscriptions = new ArrayList<>();
 
     @Builder.Default
     @ManyToMany(mappedBy = "services", fetch = FetchType.LAZY)
@@ -81,8 +81,8 @@ public class ServiceEntity {
 
     @PreRemove
     private void preRemove() {
-        // Delete from SubscriptionServiceEntity.activities
-        for (SubscriptionServiceEntity sub : new ArrayList<>(subscriptions)) {
+        // Delete from SubscriptionOfferEntity.activities
+        for (SubscriptionOfferEntity sub : new ArrayList<>(subscriptions)) {
             sub.getActivities().remove(this);
         }
 

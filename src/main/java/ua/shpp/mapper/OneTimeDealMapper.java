@@ -4,12 +4,12 @@ import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import ua.shpp.dto.OneTimeInfoRequestDto;
-import ua.shpp.dto.OneTimeInfoResponseDto;
+import ua.shpp.dto.OneTimeDealRequestDto;
+import ua.shpp.dto.OneTimeDealResponseDto;
 import ua.shpp.entity.ClientEntity;
-import ua.shpp.entity.OneTimeServiceEntity;
+import ua.shpp.entity.OneTimeOfferEntity;
 import ua.shpp.entity.payment.CheckEntity;
-import ua.shpp.entity.payment.OneTimeInfoEntity;
+import ua.shpp.entity.payment.OneTimeDealEntity;
 import ua.shpp.exception.CheckNotFoundException;
 import ua.shpp.exception.ClientNotFoundException;
 import ua.shpp.exception.OfferNotFoundException;
@@ -20,14 +20,14 @@ import ua.shpp.repository.OneTimeOfferRepository;
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
 @Mapper(componentModel = SPRING)
-public interface OneTimeInfoMapper {
+public interface OneTimeDealMapper {
     @Mapping(target = "clientId", source = "client",
             qualifiedByName = "clientToId")
     @Mapping(target = "oneTimeId", source = "oneTimeService",
             qualifiedByName = "oneTimeToId")
     @Mapping(target = "checkId", source = "paymentCheck",
             qualifiedByName = "checkToId")
-    OneTimeInfoResponseDto toDto(OneTimeInfoEntity entity);
+    OneTimeDealResponseDto toDto(OneTimeDealEntity entity);
 
     @Mapping(target = "client", source = "clientId",
             qualifiedByName = "idToClient")
@@ -35,7 +35,7 @@ public interface OneTimeInfoMapper {
             qualifiedByName = "idToOneTime")
 //    @Mapping(target = "paymentCheck", source = "checkId",
 //            qualifiedByName = "idToCheck")
-    OneTimeInfoEntity toEntity(OneTimeInfoRequestDto dto,
+    OneTimeDealEntity toEntity(OneTimeDealRequestDto dto,
                                @Context ClientRepository clientRepository,
                                @Context OneTimeOfferRepository oneTimeOfferRepository,
                                @Context CheckRepository checkRepository);
@@ -53,13 +53,13 @@ public interface OneTimeInfoMapper {
     }
 
     @Named("oneTimeToId")
-    static Long oneTimeToId(OneTimeServiceEntity entity) {
+    static Long oneTimeToId(OneTimeOfferEntity entity) {
         return entity != null ? entity.getId() : null;
     }
 
     @Named("idToOneTime")
-    default OneTimeServiceEntity idToOneTime(Long id,
-                                             @Context OneTimeOfferRepository repository) {
+    default OneTimeOfferEntity idToOneTime(Long id,
+                                           @Context OneTimeOfferRepository repository) {
         return repository.findById(id)
                 .orElseThrow(() -> new OfferNotFoundException(String.format("Offer id: %d, not found", id)));
     }

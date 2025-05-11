@@ -1,12 +1,12 @@
 package ua.shpp.mapper;
 
 import org.mapstruct.*;
-import ua.shpp.dto.SubscriptionInfoRequestDto;
-import ua.shpp.dto.SubscriptionInfoResponseDto;
+import ua.shpp.dto.SubscriptionDealRequestDto;
+import ua.shpp.dto.SubscriptionDealResponseDto;
 import ua.shpp.entity.ClientEntity;
-import ua.shpp.entity.SubscriptionServiceEntity;
+import ua.shpp.entity.SubscriptionOfferEntity;
 import ua.shpp.entity.payment.CheckEntity;
-import ua.shpp.entity.payment.SubscriptionInfoEntity;
+import ua.shpp.entity.payment.SubscriptionDealEntity;
 import ua.shpp.exception.CheckNotFoundException;
 import ua.shpp.exception.ClientNotFoundException;
 import ua.shpp.exception.OfferNotFoundException;
@@ -17,20 +17,20 @@ import ua.shpp.repository.SubscriptionOfferRepository;
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
 @Mapper(componentModel = SPRING)
-public interface SubscriptionInfoMapper {
+public interface SubscriptionDealMapper {
     @Mapping(target = "clientId", source = "client",
             qualifiedByName = "clientToId")
     @Mapping(target = "subscriptionId", source = "subscriptionService",
             qualifiedByName = "subscriptionToId")
     @Mapping(target = "checkId", source = "paymentCheck",
             qualifiedByName = "checkToId")
-    SubscriptionInfoResponseDto toDto(SubscriptionInfoEntity entity);
+    SubscriptionDealResponseDto toDto(SubscriptionDealEntity entity);
 
     @Mapping(target = "client", source = "clientId",
             qualifiedByName = "idToClient")
     @Mapping(target = "subscriptionService", source = "subscriptionId",
             qualifiedByName = "idToOffer")
-    SubscriptionInfoEntity toEntity(SubscriptionInfoRequestDto dto,
+    SubscriptionDealEntity toEntity(SubscriptionDealRequestDto dto,
                                     @Context ClientRepository clientRepository,
                                     @Context SubscriptionOfferRepository offerRepository,
                                     @Context CheckRepository checkRepository);
@@ -42,7 +42,7 @@ public interface SubscriptionInfoMapper {
     }
 
     @Named("subscriptionToId")
-    static Long subscriptionToId(SubscriptionServiceEntity entity) {
+    static Long subscriptionToId(SubscriptionOfferEntity entity) {
         return entity != null ? entity.getId() : null;
     }
 
@@ -59,8 +59,8 @@ public interface SubscriptionInfoMapper {
     }
 
     @Named("idToOffer")
-    default SubscriptionServiceEntity idToOffer(Long id,
-                                                @Context SubscriptionOfferRepository repository) {
+    default SubscriptionOfferEntity idToOffer(Long id,
+                                              @Context SubscriptionOfferRepository repository) {
         return repository.findById(id)
                 .orElseThrow(() -> new OfferNotFoundException(String.format("Offer id: %d, not found", id)));
     }
@@ -73,7 +73,7 @@ public interface SubscriptionInfoMapper {
     }
 
     @AfterMapping
-    default void setBranch(SubscriptionInfoRequestDto dto, @MappingTarget SubscriptionInfoEntity entity,
+    default void setBranch(SubscriptionDealRequestDto dto, @MappingTarget SubscriptionDealEntity entity,
                            @Context SubscriptionOfferRepository offerRepository) {
         entity.setVisits(
                 offerRepository
