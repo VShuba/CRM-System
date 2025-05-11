@@ -2,11 +2,8 @@ package ua.shpp.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import ua.shpp.entity.EventClientId;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 public record ScheduleEventDto(
         Long id,

@@ -23,6 +23,7 @@ public class AuthorizationService {
     private final EmployeeRepository employeeRepository;
     private final ServiceRepository serviceRepository;
     private final ClientRepository clientRepository;
+    private final ScheduleEventRepository scheduleEventRepository;
 
     /**
      * Hot to use?
@@ -79,6 +80,13 @@ public class AuthorizationService {
         {
             Long organizationId = clientRepository.findOrganizationIdByClientId(clientId);
             return organizationId != null && hasRoleInOrgByOrgId(organizationId, expectedRole);
+        });
+    }
+
+    public boolean hasRoleByScheduleEventId(Long eventId, OrgRole expectedRole) {
+        return withSuperAdminCheck(() -> {
+            Long serviceId = scheduleEventRepository.findServiceIdByEventId(eventId);
+            return serviceId != null && hasRoleByServiceId(serviceId, expectedRole);
         });
     }
 
