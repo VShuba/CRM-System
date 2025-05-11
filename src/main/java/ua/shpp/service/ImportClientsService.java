@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
@@ -20,6 +22,7 @@ import ua.shpp.exception.IllegalGoogleSheetFormatException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -28,6 +31,7 @@ public class ImportClientsService {
 
     private final CsvMapper csvMapper;
     private final ClientService clientService;
+    private final Validator validator;
 
     private final WebClient webClient = WebClient.builder()
             .clientConnector(new ReactorClientHttpConnector(
@@ -66,7 +70,6 @@ public class ImportClientsService {
     }
 
 
-    //todo додати хендл всіх форматів дат( або хоча б більшості)
     private List<ClientRequestDto> parseTsvToClient(String tsvContet) {
         List<ClientRequestDto> validClients = new ArrayList<>();
         CsvSchema csvSchema = CsvSchema.builder()
@@ -95,7 +98,13 @@ public class ImportClientsService {
         return validClients;
     }
 
-    private boolean isValid(@Valid ClientRequestDto clientRequestDto) {
-        return clientRequestDto != null;
+    private boolean isValid(ClientRequestDto clientRequestDto) {
+        Set<ConstraintViolation<ClientRequestDto>> violations = validator.validate(clientRequestDto);
+        if (!violations.isEmpty()) {
+            violations.forEach(v -> log.warn("Validation failed: {} -> {}", v.getPropertyPath(), v.getMessage()));
+            return false;
+        }
+        return true;
     }
+
 }
