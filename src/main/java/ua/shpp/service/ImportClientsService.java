@@ -1,6 +1,7 @@
 package ua.shpp.service;
 
 import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import ua.shpp.dto.ClientRequestDto;
 import ua.shpp.exception.GoogleSheetsNotAuthorizedException;
+import ua.shpp.exception.IllegalGoogleSheetFormatException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -77,13 +79,17 @@ public class ImportClientsService {
                 while (iterator.hasNext()) {
                     ClientRequestDto clientRequestDto = iterator.next();
 
-                    if (isValid(clientRequestDto)){
+                    if (isValid(clientRequestDto)) {
                         validClients.add(clientRequestDto);
                     } else {
                         log.warn("Invalid client data: {}", clientRequestDto);
                     }
                 }
+            } catch (RuntimeJsonMappingException e) {
+                log.warn("Error parsing google sheet tsv: {}", tsvContet, e);
+                throw new IllegalGoogleSheetFormatException("Illegal sheet format");
             } catch (IOException e) {
+                log.warn("Error parsing google sheet tsv: {}", tsvContet, e);
                 throw new RuntimeException(e);
             }
         return validClients;

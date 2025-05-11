@@ -238,4 +238,10 @@ public class GlobalExceptionHandler {
                                                                                   HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.UNAUTHORIZED, "Google Sheets Not Authorized. Open access to read sheet", request);
     }
+
+    @ExceptionHandler(IllegalGoogleSheetFormatException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalGoogleSheetFormatException(IllegalGoogleSheetFormatException ex,
+                                                                                 HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Illegal Google Sheet Format", request);
+    }
 }
