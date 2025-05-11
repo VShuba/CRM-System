@@ -6,11 +6,14 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import ua.shpp.dto.ClientRequestDto;
+import ua.shpp.exception.GoogleSheetsNotAuthorizedException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,6 +56,7 @@ public class ImportClientsService {
         String content = webClient.get()
                 .uri(initialUrl)
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new GoogleSheetsNotAuthorizedException("Forbidden access to sheet")))
                 .bodyToMono(String.class)
                 .block();
         log.debug("Received content:\n{}", content);

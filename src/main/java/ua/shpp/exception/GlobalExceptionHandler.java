@@ -232,4 +232,10 @@ public class GlobalExceptionHandler {
                                                               HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Visit already used", request);
     }
+
+    @ExceptionHandler(GoogleSheetsNotAuthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleGoogleSheetsNotAuthorizedException(GoogleSheetsNotAuthorizedException ex,
+                                                                                  HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.UNAUTHORIZED, "Google Sheets Not Authorized. Open access to read sheet", request);
+    }
 }
