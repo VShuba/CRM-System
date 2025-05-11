@@ -6,6 +6,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.branch.room.RoomRequestDTO;
 import ua.shpp.dto.branch.room.RoomResponseDTO;
@@ -21,6 +22,7 @@ public class RoomController {
     private final RoomService service;
 
     @PostMapping
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<RoomResponseDTO> createRoom(
             @PathVariable(name = "orgId") Long orgId,
             @PathVariable(name = "branchId") Long branchId,
@@ -34,6 +36,7 @@ public class RoomController {
     }
 
     @GetMapping("/{roomId}")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<RoomResponseDTO> getRoom(
             @PathVariable(name = "orgId") Long orgId,
             @PathVariable(name = "branchId") Long branchId,
@@ -43,6 +46,7 @@ public class RoomController {
     }
 
     @GetMapping
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<Page<RoomResponseDTO>> getAllRooms(
             @PathVariable(name = "orgId") Long orgId,
             @PathVariable(name = "branchId") Long branchId,
@@ -51,6 +55,7 @@ public class RoomController {
     }
 
     @PatchMapping("/{roomId}")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<RoomResponseDTO> patchRoom(
             @PathVariable(name = "orgId") Long orgId,
             @PathVariable(name = "branchId") Long branchId,
@@ -60,11 +65,12 @@ public class RoomController {
     }
 
     @DeleteMapping("/{roomId}")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<RoomResponseDTO> deleteRoom(
             @PathVariable(name = "orgId") Long orgId,
             @PathVariable(name = "branchId") Long branchId,
             @PathVariable(name = "roomId") Long roomId) {
 
         return ResponseEntity.ok(service.delete(orgId, branchId, roomId));
-    }
+    } // todo maybe return 204 - no content?
 }

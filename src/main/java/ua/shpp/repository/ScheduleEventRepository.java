@@ -31,4 +31,7 @@ public interface ScheduleEventRepository extends JpaRepository<ScheduleEventEnti
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    @Query("SELECT se.serviceEntity.id FROM ScheduleEventEntity se WHERE se.id = :eventId")
+    Long findServiceIdByEventId(@Param("eventId") Long eventId);
 }
