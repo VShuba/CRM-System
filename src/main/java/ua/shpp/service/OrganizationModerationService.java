@@ -31,7 +31,7 @@ public class OrganizationModerationService {
     }
 
     public void deleteOrganization(Long id) {
-        accessRepository.deleteById(id);
+        accessRepository.deleteById(id); // ex BD throw
         organizationRepository.deleteById(id);
     }
 

@@ -80,7 +80,7 @@ public class OneTimeOfferController {
                             schema = @Schema(implementation = OneTimeOfferDTO.class))),
             @ApiResponse(responseCode = "404", description = "One-time offer, Service, Event type id not fount", content = @Content),
     })
-    @PatchMapping
+    @PatchMapping // TODO
     public ResponseEntity<OneTimeOfferDTO> update(
             @RequestBody OneTimeOfferDTO oneTimeOfferDTO) {
         var service = oneTimeOfferService.update(oneTimeOfferDTO);

@@ -9,7 +9,7 @@ import java.util.List;
 public record SubscriptionOfferCreateDTO(
         @Schema(description = "Offer name", example = "Complex 1")
         String name,
-        @Schema(description = "Event type id", example = "1")
+        @Schema(description = "Event type id", example = "1", nullable = false)
         Long eventTypeId,
         @Schema(description = "List of services id", example = "[1,2]")
         List<Long> activitiesId,

@@ -3,6 +3,7 @@ package ua.shpp.controller;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ public class ExportClientsController {
     }
 
     @GetMapping("organization/{orgId}/clients/export")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, T(ua.shpp.model.OrgRole).ADMIN)")
     public void exportClients(@PathVariable("orgId") Long orgId, HttpServletResponse response) throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
         response.setContentType("text/tsv; charset=UTF-8");
         response.addHeader("Content-Disposition", "attachment; filename=\"clients.tsv\"");

@@ -7,6 +7,7 @@ import java.util.List;
 
 @Schema(description = "Request & response to subscription offer")
 public record SubscriptionOfferDTO(
+
         @Schema(description = " Offer id", example = "1")
         Long id,
         @Schema(description = "Offer name", example = "Complex 1")

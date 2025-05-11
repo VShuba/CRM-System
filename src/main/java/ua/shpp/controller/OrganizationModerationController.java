@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.OrganizationModerationDTO;
 import ua.shpp.service.OrganizationModerationService;
@@ -29,6 +30,7 @@ public class OrganizationModerationController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = OrganizationModerationDTO.class)))
     @GetMapping
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public List<OrganizationModerationDTO> getAll() {
         return moderationService.getAllForModeration();
     }
@@ -40,6 +42,7 @@ public class OrganizationModerationController {
             @ApiResponse(responseCode = "404", description = "Organization not found")
     })
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<Void> delete(@Parameter(description = "Organization ID") @PathVariable Long id) {
         moderationService.deleteOrganization(id);
         return ResponseEntity.noContent().build();
@@ -52,6 +55,7 @@ public class OrganizationModerationController {
             @ApiResponse(responseCode = "404", description = "Organization not found")
     })
     @PatchMapping("/{id}/toggle-access")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<Void> toggleAccess(@Parameter(description = "Organization ID") @PathVariable Long id) {
         moderationService.toggleAccess(id);
         return ResponseEntity.ok().build();

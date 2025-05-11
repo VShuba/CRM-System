@@ -17,7 +17,7 @@ public class EventClientController {
     }
 
     @PostMapping("/{eventId}/clients/{clientId}")
-    public ResponseEntity addClientToEvent(@PathVariable Long clientId, @PathVariable Long eventId) {
+    public ResponseEntity<Void> addClientToEvent(@PathVariable Long clientId, @PathVariable Long eventId) {
         eventClientService.addClientToEvent(clientId, eventId);
         return ResponseEntity.ok().build();
     }

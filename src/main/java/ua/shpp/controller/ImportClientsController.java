@@ -7,6 +7,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.service.ImportClientsService;
 
@@ -23,6 +24,7 @@ public class ImportClientsController {
     private final ImportClientsService service;
 
     @PostMapping("/organizations/{orgId}/clients/import")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<Void> importClientsFromSheet(@PathVariable(name = "orgId") Long orgId, @RequestBody String sheetId) {
         service.importClients(orgId, sheetId);
         return ResponseEntity.ok().build();

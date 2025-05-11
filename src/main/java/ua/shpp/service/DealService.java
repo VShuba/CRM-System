@@ -152,7 +152,7 @@ public class DealService {
         return subscriptionDealMapper.toDto(entity);
     }
 
-    public SubscriptionDealResponseDto subscriptionVisitByIdAndScheduleEventId(
+    public SubscriptionDealResponseDto subscriptionVisitByIdAndScheduleEventId( // todo fix relation
             Long subscriptionId, Long scheduleEventId) {
         log.info("subscriptionVisitByIdAndScheduleEventId() called with subscription id: {}, schedule id: {}",
                 subscriptionId, scheduleEventId);

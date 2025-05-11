@@ -11,6 +11,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.ClientRequestDto;
 import ua.shpp.dto.ClientResponseDto;
@@ -34,6 +35,7 @@ public class ClientController {
             @ApiResponse(responseCode = "404", description = "Organization not found")
     })
     @PostMapping
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<ClientResponseDto> createClient(
             @PathVariable(name = "orgId") Long orgId,
             @RequestBody ClientRequestDto requestDto
@@ -50,6 +52,7 @@ public class ClientController {
             @ApiResponse(responseCode = "404", description = "Customer or organization not found")
     })
     @PutMapping("/{clientId}")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<ClientResponseDto> updateClient(
             @Parameter(description = "Organization ID") @PathVariable Long orgId,
             @Parameter(description = "Client ID") @PathVariable Long clientId,
@@ -66,6 +69,7 @@ public class ClientController {
             @ApiResponse(responseCode = "404", description = "Customer or organization not found")
     })
     @GetMapping("/{clientId}")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<ClientResponseDto> getClientById(
             @Parameter(description = "Organization ID") @PathVariable Long orgId,
             @Parameter(description = "Client ID") @PathVariable Long clientId
@@ -80,6 +84,7 @@ public class ClientController {
             @ApiResponse(responseCode = "404", description = "Organization not found")
     })
     @GetMapping
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<Page<ClientResponseDto>> getClients(
             @Parameter(description = "Organization ID") @PathVariable Long orgId,
             @ParameterObject Pageable pageable
@@ -89,6 +94,7 @@ public class ClientController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<List<ClientResponseDto>> getClientByKeyword(@PathVariable Long orgId, @RequestParam String keyword) {
         return ResponseEntity.ok().body(clientService.getClientsByKeyword(keyword, orgId));
     }
@@ -99,6 +105,7 @@ public class ClientController {
             @ApiResponse(responseCode = "404", description = "Client not found")
     })
     @DeleteMapping("/{clientId}")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<Void> deleteClient(@PathVariable Long orgId, @PathVariable Long clientId) {
         clientService.delete(orgId, clientId);
         return ResponseEntity.ok().build();

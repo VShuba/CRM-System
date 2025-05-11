@@ -75,7 +75,7 @@ public class DealController {
             @ApiResponse(responseCode = "404", description = "One-time deal id not fount", content = @Content),
             @ApiResponse(responseCode = "404", description = "One-time visit id already used", content = @Content),
     })
-    @GetMapping("/use/{oneId}/schedule/{scheduleId}")
+    @GetMapping("/use/{oneId}/schedule/{scheduleId}") // TODO HOW TO preauth
     public ResponseEntity<OneTimeDealResponseDto> useOneTimeById(@PathVariable("oneId") Long oneTimeId,
                                                                  @PathVariable("scheduleId") Long scheduleId) {
         var dto = dealService.visitOneTimeByIdAndScheduleEventId(oneTimeId, scheduleId);
