@@ -13,6 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import ua.shpp.dto.ScheduleEventCreateDto;
 import ua.shpp.dto.ScheduleEventDto;
 import ua.shpp.dto.ScheduleEventFilterDto;
 import ua.shpp.service.ScheduleEventService;
@@ -36,8 +37,9 @@ public class ScheduleEventController {
             @ApiResponse(responseCode = "404", description = "Service id not fount", content = @Content),
     })
     @PostMapping
-    public ResponseEntity<ScheduleEventDto> create(@RequestBody ScheduleEventDto scheduleEventDto) {
-        var event = scheduleEventService.create(scheduleEventDto);
+    @PreAuthorize("@authz.hasRoleByServiceId(#scheduleEventCreateDto.serviceId(), T(ua.shpp.model.OrgRole).ADMIN)")
+    public ResponseEntity<ScheduleEventDto> create(@RequestBody ScheduleEventCreateDto scheduleEventCreateDto) {
+        var event = scheduleEventService.create(scheduleEventCreateDto);
         URI location = URI.create("/api/schedule/event/" + event.id());
 
         return ResponseEntity.created(location).body(event);
