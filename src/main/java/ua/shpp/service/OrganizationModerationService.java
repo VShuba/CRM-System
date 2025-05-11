@@ -31,7 +31,10 @@ public class OrganizationModerationService {
     }
 
     public void deleteOrganization(Long id) {
-        accessRepository.deleteById(id); // ex BD throw
+        organizationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Organization not found"));
+
+        accessRepository.deleteById(id);
         organizationRepository.deleteById(id);
     }
 

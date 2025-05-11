@@ -130,14 +130,17 @@ class OrganizationModerationServiceTest {
     void deleteOrganization_callsDeleteOnBothRepositories() {
         // Arrange
         Long orgId = 123L;
+        Organization mockOrganization = createMockOrganization(orgId, "Test Org");
+        when(organizationRepository.findById(orgId)).thenReturn(Optional.of(mockOrganization));
 
         // Act
         organizationModerationService.deleteOrganization(orgId);
 
         // Assert
+        verify(organizationRepository).findById(orgId);
         verify(accessRepository).deleteById(orgId);
         verify(organizationRepository).deleteById(orgId);
-        verifyNoMoreInteractions(accessRepository, organizationRepository);
+        verifyNoMoreInteractions(organizationRepository, accessRepository);
         verifyNoInteractions(organizationModerationMapper);
     }
 

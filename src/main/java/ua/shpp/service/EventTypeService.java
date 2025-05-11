@@ -7,10 +7,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import ua.shpp.dto.EventTypeRequestDTO;
 import ua.shpp.dto.EventTypeResponseDTO;
+import ua.shpp.entity.BranchEntity;
 import ua.shpp.entity.EventTypeEntity;
+import ua.shpp.exception.EntityNotFoundException;
 import ua.shpp.exception.EventTypeAlreadyExistsException;
 import ua.shpp.exception.EventTypeNotFoundException;
 import ua.shpp.mapper.EventTypeMapper;
@@ -66,6 +69,16 @@ public class EventTypeService {
 
         EventTypeEntity existing = eventTypeRepository.findById(id)
                 .orElseThrow(() -> new EventTypeNotFoundException("Event type with id " + id + " not found"));
+
+        BranchEntity currentBranch = existing.getBranch();
+        Long organizationId = currentBranch.getOrganization().getId();
+
+        BranchEntity newBranch = branchRepository.findById(dto.branchId())
+                .orElseThrow(() -> new EntityNotFoundException("Branch with id " + dto.branchId() + " not found"));
+
+        if (!newBranch.getOrganization().getId().equals(organizationId)) {
+            throw new AccessDeniedException("Cannot assign event type to a branch in another organization");
+        }
 
         validateNameChangeUniqueness(existing, dto);
         eventTypeMapper.updateFromDto(dto, existing,
