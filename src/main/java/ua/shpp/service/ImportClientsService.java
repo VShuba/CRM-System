@@ -22,31 +22,46 @@ import java.util.List;
 public class ImportClientsService {
 
     private final CsvMapper csvMapper;
+    private final ClientService clientService;
 
-    //todo розібратися restclient - webclient
     private final WebClient webClient = WebClient.builder()
             .clientConnector(new ReactorClientHttpConnector(
                     HttpClient.create().followRedirect(true)
             ))
             .build();
 
-    public List<ClientRequestDto> importClients(String sheetId) {
+    public void importClients(Long orgId, String sheetId) {
+        String initialUrl = buildUrlToGoogleSheet(sheetId);
+        String content = getTSVFromGoogleSheet(initialUrl);
+        List<ClientRequestDto> parsedClients = parseTsvToClient(content);
+        importClientsToOrganization(orgId, parsedClients);
+    }
+
+    private void importClientsToOrganization(Long orgId, List<ClientRequestDto> importedClients) {
+        for (ClientRequestDto importedClientDto : importedClients) {
+            clientService.createClient(orgId, importedClientDto);
+        }
+    }
+
+    private static String buildUrlToGoogleSheet(String sheetId) {
         String initialUrl = "https://docs.google.com/spreadsheets/d/" + sheetId + "/export?format=tsv&gid=0";
         log.info("ImportClientsService uri: {}", initialUrl);
+        return initialUrl;
+    }
 
+    private String getTSVFromGoogleSheet(String initialUrl) {
         String content = webClient.get()
                 .uri(initialUrl)
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
-
-        log.info("Content:\n{}", content);
-        return parseTsvWithJackson(content);
+        log.debug("Received content:\n{}", content);
+        return content;
     }
 
 
     //todo додати хендл всіх форматів дат( або хоча б більшості)
-    private List<ClientRequestDto> parseTsvWithJackson(String tsvContet) {
+    private List<ClientRequestDto> parseTsvToClient(String tsvContet) {
         List<ClientRequestDto> validClients = new ArrayList<>();
         CsvSchema csvSchema = CsvSchema.builder()
                 .setColumnSeparator('\t')
