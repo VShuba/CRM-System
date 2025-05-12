@@ -2,6 +2,7 @@ package ua.shpp.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import ua.shpp.model.PaymentMethodForStory;
 
 import java.math.BigDecimal;
@@ -11,9 +12,11 @@ import java.time.LocalTime;
 @Schema(description = "History of visits")
 public record VisitHistoryDTO(
         @Schema(description = "Visit history identifier", example = "1")
+        @NotNull
         Long id,
 
         @Schema(description = "Customer ID", example = "1")
+        @NotNull
         Long clientId,
 
         @Schema(description = "Color is tied to the service", example = "#AABBCC")

@@ -9,16 +9,16 @@ public record ClientResponseDto(
         @CsvBindByName(column = "id", required = true)
         @CsvBindByPosition(position = 0)
         Long id,
-        @CsvBindByName(column = "Ім’я", required = true)
+        @CsvBindByName(column = "Name", required = true)
         @CsvBindByPosition(position = 1)
         String name,
-        @CsvBindByName(column = "Телефон", required = true)
+        @CsvBindByName(column = "Phone", required = true)
         @CsvBindByPosition(position = 2)
         String phone,
-        @CsvBindByName(column = "День народження", required = true)
+        @CsvBindByName(column = "Birthday", required = true)
         @CsvBindByPosition(position = 3)
         LocalDate birthday,
-        @CsvBindByName(column = "Коментар", required = true)
+        @CsvBindByName(column = "Comment", required = true)
         @CsvBindByPosition(position = 4)
         String comment) {
 }

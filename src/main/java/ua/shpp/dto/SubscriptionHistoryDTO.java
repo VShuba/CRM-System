@@ -6,6 +6,7 @@ import lombok.NonNull;
 @Schema(description = "History of valid and invalid subscriptions")
 public record SubscriptionHistoryDTO(
         @Schema(description = "Unique identifier of the subscription", example = "1")
+        @NonNull
         Long id,
 
         @Schema(description = "Identifier of the client associated with this subscription", example = "1")
