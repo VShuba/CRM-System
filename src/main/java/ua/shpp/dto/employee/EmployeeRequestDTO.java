@@ -2,18 +2,15 @@ package ua.shpp.dto.employee;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 import java.util.Set;
 
 @Builder
 public record EmployeeRequestDTO(
-        @NotNull
-        @Schema(description = "Branch ID", example = "1")
-        @JsonProperty("branch_id")
-        Long branchId,
-
         @Size(min = 3, max = 50, message = "The employee name must be 3-50 characters long")
         @Schema(description = "Employee name", example = "Peter")
         String name,

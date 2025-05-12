@@ -199,11 +199,10 @@ class EmployeeServiceTest {
         EmployeeRequestDTO createEmployeeDTO = EmployeeRequestDTO.builder()
                 .name(name)
                 .email(email)
-                .branchId(branchId)
                 .existingServicesIds(existingServiceIds)
                 .newServicesDTO(newServices)
                 .build();
-        employeeService.createEmployee(avatarFile, createEmployeeDTO);
+        employeeService.createEmployee(branchId, avatarFile, createEmployeeDTO);
 
         return employeeRepository.findByEmailAndBranchId(email, branchId);
     }

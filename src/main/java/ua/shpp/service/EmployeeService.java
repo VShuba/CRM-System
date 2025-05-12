@@ -33,10 +33,10 @@ public class EmployeeService {
     private final int AVATAR_HEIGHT = 75;
     private final int MAX_AVATAR_SIZE_MB = 3;
 
-    public EmployeeResponseDTO createEmployee(MultipartFile avatarImg, EmployeeRequestDTO employeeDTO) {
-        log.debug("Find by id: {} branch", employeeDTO.branchId());
-        BranchEntity branch = branchRepository.findById(employeeDTO.branchId())
-                .orElseThrow(() -> new RuntimeException("Branch with id " + employeeDTO.branchId() + " not found"));
+    public EmployeeResponseDTO createEmployee(Long branchId, MultipartFile avatarImg, EmployeeRequestDTO employeeDTO) {
+        log.debug("Find by id: {} branch", branchId);
+        BranchEntity branch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new RuntimeException("Branch with id " + branchId + " not found"));
         log.debug("Branch was found with name: {}, employees: {}, services: {}",
                 branch.getName(), branch.getEmployees(), branch.getServiceEntities());
 
