@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.EventTypeRequestDTO;
 import ua.shpp.dto.EventTypeResponseDTO;
@@ -43,6 +44,7 @@ public class EventTypeController {
                     content = @Content)
     })
     @PostMapping
+    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#dto.branchId(), T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<EventTypeResponseDTO> create(@RequestBody @Valid EventTypeRequestDTO dto) {
         EventTypeResponseDTO response = eventTypeService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -56,6 +58,7 @@ public class EventTypeController {
                             array = @ArraySchema(schema = @Schema(implementation = EventTypeResponseDTO.class))))
     })
     @GetMapping("/branch/{branchId}")
+    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#branchId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<List<EventTypeResponseDTO>> getAllByBranch(@PathVariable Long branchId) {
         List<EventTypeResponseDTO> response = eventTypeService.getAllByBranch(branchId);
         return ResponseEntity.ok(response);
@@ -70,6 +73,7 @@ public class EventTypeController {
             @ApiResponse(responseCode = "404", description = "Event type not found", content = @Content)
     })
     @GetMapping("/{id}")
+    @PreAuthorize("@authz.hasRoleInOrgByEventTypeId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<EventTypeResponseDTO> getById(@PathVariable Long id) {
         EventTypeResponseDTO response = eventTypeService.getById(id);
         return ResponseEntity.ok(response);
@@ -86,6 +90,8 @@ public class EventTypeController {
             @ApiResponse(responseCode = "409", description = "New event type name already exists", content = @Content)
     })
     @PutMapping("/{id}")
+    @PreAuthorize("@authz.hasRoleInOrgByEventTypeId(#id, T(ua.shpp.model.OrgRole).ADMIN) && " +
+            "@authz.hasRoleInOrgByBranchId(#dto.branchId(), T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<EventTypeResponseDTO> update(@PathVariable Long id,
                                                        @RequestBody @Valid EventTypeRequestDTO dto) {
         EventTypeResponseDTO response = eventTypeService.update(id, dto);
@@ -99,6 +105,7 @@ public class EventTypeController {
             @ApiResponse(responseCode = "404", description = "Event type not found")
     })
     @DeleteMapping("/{id}")
+    @PreAuthorize("@authz.hasRoleInOrgByEventTypeId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         eventTypeService.delete(id);
         return ResponseEntity.noContent().build();
@@ -112,6 +119,8 @@ public class EventTypeController {
                             schema = @Schema(implementation = EventTypeResponseDTO.class)))
     })
     @GetMapping
+    @PreAuthorize("(@branchId != null && @authz.hasRoleInOrgByBranchId(#branchId, T(ua.shpp.model.OrgRole).ADMIN)) || " +
+            "(#serviceId != null && @authz.hasRoleByServiceId(#serviceId, T(ua.shpp.model.OrgRole).ADMIN))")
     public ResponseEntity<Page<EventTypeResponseDTO>> getFiltered(
             @Parameter(description = "Filter by event type name (optional)")
             @RequestParam(required = false) String name,

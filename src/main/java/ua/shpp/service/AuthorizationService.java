@@ -24,6 +24,7 @@ public class AuthorizationService {
     private final ServiceRepository serviceRepository;
     private final ClientRepository clientRepository;
     private final ScheduleEventRepository scheduleEventRepository;
+    private final EventTypeRepository eventTypeRepository;
 
     /**
      * Hot to use?
@@ -96,6 +97,14 @@ public class AuthorizationService {
                         hasRoleByScheduleEventId(scheduleEventId, expectedRole)
         );
     }
+
+    public boolean hasRoleInOrgByEventTypeId(Long eventTypeId, OrgRole expectedRole) {
+        return withSuperAdminCheck(() -> {
+            Long branchId = eventTypeRepository.findBranchIdByEventTypeId(eventTypeId);
+            return branchId != null && hasRoleInOrgByBranchId(branchId, expectedRole);
+        });
+    }
+
     private boolean isSuperAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication != null &&
