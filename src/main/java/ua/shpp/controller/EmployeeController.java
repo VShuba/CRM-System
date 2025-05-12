@@ -23,7 +23,7 @@ import ua.shpp.service.EmployeeService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/branches/{branchId}")
 @RequiredArgsConstructor
 @Tag(name = "Employees", description = "Operations related to employee")
 @Slf4j
@@ -34,7 +34,9 @@ public class EmployeeController {
     @PostMapping(path = "/employees",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new employee with avatar and JSON data")
-    public ResponseEntity<EmployeeResponseDTO> addEmployee(@RequestPart(name = "avatar") MultipartFile avatarImg,
+    @PreAuthorize("@authz.hasRoleInOrgByEmployeeId(#branchId, T(ua.shpp.model.OrgRole).MANAGER)")
+    public ResponseEntity<EmployeeResponseDTO> addEmployee(@PathVariable Long branchId,
+                                                           @RequestPart(name = "avatar") MultipartFile avatarImg,
                                                            @Schema(
                                                                    description = "JSON-formatted employee data " +
                                                                            "(EmployeeRequestDTO) as string",
@@ -46,7 +48,7 @@ public class EmployeeController {
             EmployeeRequestDTO employeeRequestDTO = objectMapper.readValue(employeeDTOStr, EmployeeRequestDTO.class);
             log.info("Deserialized string into EmployeeRequestDTO: {}", employeeRequestDTO.toString());
 
-            EmployeeResponseDTO employeeResponseDTO = employeeService.createEmployee(avatarImg, employeeRequestDTO);
+            EmployeeResponseDTO employeeResponseDTO = employeeService.createEmployee(branchId, avatarImg, employeeRequestDTO);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(employeeResponseDTO);
         } catch (JsonProcessingException e) {
@@ -57,14 +59,17 @@ public class EmployeeController {
     @PutMapping(path = "/employees/{id}",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Update employee with avatar and JSON data") // todo where is  PreAuthorize?
-    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable Long id, @RequestPart(name = "avatar", required = false) MultipartFile avatarImg,
+    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable Long id,
+                                                              @RequestPart(name = "avatar", required = false)
+                                                              MultipartFile avatarImg,
                                                               @Schema(
                                                                       description = "JSON-formatted employee data " +
                                                                               "(EmployeeRequestDTO) as string",
                                                                       requiredMode = Schema.RequiredMode.REQUIRED,
                                                                       implementation = EmployeeUpdateRequestDTO.class
                                                               )
-                                                              @RequestPart(name = "employee", required = false) String employeeDTOStr) {
+                                                              @RequestPart(name = "employee", required = false)
+                                                              String employeeDTOStr) {
         try {
             EmployeeUpdateRequestDTO employeeUpdateRequestDTO = null;
             if (employeeDTOStr != null) {
