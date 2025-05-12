@@ -59,10 +59,8 @@ public class EmployeeController {
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Update employee with avatar and JSON data")
     @PreAuthorize("@authz.hasRoleInOrgByBranchId(#branchId, T(ua.shpp.model.OrgRole).ADMIN)")
-    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable
-                                                              Long branchId,
-                                                              @PathVariable
-                                                              Long employeeId,
+    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable Long branchId,
+                                                              @PathVariable Long employeeId,
                                                               @RequestPart(name = "avatar", required = false)
                                                               MultipartFile avatarImg,
                                                               @Schema(
@@ -89,7 +87,7 @@ public class EmployeeController {
 
     @GetMapping("/employee/{employeeId}")
     @Operation(summary = "Get employee")
-    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#branchId, T(ua.shpp.model.OrgRole).ADMIN)")
+    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#branchId, T(ua.shpp.model.OrgRole).MANAGER)")
     public ResponseEntity<EmployeeResponseDTO> getEmployee(@PathVariable Long branchId, @PathVariable Long employeeId) {
         EmployeeResponseDTO employeeResponseDTO = employeeService.getEmployee(employeeId);
 
