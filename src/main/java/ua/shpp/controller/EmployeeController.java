@@ -23,7 +23,7 @@ import ua.shpp.service.EmployeeService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/branches/{branchId}")
+@RequestMapping("/api/branches/{branchId}/employees")
 @RequiredArgsConstructor
 @Tag(name = "Employees", description = "Operations related to employee")
 @Slf4j
@@ -31,10 +31,9 @@ public class EmployeeController {
     private final EmployeeService employeeService;
     private final ObjectMapper objectMapper;
 
-    @PostMapping(path = "/employees",
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new employee with avatar and JSON data")
-    @PreAuthorize("@authz.hasRoleInOrgByEmployeeId(#branchId, T(ua.shpp.model.OrgRole).MANAGER)")
+    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#branchId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<EmployeeResponseDTO> addEmployee(@PathVariable Long branchId,
                                                            @RequestPart(name = "avatar") MultipartFile avatarImg,
                                                            @Schema(
@@ -56,10 +55,14 @@ public class EmployeeController {
         }
     }
 
-    @PutMapping(path = "/employees/{id}",
+    @PutMapping(path = "/employee/{employeeId}",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Update employee with avatar and JSON data") // todo where is  PreAuthorize?
-    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable Long id,
+    @Operation(summary = "Update employee with avatar and JSON data")
+    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#branchId, T(ua.shpp.model.OrgRole).ADMIN)")
+    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable
+                                                              Long branchId,
+                                                              @PathVariable
+                                                              Long employeeId,
                                                               @RequestPart(name = "avatar", required = false)
                                                               MultipartFile avatarImg,
                                                               @Schema(
@@ -76,7 +79,7 @@ public class EmployeeController {
                 employeeUpdateRequestDTO = objectMapper.readValue(employeeDTOStr, EmployeeUpdateRequestDTO.class);
                 log.info("Deserialized string into EmployeeRequestDTO: {}", employeeUpdateRequestDTO.toString());
             }
-            EmployeeResponseDTO employeeResponseDTO = employeeService.updateEmployee(id, avatarImg, employeeUpdateRequestDTO);
+            EmployeeResponseDTO employeeResponseDTO = employeeService.updateEmployee(employeeId, avatarImg, employeeUpdateRequestDTO);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(employeeResponseDTO);
         } catch (JsonProcessingException e) {
@@ -84,31 +87,32 @@ public class EmployeeController {
         }
     }
 
-    @GetMapping("/employee/{id}")
+    @GetMapping("/employee/{employeeId}")
     @Operation(summary = "Get employee")
-    @PreAuthorize("@authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).MANAGER)")
-    public ResponseEntity<EmployeeResponseDTO> getEmployee(@PathVariable Long id) {
-        EmployeeResponseDTO employeeResponseDTO = employeeService.getEmployee(id);
+    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#branchId, T(ua.shpp.model.OrgRole).ADMIN)")
+    public ResponseEntity<EmployeeResponseDTO> getEmployee(@PathVariable Long branchId, @PathVariable Long employeeId) {
+        EmployeeResponseDTO employeeResponseDTO = employeeService.getEmployee(employeeId);
 
         return ResponseEntity.status(HttpStatus.OK).body(employeeResponseDTO);
     }
 
-    @DeleteMapping("/employee/{id}")
+    @DeleteMapping("/employee/{employeeId}")
     @Operation(summary = "Delete employee")
-    @PreAuthorize("@authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
-        if (employeeService.deleteEmployee(id)) {
+    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#branchId, T(ua.shpp.model.OrgRole).ADMIN)")
+    public ResponseEntity<Void> deleteEmployee(@PathVariable Long branchId, @PathVariable Long employeeId) {
+        if (employeeService.deleteEmployee(employeeId)) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    @GetMapping("/employee/{id}/services")
+    @GetMapping("/employee/{employeeId}/services")
     @Operation(summary = "Get employee services")
-    @PreAuthorize("@authz.hasRoleInOrgByEmployeeId(#id, T(ua.shpp.model.OrgRole).MANAGER)")
-    public ResponseEntity<List<EmployeeServicesResponseDTO>> getEmployeeServices(@PathVariable Long id) {
-        List<EmployeeServicesResponseDTO> employeeServicesResponseDTO = employeeService.getEmployeeServices(id);
+    @PreAuthorize("@authz.hasRoleInOrgByBranchId(#branchId, T(ua.shpp.model.OrgRole).MANAGER)")
+    public ResponseEntity<List<EmployeeServicesResponseDTO>> getEmployeeServices(@PathVariable Long branchId,
+                                                                                 @PathVariable Long employeeId) {
+        List<EmployeeServicesResponseDTO> employeeServicesResponseDTO = employeeService.getEmployeeServices(employeeId);
 
         return ResponseEntity.status(HttpStatus.OK).body(employeeServicesResponseDTO);
     }
