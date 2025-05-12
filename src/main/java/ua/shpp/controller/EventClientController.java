@@ -32,7 +32,7 @@ public class EventClientController {
     }
 
     @PreAuthorize("@authz.hasRoleInOrgByOrgId(#orgId, T(ua.shpp.model.OrgRole).ADMIN)")
-    @PostMapping("/organizations/{orgId}/clients/event/{eventId}")
+    @PostMapping("/{eventId}/organizations/{orgId}/clients")
     public ResponseEntity<EventClientDto> addClientAndAssignEvent(@PathVariable Long eventId,
                                                                   @PathVariable Long orgId,
                                                                   @RequestBody ClientRequestDto eventClientDto) {

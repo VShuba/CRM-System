@@ -27,7 +27,16 @@ public class SwaggerConfig {
                                 .scheme("bearer")
                                 .bearerFormat("JWT")
                                 .in(SecurityScheme.In.HEADER)
-                                .description("Enter the JWT token in the format: Bearer <token>")
+                                .description("""
+                                        Enter the JWT token in the format: Bearer <token>
+                                        
+                                        
+                                        
+                                        To authenticate with Google OAuth, use the following OAuth2 authorization URL:
+                                        /oauth2/authorization/google
+                                        After authorization, you will receive an access token.
+                                        """)
+
                         )
                 )
                 .info(new Info()

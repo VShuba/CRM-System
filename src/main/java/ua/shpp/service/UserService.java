@@ -64,10 +64,10 @@ public class UserService {
         return Long.parseLong(userIDStr);
     }
 
-    public UserEntity createOAuthUser(UserEntity login) {
-        if (!repository.existsByLogin(login.getEmail())) {
-            repository.save(login);
-        }
-        return login;
+    public UserEntity createOAuthUser(UserEntity user) {
+        return repository.findByLogin(
+                        user.getLogin())
+                .orElseGet(() -> repository.save(user));
+
     }
 }

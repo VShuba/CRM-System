@@ -47,15 +47,15 @@ public class OAuthSuccessHandle implements AuthenticationSuccessHandler {
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException {
         DefaultOAuth2User oAuthUser = (DefaultOAuth2User) authentication.getPrincipal();
-
+        log.debug("Entered onAuthenticationSuccess");
         UserEntity userEntity = UserEntity.builder()
                 .login(oAuthUser.getAttribute(EMAIL))
                 .email(oAuthUser.getAttribute(EMAIL))
                 .password(passwordGeneratorService.generateRandomPassword(RANDOM_PASSWORD_LENGTH))
                 .globalRole(GlobalRole.USER)
                 .build();
-        userService.createOAuthUser(userEntity);
-        log.info("userEntity id: {}", userEntity.getId());
+        userEntity = userService.createOAuthUser(userEntity);
+
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", userEntity.getId());
         claims.put("role", userEntity.getGlobalRole());
