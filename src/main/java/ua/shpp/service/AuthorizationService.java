@@ -90,6 +90,12 @@ public class AuthorizationService {
         });
     }
 
+    public boolean hasRoleByClientAndScheduleEventId(Long clientId, Long scheduleEventId, OrgRole expectedRole) {
+        return withSuperAdminCheck(() ->
+                hasRoleInOrgByClientId(clientId, expectedRole) &&
+                        hasRoleByScheduleEventId(scheduleEventId, expectedRole)
+        );
+    }
     private boolean isSuperAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication != null &&
