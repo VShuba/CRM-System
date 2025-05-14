@@ -3,7 +3,6 @@ package ua.shpp.dto.employee;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -13,12 +12,12 @@ import java.util.Set;
 @Builder
 public record EmployeeUpdateRequestDTO(
 
-        @Size(min = 3, max = 50, message = "The employee name must be 3-50 characters long")
-        @Schema(description = "Employee name", example = "Peter")
+        @Size(min = 3, max = 70, message = "The employee name must be 3-70 characters long")
+        @Schema(description = "Employee name", example = "Alina")
         String name,
 
         @Email
-        @Schema(description = "Email of the employee", example = "peter@example.com")
+        @Schema(description = "Email of the employee", example = "test@example.com")
         String email,
 
         @Pattern(message = "Wrong phone format",

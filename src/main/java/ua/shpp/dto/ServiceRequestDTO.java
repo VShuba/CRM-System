@@ -3,6 +3,7 @@ package ua.shpp.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
@@ -10,10 +11,12 @@ import java.util.List;
 public record ServiceRequestDTO(
 
         @Schema(description = "Service name", example = "Haircut")
+        @Size(min = 3, max = 50, message = "The service name must be 3-50 characters long")
         @NotBlank(message = "Service name must not be blank")
         String name,
 
         @Schema(description = "HEX color code for the service", example = "#FF5733")
+        @Size(min = 3, max = 10, message = "The HEX color code must be 3-50 characters long")
         @NotBlank(message = "Color must not be blank")
         String color,
 
