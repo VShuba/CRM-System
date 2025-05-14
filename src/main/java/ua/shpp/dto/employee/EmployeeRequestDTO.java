@@ -24,7 +24,7 @@ public record EmployeeRequestDTO(
         @Schema(description = "Employee phone number", example = "+380991112233")
         String phone,
 
-        @Schema(description = "ID of existing services")
+        @Schema(description = "ID of existing services", example = "[1]")
         @JsonProperty("existing_services_ids")
         Set<Long> existingServicesIds,
 

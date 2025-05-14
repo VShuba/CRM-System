@@ -9,6 +9,7 @@ import ua.shpp.entity.SubscriptionHistoryEntity;
 import ua.shpp.entity.SubscriptionOfferEntity;
 import ua.shpp.entity.payment.SubscriptionDealEntity;
 import ua.shpp.exception.ClientNotFoundException;
+import ua.shpp.exception.MissingSubscriptionServiceException;
 import ua.shpp.exception.SubscriptionHistoryCreationException;
 import ua.shpp.mapper.SubscriptionHistoryMapper;
 import ua.shpp.repository.ClientRepository;
@@ -32,9 +33,8 @@ public class SubscriptionHistoryService {
         log.info("Creating history for SubscriptionInfo ID: {}", subscriptionInfo.getId());
         SubscriptionOfferEntity subscriptionService = subscriptionInfo.getSubscriptionService();
 
-        if (subscriptionService == null) {
-            log.error("SubscriptionService is null for SubscriptionInfo ID: {}", subscriptionInfo.getId());
-            throw new IllegalStateException("SubscriptionService is null for ID: " + subscriptionInfo.getId());
+        if (subscriptionInfo.getSubscriptionService() == null) {
+            throw new MissingSubscriptionServiceException(subscriptionInfo.getId());
         }
 
         try {

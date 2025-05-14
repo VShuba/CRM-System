@@ -145,10 +145,6 @@ public class DealService {
         log.info("Subscription with id: {}, visit: {}", id, entity.getVisits());
         log.debug("Updated subscription deal entity: {}", entity);
 
-        // Викликаємо сервіс історії для оновлення visits_left, передаючи оновлену сутність
-        subscriptionHistoryService.updateHistoryVisitsRemaining(entity);
-        log.debug("Requested update of visits_left in history for SubscriptionInfo ID: {}", entity.getId());
-
         return subscriptionDealMapper.toDto(entity);
     }
 

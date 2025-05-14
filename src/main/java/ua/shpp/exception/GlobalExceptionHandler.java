@@ -255,4 +255,10 @@ public class GlobalExceptionHandler {
                                                                                  HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Illegal Google Sheet Format", request);
     }
+
+    @ExceptionHandler(MissingSubscriptionServiceException.class)
+    public ResponseEntity<ErrorResponse> handleMissingSubscriptionService(MissingSubscriptionServiceException ex,
+                                                                          HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, "Missing SubscriptionService", request);
+    }
 }

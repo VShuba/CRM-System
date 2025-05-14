@@ -112,6 +112,7 @@ public class DealController {
         return ResponseEntity.ok(dto);
     }
 
+    @Deprecated
     @Operation(summary = "Use subscription deal by id and schedule event id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Subscription deal visit successfully added",

@@ -12,6 +12,7 @@ import ua.shpp.entity.SubscriptionHistoryEntity;
 import ua.shpp.entity.SubscriptionOfferEntity;
 import ua.shpp.entity.payment.SubscriptionDealEntity;
 import ua.shpp.exception.ClientNotFoundException;
+import ua.shpp.exception.MissingSubscriptionServiceException;
 import ua.shpp.exception.SubscriptionHistoryCreationException;
 import ua.shpp.mapper.SubscriptionHistoryMapper;
 import ua.shpp.repository.ClientRepository;
@@ -114,25 +115,28 @@ class SubscriptionHistoryServiceTest {
         assertDoesNotThrow(() -> subscriptionHistoryService.createSubscriptionHistory(mockSubscriptionInfo));
 
         // Assert
-        verify(mockSubscriptionInfo).getSubscriptionService();
+        verify(mockSubscriptionInfo, atLeastOnce()).getSubscriptionService();
         verify(subscriptionHistoryMapper).toHistory(mockSubscriptionInfo, mockService);
         verify(subscriptionHistoryRepository).save(mockHistoryEntity);
         verify(mockSubscriptionInfo, atLeastOnce()).getId();
     }
 
+
     @Test
-    void createSubscriptionHistory_serviceIsNull_throwsIllegalStateException() {
+    void createSubscriptionHistory_serviceIsNull_throwsMissingSubscriptionServiceException() {
         // Arrange
         SubscriptionDealEntity mockSubscriptionInfo = mock(SubscriptionDealEntity.class);
         when(mockSubscriptionInfo.getSubscriptionService()).thenReturn(null);
         when(mockSubscriptionInfo.getId()).thenReturn(100L);
 
         // Act & Assert
-        assertThrows(IllegalStateException.class, () ->
-                subscriptionHistoryService.createSubscriptionHistory(mockSubscriptionInfo));
+        MissingSubscriptionServiceException thrown = assertThrows(MissingSubscriptionServiceException.class,
+                () -> subscriptionHistoryService.createSubscriptionHistory(mockSubscriptionInfo));
 
-        // Assert
-        verify(mockSubscriptionInfo).getSubscriptionService();
+        assertEquals("SubscriptionService is null for ID: 100", thrown.getMessage());
+
+        // Verify
+        verify(mockSubscriptionInfo, atLeastOnce()).getSubscriptionService();
         verify(mockSubscriptionInfo, atLeastOnce()).getId();
         verifyNoInteractions(subscriptionHistoryMapper);
         verifyNoInteractions(subscriptionHistoryRepository);
@@ -163,11 +167,12 @@ class SubscriptionHistoryServiceTest {
         assertEquals("DB error", thrown.getCause().getMessage());
 
         // Verify
-        verify(mockSubscriptionInfo).getSubscriptionService();
+        verify(mockSubscriptionInfo, atLeastOnce()).getSubscriptionService();
         verify(subscriptionHistoryMapper).toHistory(mockSubscriptionInfo, mockService);
         verify(subscriptionHistoryRepository).save(mockHistoryEntity);
         verify(mockSubscriptionInfo, atLeastOnce()).getId();
     }
+
 
     @Test
     void getSubscriptionHistoryByClientAndValidity_clientFoundButNoHistoryFound_returnsEmptyList() {
