@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.SubscriptionHistoryDTO;
 import ua.shpp.service.history.SubscriptionHistoryService;
@@ -38,6 +39,7 @@ public class SubscriptionHistoryController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/clients/{clientId}/filter")
+    @PreAuthorize("@authz.hasRoleInOrgByClientId(#clientId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<List<SubscriptionHistoryDTO>> getClientSubscriptionHistory(
             @Parameter(description = "Client ID", required = true, example = "1")
             @PathVariable Long clientId,
@@ -61,6 +63,7 @@ public class SubscriptionHistoryController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/clients/{clientId}")
+    @PreAuthorize("@authz.hasRoleInOrgByClientId(#clientId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<List<SubscriptionHistoryDTO>> getAllClientSubscriptionHistory(
             @Parameter(description = "Client ID", required = true, example = "1")
             @PathVariable Long clientId) {
