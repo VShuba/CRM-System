@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.*;
 import ua.shpp.model.PaymentMethod;
@@ -30,6 +31,7 @@ public class DealController {
             @ApiResponse(responseCode = "404", description = "Client, Service or Event type id not fount", content = @Content),
     })
     @PostMapping("/one-time/{paymentMethod}")
+    @PreAuthorize("@authz.hasRoleInOrgByClientId(#dto.clientId(), T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<OneTimeDealResponseDto> create(
             @RequestBody OneTimeDealRequestDto dto,
             @PathVariable("paymentMethod") PaymentMethod paymentMethod) {
@@ -46,7 +48,8 @@ public class DealController {
                             schema = @Schema(implementation = OneTimeDealResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "One-time deal id not fount", content = @Content),
     })
-    @GetMapping("/one-time/{id}")
+    @GetMapping("/one-time/{id}") // todo preAuth
+    @PreAuthorize("@authz.hasRoleInOrgByOneTimeDealId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<OneTimeDealResponseDto> getOneTimeById(@PathVariable Long id) {
         var dto = dealService.getOneTimeById(id);
         return ResponseEntity.ok(dto);
@@ -61,7 +64,7 @@ public class DealController {
             @ApiResponse(responseCode = "404", description = "One-time deal id not fount", content = @Content),
             @ApiResponse(responseCode = "404", description = "One-time visit id already used", content = @Content),
     })
-    @GetMapping("/use/{id}")
+    @GetMapping("/use/{id}") // todo if it`s deprecated - maybe delete it?
     public ResponseEntity<OneTimeDealResponseDto> useOneTimeById(@PathVariable Long id) {
         var dto = dealService.visitOneTimeById(id);
         return ResponseEntity.ok(dto);
@@ -90,6 +93,7 @@ public class DealController {
             @ApiResponse(responseCode = "404", description = "Client, Service or Event type id not fount", content = @Content),
     })
     @PostMapping("/subscription/{paymentMethod}")
+    @PreAuthorize("@authz.hasRoleInOrgByClientId(#dto.clientId(), T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<SubscriptionDealResponseDto> create(
             @RequestBody SubscriptionDealRequestDto dto,
             @PathVariable("paymentMethod") PaymentMethod paymentMethod) {
@@ -107,6 +111,7 @@ public class DealController {
             @ApiResponse(responseCode = "404", description = "Subscription deal id not fount", content = @Content),
     })
     @GetMapping("/subscription/{id}")
+    @PreAuthorize("@authz.hasRoleInOrgBySubscriptionDealId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<SubscriptionDealResponseDto> getSubscriptionById(@PathVariable Long id) {
         var dto = dealService.getSubscriptionById(id);
         return ResponseEntity.ok(dto);
@@ -121,7 +126,8 @@ public class DealController {
             @ApiResponse(responseCode = "404", description = "Subscription deal id not fount", content = @Content),
             @ApiResponse(responseCode = "404", description = "Subscription visit id already used", content = @Content),
     })
-    @GetMapping("/visit/{id}")
+    @GetMapping("/visit/{id}") // todo ендпоінт /visit/{id} змінює дані, але реалізований через GET, а не POST або PATCH. Це антипаттерн з точки зору REST
+    @PreAuthorize("@authz.hasRoleInOrgBySubscriptionDealId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<SubscriptionDealResponseDto> visitSubscriptionById(@PathVariable Long id) {
         var dto = dealService.subscriptionVisitById(id);
         return ResponseEntity.ok(dto);
@@ -136,6 +142,7 @@ public class DealController {
             @ApiResponse(responseCode = "404", description = "Subscription visit id already used", content = @Content),
     })
     @GetMapping("/visit/{id}/schedule/{scheduleId}")
+    @PreAuthorize("@authz.hasRoleBySubscriptionDealAndScheduleEventId(#id, #scheduleId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<SubscriptionDealResponseDto> visitSubscriptionById(
             @PathVariable("id") Long id,
             @PathVariable("scheduleId") Long scheduleId) {
@@ -150,7 +157,7 @@ public class DealController {
                             schema = @Schema(implementation = CheckDto.class))),
             @ApiResponse(responseCode = "404", description = "Check id not fount", content = @Content),
     })
-    @GetMapping("/check/{id}")
+    @GetMapping("/check/{id}") // todo не можу придумати як прикрутити preAuth
     public ResponseEntity<CheckDto> getCheckById(@PathVariable Long id) {
         var dto = dealService.getCheckById(id);
         return ResponseEntity.ok(dto);

@@ -13,6 +13,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.OneTimeOfferDTO;
 import ua.shpp.dto.SubscriptionOfferCreateDTO;
@@ -36,6 +37,7 @@ public class SubscriptionOfferController {
             @ApiResponse(responseCode = "404", description = "Service or Event type id not fount", content = @Content),
     })
     @PostMapping
+    @PreAuthorize("@authz.hasRoleInOrgByEventTypeId(#subscriptionOfferDTO.eventTypeId(), T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<SubscriptionOfferDTO> create(
             @RequestBody SubscriptionOfferCreateDTO subscriptionOfferDTO) {
         var offer = subscriptionOfferService.create(subscriptionOfferDTO);
@@ -51,7 +53,7 @@ public class SubscriptionOfferController {
                             schema = @Schema(implementation = OneTimeOfferDTO.class))),
             @ApiResponse(responseCode = "404", description = "Subscription offer id not fount", content = @Content),
     })
-    @GetMapping("/{id}")
+    @GetMapping("/{id}") // todo не можу придумати як preAuth
     public ResponseEntity<SubscriptionOfferDTO> getById(@PathVariable Long id) {
         var dto = subscriptionOfferService.getById(id);
         return ResponseEntity.ok(dto);
@@ -66,10 +68,12 @@ public class SubscriptionOfferController {
                                     schema = @Schema(implementation = SubscriptionOfferDTO.class)))),
     })
     @GetMapping
-    public ResponseEntity<Page<SubscriptionOfferDTO>> getAllByEventTypeId(@Parameter(
-                                                                                  description = "ID of the Event Type to filter offers",
-                                                                                  required = true) @RequestParam(defaultValue = "1") Long eventTypeId,
-                                                                          @ParameterObject() Pageable pageRequest) {
+    @PreAuthorize("@authz.hasRoleInOrgByEventTypeId(#eventTypeId, T(ua.shpp.model.OrgRole).ADMIN)")
+    public ResponseEntity<Page<SubscriptionOfferDTO>> getAllByEventTypeId(
+            @Parameter(description = "ID of the Event Type to filter offers", required = true)
+            @RequestParam(defaultValue = "1") Long eventTypeId,
+            @ParameterObject() Pageable pageRequest
+    ) {
         Page<SubscriptionOfferDTO> result = subscriptionOfferService
                 .getAllByEventTypeId(eventTypeId, pageRequest);
         return ResponseEntity.ok(result);
@@ -82,7 +86,7 @@ public class SubscriptionOfferController {
                             schema = @Schema(implementation = OneTimeOfferDTO.class))),
             @ApiResponse(responseCode = "404", description = "Subscription offer, Service, Event type id not fount", content = @Content),
     })
-    @PatchMapping
+    @PatchMapping// todo  preAuth
     public ResponseEntity<SubscriptionOfferDTO> update(
             @RequestBody SubscriptionOfferDTO subscriptionOfferDTO) {
         var service = subscriptionOfferService.update(subscriptionOfferDTO);
@@ -99,7 +103,7 @@ public class SubscriptionOfferController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Deleted successfully"),
     })
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}") // todo  preAuth
     public ResponseEntity<SubscriptionOfferDTO> delete(@PathVariable Long id) {
         subscriptionOfferService.delete(id);
         return ResponseEntity.noContent().build();

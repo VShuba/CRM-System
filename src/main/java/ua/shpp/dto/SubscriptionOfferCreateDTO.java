@@ -11,7 +11,7 @@ public record SubscriptionOfferCreateDTO(
         @Schema(description = "Offer name", example = "Complex 1")
         @Size(min = 3, max = 50, message = "The offer name must be 3-50 characters long")
         String name,
-        @Schema(description = "Event type id", example = "1", nullable = false)
+        @Schema(description = "Event type id", example = "1")
         Long eventTypeId,
         @Schema(description = "List of services id", example = "[1,2]")
         List<Long> activitiesId,
