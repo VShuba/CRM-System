@@ -56,6 +56,19 @@ public class DealService {
     }
 
     public SubscriptionDealResponseDto createSubscription(SubscriptionDealRequestDto dto, PaymentMethod paymentMethod) {
+
+        // todo може додати хоч якусь перевірку що clientId та subscriptionId відносятся до одної організації?
+        //  приклад нижче
+//        var client = clientRepository.findById(dto.clientId())
+//                .orElseThrow(() -> new IllegalArgumentException("Client not found"));
+//
+//        var offer = subscriptionOfferRepository.findById(dto.subscriptionId())
+//                .orElseThrow(() -> new IllegalArgumentException("Subscription offer not found"));
+//
+//        if (!client.getOrganizationId().equals(offer.getOrganizationId())) {
+//            throw new AccessDeniedException("Client and subscription offer belong to different organizations");
+//        }
+
         log.info("create() called with DTO: {} , payment method: {}", dto, paymentMethod);
         var entity = subscriptionDealMapper.toEntity(dto,
                 clientRepository,
@@ -65,10 +78,10 @@ public class DealService {
         log.info("Created check id:{} for for subscription deal", check.getId());
         log.debug("Created check entity for subscription deal {}", check);
         entity.setPaymentCheck(check);
-        entity = subscriptionDealRepository.save(entity);
+        entity = subscriptionDealRepository.save(entity); // todo ?????????????????????????
         log.info("Created subscription deal (id={})", entity.getId());
         log.debug("Created subscription deal entity: {}", entity);
-        entity = subscriptionDealRepository.save(entity);
+        entity = subscriptionDealRepository.save(entity); // todo ?????????????????????????
         log.info("Created subscription deal (id={})", entity.getId());
         log.debug("Created subscription deal entity: {}", entity);
 
@@ -153,7 +166,7 @@ public class DealService {
     }
 
     public SubscriptionDealResponseDto subscriptionVisitByIdAndScheduleEventId( // todo fix relation
-            Long subscriptionId, Long scheduleEventId) {
+                                                                                Long subscriptionId, Long scheduleEventId) {
         log.info("subscriptionVisitByIdAndScheduleEventId() called with subscription id: {}, schedule id: {}",
                 subscriptionId, scheduleEventId);
         var entity = getSubscriptionEntityById(subscriptionId);

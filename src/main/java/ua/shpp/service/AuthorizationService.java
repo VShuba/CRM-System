@@ -25,16 +25,9 @@ public class AuthorizationService {
     private final ClientRepository clientRepository;
     private final ScheduleEventRepository scheduleEventRepository;
     private final EventTypeRepository eventTypeRepository;
+    private final SubscriptionDealRepository subscriptionDealRepository;
+    private final OneTimeDealRepository oneTimeDealRepository;
 
-    /**
-     * Hot to use?
-     * ->>>
-     * public boolean yourMethodName(YourParams params) {
-     * return withSuperAdminCheck(() -> {
-     * // your implementation
-     * });
-     * }
-     */
     private boolean withSuperAdminCheck(BooleanSupplier check) {
         return isSuperAdmin() || check.getAsBoolean();
     }
@@ -102,6 +95,29 @@ public class AuthorizationService {
         return withSuperAdminCheck(() -> {
             Long branchId = eventTypeRepository.findBranchIdByEventTypeId(eventTypeId);
             return branchId != null && hasRoleInOrgByBranchId(branchId, expectedRole);
+        });
+    }
+
+    public boolean hasRoleInOrgBySubscriptionDealId(Long dealId, OrgRole expectedRole) {
+        return withSuperAdminCheck(() -> {
+            Long clientId = subscriptionDealRepository.findClientIdBySubscriptionDealId(dealId);
+            return clientId != null && hasRoleInOrgByClientId(clientId, expectedRole);
+        });
+    }
+
+    public boolean hasRoleInOrgByOneTimeDealId(Long dealId, OrgRole expectedRole) {
+        return withSuperAdminCheck(() -> {
+            Long clientId = oneTimeDealRepository.findClientIdByOneTimeDealId(dealId);
+            return clientId != null && hasRoleInOrgByClientId(clientId, expectedRole);
+        });
+    }
+
+    public boolean hasRoleBySubscriptionDealAndScheduleEventId(Long subscriptionDealId, Long scheduleEventId, OrgRole expectedRole) {
+        return withSuperAdminCheck(() -> {
+            Long clientId = subscriptionDealRepository.findClientIdBySubscriptionDealId(subscriptionDealId);
+            return clientId != null &&
+                    hasRoleInOrgByClientId(clientId, expectedRole) &&
+                    hasRoleByScheduleEventId(scheduleEventId, expectedRole);
         });
     }
 
