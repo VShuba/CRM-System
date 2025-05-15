@@ -80,7 +80,7 @@ public class OneTimeOfferController {
                             schema = @Schema(implementation = OneTimeOfferDTO.class))),
             @ApiResponse(responseCode = "404", description = "One-time offer, Service, Event type id not fount", content = @Content),
     })
-    @PatchMapping // TODO
+    @PatchMapping // todo preauth
     public ResponseEntity<OneTimeOfferDTO> update(
             @RequestBody OneTimeOfferDTO oneTimeOfferDTO) {
         var service = oneTimeOfferService.update(oneTimeOfferDTO);
@@ -98,7 +98,7 @@ public class OneTimeOfferController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Deleted successfully"),
     })
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}") // todo preauth
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         oneTimeOfferService.delete(id);
         return ResponseEntity.noContent().build();
