@@ -47,9 +47,10 @@ public class ScheduleEventService {
         return scheduleEventMapper.toDto(entity);
     }
 
-    public List<ScheduleEventDto> getAllBetweenDates(LocalDate startDate, LocalDate endDate) {
+    public List<ScheduleEventDto> getAllBetweenDates(Long orgId, LocalDate startDate, LocalDate endDate) {
         log.debug("getAllBetweenDates() called with from {} to {} dates", startDate, endDate);
-        var listEntity = scheduleEventRepository.findByEventDateBetween(startDate, endDate);
+        var listEntity = scheduleEventRepository
+                .findByOrganizationIdAndEventDateBetween(orgId, startDate, endDate);
         log.debug("dates between {} to {},\n events:\n {} ",
                 startDate, endDate, listEntity);
         log.info("dates between {} to {} have {} events",
@@ -58,6 +59,7 @@ public class ScheduleEventService {
     }
 
     public List<ScheduleEventDto> eventFilter(
+                                              Long orgId,
                                               Long roomId,
                                               Long employeeId,
                                               Long serviceId,
@@ -67,8 +69,8 @@ public class ScheduleEventService {
         log.debug("eventFilter() called with room id: {}, employee id: {}, service id:{}, event type id: {}, from {} to {} dates",
                 roomId, employeeId, serviceId, eventTypeId, startDate, endDate);
 
-        List<ScheduleEventEntity> list =  scheduleEventRepository.findFilteredByAll(roomId,
-                    employeeId, serviceId, eventTypeId, startDate, endDate);
+        List<ScheduleEventEntity> list =  scheduleEventRepository.findFilteredByAll(
+                orgId, roomId, employeeId, serviceId, eventTypeId, startDate, endDate);
         log.info("eventFilter() found {} events",list.size());
         log.debug("Found events: {}",list);
         return list.stream().map(scheduleEventMapper::toDto).toList();

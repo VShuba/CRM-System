@@ -67,8 +67,11 @@ public class ScheduleEventController {
                                     schema = @Schema(implementation = ScheduleEventDto.class)))),
             @ApiResponse(responseCode = "404", description = "Schedule event id not fount", content = @Content),
     })
-    @GetMapping("/from/{start}/to/{end}") // todo я не можу зробити PreAuthorize тому шо тут тянуться взагалі всі events. Незалежно від організації
+    @GetMapping("all/organisation/{id}/from/{start}/to/{end}")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<List<ScheduleEventDto>> getEventsFromTo(
+            @PathVariable
+            Long id,
             @Parameter(
                     description = "Start date (day-month-year, dd-MM-yyyy)",
                     example = "22-10-2025"
@@ -84,7 +87,7 @@ public class ScheduleEventController {
             @PathVariable
             @DateTimeFormat(pattern = "dd-MM-yyyy")
             LocalDate end) {
-        var dto = scheduleEventService.getAllBetweenDates(start, end);
+        var dto = scheduleEventService.getAllBetweenDates(id, start, end);
         return ResponseEntity.ok(dto);
     }
 
@@ -107,11 +110,11 @@ public class ScheduleEventController {
                             array = @ArraySchema(
                                     schema = @Schema(implementation = ScheduleEventDto.class)))),
     })
-    @GetMapping("filter/from/{start}/to/{end}")
-    // todo тут ніде немає фільтрації за organization_id, а service_id, room_id, employee_id - можуть належати різним організаціям.
-    // todo тому так само не можу прикрутити PreAuthorize
+    @GetMapping("all/organisation/{id}/filter/from/{start}/to/{end}")
+    @PreAuthorize("@authz.hasRoleInOrgByOrgId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<List<ScheduleEventDto>> eventFilter(
-
+            @PathVariable
+            Long id,
             @ModelAttribute ScheduleEventFilterDto dto,
             @Parameter(
                     description = "Start date (day-month-year, dd-MM-yyyy)",
@@ -129,7 +132,7 @@ public class ScheduleEventController {
             @DateTimeFormat(pattern = "dd-MM-yyyy")
             LocalDate end) {
         var list = scheduleEventService
-                .eventFilter(dto.roomId(), dto.employeeId(), dto.serviceId(), dto.eventTypeId(), start, end);
+                .eventFilter(id, dto.roomId(), dto.employeeId(), dto.serviceId(), dto.eventTypeId(), start, end);
         return ResponseEntity.ok(list);
     }
 }

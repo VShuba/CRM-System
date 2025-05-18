@@ -41,4 +41,8 @@ public class Organization {
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<InvitationEntity> invitationEntities = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScheduleEventEntity> scheduleEvent = new ArrayList<>();
 }

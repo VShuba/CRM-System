@@ -53,7 +53,8 @@ public class SubscriptionOfferController {
                             schema = @Schema(implementation = OneTimeOfferDTO.class))),
             @ApiResponse(responseCode = "404", description = "Subscription offer id not fount", content = @Content),
     })
-    @GetMapping("/{id}") // todo не можу придумати як preAuth
+    @GetMapping("/{id}")
+    @PreAuthorize("@authz.hasRoleSubscriptionOfferId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<SubscriptionOfferDTO> getById(@PathVariable Long id) {
         var dto = subscriptionOfferService.getById(id);
         return ResponseEntity.ok(dto);
@@ -86,7 +87,8 @@ public class SubscriptionOfferController {
                             schema = @Schema(implementation = OneTimeOfferDTO.class))),
             @ApiResponse(responseCode = "404", description = "Subscription offer, Service, Event type id not fount", content = @Content),
     })
-    @PatchMapping// todo  preAuth
+    @PatchMapping
+    @PreAuthorize("@authz.hasRoleSubscriptionOfferId(#subscriptionOfferDTO.id(), T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<SubscriptionOfferDTO> update(
             @RequestBody SubscriptionOfferDTO subscriptionOfferDTO) {
         var service = subscriptionOfferService.update(subscriptionOfferDTO);
@@ -103,7 +105,8 @@ public class SubscriptionOfferController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Deleted successfully"),
     })
-    @DeleteMapping("/{id}") // todo  preAuth
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@authz.hasRoleSubscriptionOfferId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<SubscriptionOfferDTO> delete(@PathVariable Long id) {
         subscriptionOfferService.delete(id);
         return ResponseEntity.noContent().build();

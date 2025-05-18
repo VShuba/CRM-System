@@ -25,6 +25,7 @@ public interface ScheduleEventMapper {
     @Mapping(target = "employee", source = "trainerId", qualifiedByName = "idToTrainer")
     @Mapping(target = "room", source = "roomId", qualifiedByName = "idToRoom")
     @Mapping(target = "eventType", source = "eventTypeId", qualifiedByName = "idToEventType")
+    @Mapping(target = "organization", source = "serviceId", qualifiedByName = "setOrganization")
     ScheduleEventEntity toEntity(ScheduleEventDto dto,
                                  @Context ServiceRepository serviceRepository,
                                  @Context EmployeeRepository employeeRepository,
@@ -38,6 +39,7 @@ public interface ScheduleEventMapper {
     @Mapping(target = "employee", source = "trainerId", qualifiedByName = "idToTrainer")
     @Mapping(target = "room", source = "roomId", qualifiedByName = "idToRoom")
     @Mapping(target = "eventType", source = "eventTypeId", qualifiedByName = "idToEventType")
+    @Mapping(target = "organization", source = "serviceId", qualifiedByName = "setOrganization")
     ScheduleEventEntity toEntity(ScheduleEventCreateDto dto,
                                  @Context ServiceRepository serviceRepository,
                                  @Context EmployeeRepository employeeRepository,
@@ -102,5 +104,14 @@ public interface ScheduleEventMapper {
             return null;
         }
         return entity.getId();
+    }
+
+    @Named("setOrganization")
+    default Organization setOrganization(Long id,
+                                      @Context ServiceRepository repository) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ServiceNotFoundException("Service not found: " + id))
+                .getBranch()
+                .getOrganization();
     }
 }

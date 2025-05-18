@@ -2,9 +2,11 @@ package ua.shpp.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.shpp.dto.*;
+import ua.shpp.entity.Organization;
 import ua.shpp.entity.payment.CheckEntity;
 import ua.shpp.entity.payment.Checkable;
 import ua.shpp.entity.payment.OneTimeDealEntity;
@@ -22,6 +24,7 @@ import ua.shpp.service.history.SubscriptionHistoryService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +48,7 @@ public class DealService {
                 clientRepository,
                 oneTimeOfferRepository,
                 checkRepository);
+        isClientAndOfferFromSameOrganization(entity);
         var check = createCheck(entity, paymentMethod);
         log.info("Created check id:{} for one-time deal", check.getId());
         log.debug("Created check entity for one-time deal {}", check);
@@ -56,32 +60,17 @@ public class DealService {
     }
 
     public SubscriptionDealResponseDto createSubscription(SubscriptionDealRequestDto dto, PaymentMethod paymentMethod) {
-
-        // todo може додати хоч якусь перевірку що clientId та subscriptionId відносятся до одної організації?
-        //  приклад нижче
-//        var client = clientRepository.findById(dto.clientId())
-//                .orElseThrow(() -> new IllegalArgumentException("Client not found"));
-//
-//        var offer = subscriptionOfferRepository.findById(dto.subscriptionId())
-//                .orElseThrow(() -> new IllegalArgumentException("Subscription offer not found"));
-//
-//        if (!client.getOrganizationId().equals(offer.getOrganizationId())) {
-//            throw new AccessDeniedException("Client and subscription offer belong to different organizations");
-//        }
-
         log.info("create() called with DTO: {} , payment method: {}", dto, paymentMethod);
         var entity = subscriptionDealMapper.toEntity(dto,
                 clientRepository,
                 subscriptionOfferRepository,
                 checkRepository);
+        isClientAndOfferFromSameOrganization(entity);
         var check = createCheck(entity, paymentMethod);
         log.info("Created check id:{} for for subscription deal", check.getId());
         log.debug("Created check entity for subscription deal {}", check);
         entity.setPaymentCheck(check);
-        entity = subscriptionDealRepository.save(entity); // todo ?????????????????????????
-        log.info("Created subscription deal (id={})", entity.getId());
-        log.debug("Created subscription deal entity: {}", entity);
-        entity = subscriptionDealRepository.save(entity); // todo ?????????????????????????
+        entity = subscriptionDealRepository.save(entity);
         log.info("Created subscription deal (id={})", entity.getId());
         log.debug("Created subscription deal entity: {}", entity);
 
@@ -109,20 +98,6 @@ public class DealService {
         return subscriptionDealMapper.toDto(entity);
     }
 
-    public OneTimeDealResponseDto visitOneTimeById(Long oneTimeId) {
-        log.info("visitOneTimeById() called with id: {}", oneTimeId);
-        var entity = getOneTimeEntityById(oneTimeId);
-        log.debug("Fetching one-time deal entity: {}", entity);
-        if (Boolean.TRUE.equals(entity.getVisitUsed())) {
-            throw new VisitAlreadyUsedException(String.format("One-time visit id: %d already used", oneTimeId));
-        }
-        entity.setVisitUsed(true);
-        entity = oneTimeDealRepository.save(entity);
-        log.info("OneTime with id: {}, visit: {}", oneTimeId, entity.getVisitUsed());
-        log.debug("Updated one-time deal entity: {}", entity);
-        return oneTimeDealMapper.toDto(entity);
-    }
-
     @Transactional
     public OneTimeDealResponseDto visitOneTimeByIdAndScheduleEventId(Long oneTimeId, Long scheduleEventId) {
         log.info("visitOneTimeByIdAndScheduleEventId() called with one-time id: {}, schedule id: {} ",
@@ -145,22 +120,7 @@ public class DealService {
         return oneTimeDealMapper.toDto(entity);
     }
 
-    public SubscriptionDealResponseDto subscriptionVisitById(Long id) {
-        log.info("subscriptionVisitById() called with id: {}", id);
-        var entity = getSubscriptionEntityById(id);
-        log.debug("Fetching subscription deal entity: {}", entity);
-        if (entity.getVisits() <= 0) {
-            throw new VisitAlreadyUsedException(String.format("Subscription visits id: %d already used", id));
-        }
-        Integer visits = entity.getVisits();
-        entity.setVisits(--visits);
-        entity = subscriptionDealRepository.save(entity);
-        log.info("Subscription with id: {}, visit: {}", id, entity.getVisits());
-        log.debug("Updated subscription deal entity: {}", entity);
-
-        return subscriptionDealMapper.toDto(entity);
-    }
-
+    @Transactional
     public SubscriptionDealResponseDto subscriptionVisitByIdAndScheduleEventId( // todo fix relation
                                                                                 Long subscriptionId, Long scheduleEventId) {
         log.info("subscriptionVisitByIdAndScheduleEventId() called with subscription id: {}, schedule id: {}",
@@ -199,19 +159,6 @@ public class DealService {
     private OneTimeDealEntity getOneTimeEntityById(Long id) {
         return oneTimeDealRepository.findById(id).orElseThrow(
                 () -> new DealNotFoundException(String.format("One-time visit id: %s, not found", id)));
-    }
-
-    public ValidVisitsDealDto validOneTimeVisitById(Long id) {
-        return new ValidVisitsDealDto(id,
-                getOneTimeEntityById(id).getVisitUsed(),
-                1);
-    }
-
-    public ValidVisitsDealDto validSubscriptionById(Long id) {
-        var entity = getSubscriptionEntityById(id);
-        return new ValidVisitsDealDto(id,
-                entity.getVisits() > 0,
-                entity.getVisits());
     }
 
     private SubscriptionDealEntity getSubscriptionEntityById(Long id) {
@@ -272,5 +219,42 @@ public class DealService {
                     .paymentMethod(paymentMethod)
                     .build();
         };
+    }
+
+    private <T extends Checkable> void isClientAndOfferFromSameOrganization(T entity) {
+        Organization clientOrganisation = null;
+        Organization offerOrganisation = null;
+
+        if (entity instanceof OneTimeDealEntity oneTimeDealEntity) {
+            clientOrganisation = oneTimeDealEntity
+                    .getClient()
+                    .getOrganization();
+            offerOrganisation = oneTimeDealEntity
+                    .getOneTimeService()
+                    .getActivity()
+                    .getBranch()
+                    .getOrganization();
+        } else if (entity instanceof SubscriptionDealEntity subscriptionDealEntity) {
+            clientOrganisation = subscriptionDealEntity
+                    .getClient()
+                    .getOrganization();
+            offerOrganisation = subscriptionDealEntity
+                    .getSubscriptionService()
+                    .getActivities().getFirst()
+                    .getBranch()
+                    .getOrganization();
+        }
+        if (Objects.nonNull(clientOrganisation)
+                && Objects.nonNull(offerOrganisation)
+                && !clientOrganisation.equals(offerOrganisation)) {
+            log.warn(String.format("""
+                            create() called with diferent odganisations id!
+                            Clien oganisation id: %d;
+                            Subscription offer organisation id: %d;
+                            """,
+                    clientOrganisation.getId(),
+                    offerOrganisation.getId()));
+            throw new AccessDeniedException("Client and subscription offer belong to different organizations");
+        }
     }
 }

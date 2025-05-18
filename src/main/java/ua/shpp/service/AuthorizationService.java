@@ -6,6 +6,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import ua.shpp.entity.OneTimeOfferEntity;
+import ua.shpp.entity.SubscriptionOfferEntity;
+import ua.shpp.entity.payment.CheckEntity;
+import ua.shpp.exception.CheckNotFoundException;
+import ua.shpp.exception.OfferNotFoundException;
 import ua.shpp.model.GlobalRole;
 import ua.shpp.model.OrgRole;
 import ua.shpp.repository.*;
@@ -27,6 +32,9 @@ public class AuthorizationService {
     private final EventTypeRepository eventTypeRepository;
     private final SubscriptionDealRepository subscriptionDealRepository;
     private final OneTimeDealRepository oneTimeDealRepository;
+    private final CheckRepository checkRepository;
+    private final OneTimeOfferRepository oneTimeOfferRepository;
+    private final SubscriptionOfferRepository subscriptionOfferRepository;
 
     private boolean withSuperAdminCheck(BooleanSupplier check) {
         return isSuperAdmin() || check.getAsBoolean();
@@ -119,6 +127,43 @@ public class AuthorizationService {
                     hasRoleInOrgByClientId(clientId, expectedRole) &&
                     hasRoleByScheduleEventId(scheduleEventId, expectedRole);
         });
+    }
+
+    public boolean hasRoleByCheckId(Long checkId, OrgRole expectedRole) {
+        return withSuperAdminCheck(() -> {
+            CheckEntity checkEntity = checkRepository.findById(checkId)
+                    .orElseThrow(() -> new CheckNotFoundException(
+                            String.format("Check id: %d, not found", checkId)));
+            Long orgId = checkEntity.getOneTimeInfo() != null
+                    ? checkEntity.getOneTimeInfo().getClient().getOrganization().getId()
+                    : checkEntity.getSubscriptionInfo().getClient().getOrganization().getId();
+            return orgId != null && hasRoleInOrgByOrgId(orgId, expectedRole);
+        });
+    }
+
+    public boolean hasRoleByOneTimeOfferId(Long offerId, OrgRole expectedRole) {
+        OneTimeOfferEntity offerEntity = oneTimeOfferRepository.findById(offerId)
+                .orElseThrow(() -> new OfferNotFoundException(
+                        String.format("Offer id: %d, not found", offerId)));
+        Long orgId = offerEntity
+                .getActivity()
+                .getBranch()
+                .getOrganization()
+                .getId();
+        return orgId != null && hasRoleInOrgByOrgId(orgId, expectedRole);
+    }
+
+    public boolean hasRoleSubscriptionOfferId(Long offerId, OrgRole expectedRole) {
+        SubscriptionOfferEntity offerEntity = subscriptionOfferRepository.findById(offerId)
+                .orElseThrow(() -> new OfferNotFoundException(
+                        String.format("Offer id: %d, not found", offerId)));
+        Long orgId = offerEntity
+                .getActivities()
+                .getFirst()
+                .getBranch()
+                .getOrganization()
+                .getId();
+        return orgId != null && hasRoleInOrgByOrgId(orgId, expectedRole);
     }
 
     private boolean isSuperAdmin() {

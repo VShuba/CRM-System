@@ -20,6 +20,11 @@ public class ScheduleEventEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "organization_id", nullable = false)
+    private Organization organization;
+
     //  Обрати приміщення
     //  Обрати працівника
     //  Обрати тип заходу
@@ -67,6 +72,4 @@ public class ScheduleEventEntity {
     )
     @JoinColumn(name = "event_type_id")
     private EventTypeEntity eventType;
-
-    //todo fix service what was added
 }

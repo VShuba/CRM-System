@@ -13,6 +13,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.shpp.dto.OneTimeOfferCreateDTO;
 import ua.shpp.dto.OneTimeOfferDTO;
@@ -36,6 +37,7 @@ public class OneTimeOfferController {
             @ApiResponse(responseCode = "404", description = "Service or Event type id not fount", content = @Content),
     })
     @PostMapping
+    @PreAuthorize("@authz.hasRoleByServiceId(#oneTimeOfferDTO.activityId(), T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<OneTimeOfferDTO> create(
             @RequestBody OneTimeOfferCreateDTO oneTimeOfferDTO) {
         var service = oneTimeOfferService.create(oneTimeOfferDTO);
@@ -52,6 +54,7 @@ public class OneTimeOfferController {
             @ApiResponse(responseCode = "404", description = "One-time offer id not fount", content = @Content),
     })
     @GetMapping("/{id}")
+    @PreAuthorize("@authz.hasRoleByOneTimeOfferId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<OneTimeOfferDTO> getById(@PathVariable Long id) {
         var dto = oneTimeOfferService.getById(id);
         return ResponseEntity.ok(dto);
@@ -65,6 +68,7 @@ public class OneTimeOfferController {
                                     schema = @Schema(implementation = OneTimeOfferDTO.class)))),
     })
     @GetMapping
+    @PreAuthorize("@authz.hasRoleInOrgByEventTypeId(#eventTypeId, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<Page<OneTimeOfferDTO>> getAllByEventTypeId(@Parameter(
                                                                              description = "ID of the Event Type to filter offers",
                                                                              required = true) @RequestParam(defaultValue = "1") Long eventTypeId,
@@ -80,7 +84,8 @@ public class OneTimeOfferController {
                             schema = @Schema(implementation = OneTimeOfferDTO.class))),
             @ApiResponse(responseCode = "404", description = "One-time offer, Service, Event type id not fount", content = @Content),
     })
-    @PatchMapping // todo preauth
+    @PatchMapping
+    @PreAuthorize("@authz.hasRoleByOneTimeOfferId(#oneTimeOfferDTO.id(), T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<OneTimeOfferDTO> update(
             @RequestBody OneTimeOfferDTO oneTimeOfferDTO) {
         var service = oneTimeOfferService.update(oneTimeOfferDTO);
@@ -92,13 +97,13 @@ public class OneTimeOfferController {
                 .body(service);
     }
 
-
     @Operation(summary = "Delete a one‑time offer by id",
             description = "Delete a one‑time offer by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Deleted successfully"),
     })
-    @DeleteMapping("/{id}") // todo preauth
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@authz.hasRoleByOneTimeOfferId(#id, T(ua.shpp.model.OrgRole).ADMIN)")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         oneTimeOfferService.delete(id);
         return ResponseEntity.noContent().build();
