@@ -6,8 +6,8 @@ stages:
 # Змінні, які використовуються у пайплайні
 variables:
   APP_NAME: crm-system.jar                                # Назва .jar файлу, який створюється і запускається
-  DEPLOY_DIR: /opt/practics                        # Каталог на сервері, куди копіюється .jar
-  SERVER: ec2-34-254-199-54.eu-west-1.compute.amazonaws.com  # IP-адреса або DNS-ім’я сервера
+  DEPLOY_DIR: /opt/crm-system                        # Каталог на сервері, куди копіюється .jar
+  SERVER: ec2-56-228-80-43.eu-north-1.compute.amazonaws.com  # IP-адреса або DNS-ім’я сервера
   SSH_USER: deployer                               # Ім’я користувача для підключення до сервера
 
 # Завдання для етапу build
@@ -30,7 +30,7 @@ deploy-job:
     - apt-get update -y                              #  Оновлення списку пакетів
     - apt-get install -y openssh-client              #  Встановлення SSH-клієнта
     - mkdir -p ~/.ssh                                #  Створюємо директорію для SSH-ключів
-    - cat "$DEPLOYER_RSA_PRIVATE_KEY" > ~/.ssh/id_rsa  #  Читаємо вміст файлу зі змінної (File тип) і записуємо у ~/.ssh/id_rsa
+    - cat "$CRM_DEPLOYER_RSA_PRIVATE_KEY" > ~/.ssh/id_rsa  #  Читаємо вміст файлу зі змінної (File тип) і записуємо у ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa                        #  Встановлюємо права доступу до ключа
     - echo -e "Host $SERVER\n  User $SSH_USER\n  IdentityFile ~/.ssh/id_rsa\n  StrictHostKeyChecking no" > ~/.ssh/config  # Додаємо налаштування для SSH
 
