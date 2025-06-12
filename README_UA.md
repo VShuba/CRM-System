@@ -22,30 +22,30 @@
 
 ## 🗂️ Структура проєкту
 
+```text
 src
 ├── main
-│ ├── java/ua.shpp
-│ │ ├── configuration # Налаштування Security, CORS, Swagger
-│ │ ├── constraints # Кастомні валідації
-│ │ ├── controller # REST-контролери: Branch, Organization, Auth
-│ │ ├── dto # DTO-шари
-│ │ ├── entity # JPA-сутності (Organization, Branch, User)
-│ │ ├── exception # Глобальний хендлінг винятків
-│ │ ├── mapper # Мапери DTO <=> Entity (MapStruct)
-│ │ ├── model # Фільтри запитів та обгортки
-│ │ ├── repository # Репозиторії Spring Data
-│ │ ├── security # Фільтри, токени, ролі
-│ │ ├── service # Бізнес-логіка
-│ │ └── util # Утилітарні класи
-│ ├── resources
-│ │ ├── application.properties
-│ │ ├── data.sql
-│ │ ├── logback-spring.xml
-│ │ └── import-sheet-template.tsv
-├── test # Юніт- та інтеграційні тести
-├── .gitlab-ci.yml # Налаштування CI/CD
-
----
+│   ├── java/ua.shpp
+│   │   ├── configuration          # Security, CORS, Swagger configs
+│   │   ├── constraints            # Custom validations
+│   │   ├── controller             # REST endpoints: Branch, Organization, Auth
+│   │   ├── dto                    # Clean DTO layer
+│   │   ├── entity                 # JPA entities (Organization, Branch, User)
+│   │   ├── exception              # Global exception handling
+│   │   ├── mapper                 # DTO <=> Entity mappers (MapStruct)
+│   │   ├── model                  # Request filters and wrappers
+│   │   ├── repository             # Spring Data repositories
+│   │   ├── security               # Auth filters, token logic, roles
+│   │   ├── service                # Business logic
+│   │   └── util                   # Utility classes
+│   ├── resources
+│   │   ├── application.properties
+│   │   ├── data.sql
+│   │   ├── logback-spring.xml
+│   │   └── import-sheet-template.tsv
+├── test                          # Unit and integration tests
+├── .gitlab-ci.yml                # CI/CD pipeline config
+```
 
 ## 🔐 Безпека
 
