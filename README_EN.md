@@ -23,30 +23,30 @@ It enables centralized control of organizations, branches, and users with role-b
 
 ## 🗂️ Project Structure
 
+```text
 src
 ├── main
-│ ├── java/ua.shpp
-│ │ ├── configuration # Security, CORS, Swagger configs
-│ │ ├── constraints # Custom validations
-│ │ ├── controller # REST endpoints: Branch, Organization, Auth
-│ │ ├── dto # Clean DTO layer
-│ │ ├── entity # JPA entities (Organization, Branch, User)
-│ │ ├── exception # Global exception handling
-│ │ ├── mapper # DTO <=> Entity mappers (MapStruct)
-│ │ ├── model # Request filters and wrappers
-│ │ ├── repository # Spring Data repositories
-│ │ ├── security # Auth filters, token logic, roles
-│ │ ├── service # Business logic
-│ │ └── util # Utility classes
-│ ├── resources
-│ │ ├── application.properties
-│ │ ├── data.sql
-│ │ ├── logback-spring.xml
-│ │ └── import-sheet-template.tsv
-├── test # Unit and integration tests
-├── .gitlab-ci.yml # CI/CD pipeline config
-
----
+│   ├── java/ua.shpp
+│   │   ├── configuration          # Security, CORS, Swagger configs
+│   │   ├── constraints            # Custom validations
+│   │   ├── controller             # REST endpoints: Branch, Organization, Auth
+│   │   ├── dto                    # Clean DTO layer
+│   │   ├── entity                 # JPA entities (Organization, Branch, User)
+│   │   ├── exception              # Global exception handling
+│   │   ├── mapper                 # DTO <=> Entity mappers (MapStruct)
+│   │   ├── model                  # Request filters and wrappers
+│   │   ├── repository             # Spring Data repositories
+│   │   ├── security               # Auth filters, token logic, roles
+│   │   ├── service                # Business logic
+│   │   └── util                   # Utility classes
+│   ├── resources
+│   │   ├── application.properties
+│   │   ├── data.sql
+│   │   ├── logback-spring.xml
+│   │   └── import-sheet-template.tsv
+├── test                          # Unit and integration tests
+├── .gitlab-ci.yml                # CI/CD pipeline config
+```
 
 ## 🔐 Security
 
